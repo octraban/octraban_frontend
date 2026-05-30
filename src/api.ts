@@ -38,8 +38,19 @@ export interface DecodedEvent {
   upgrade_info?: { type: "upgrade"; oldHash: string; newHash: string };
   // Issue #52: storage tier breakdown
   storage_tiers?: StorageTiers;
-  // Fee-Bump sponsorship wrapper
-  fee_bump?: FeeBumpInfo;
+  // Issue #74: clawback compliance flag
+  is_clawback?: boolean;
+}
+
+export interface SourceFile {
+  path: string;
+  content: string;
+}
+
+export interface MigrationStatus {
+  pending: boolean;
+  upgradedAtLedger: number | null;
+  migratedAtLedger: number | null;
 }
 
 export interface ContractMeta {
@@ -47,6 +58,17 @@ export interface ContractMeta {
   name: string;
   description: string;
   functions: { name: string; description: string }[];
+  source?: string;
+  source_file?: string;
+  source_files?: SourceFile[];
+}
+
+export interface BurnAlert {
+  contractId: string;
+  ledger: number;
+  burnedPct: number;
+  burnedAmount: string;
+  flaggedAt: number;
 }
 
 // Issue #38: paginated contract transaction response
@@ -74,6 +96,13 @@ export interface SimResult {
   error?: string;
 }
 
+export interface PrivilegedRole {
+  role: string;
+  address: string;
+  ledger: number | null;
+  updated_at: string;
+}
+
 export const api = {
   events: (params: { contract?: string; fn?: string; page?: number; type?: string }) => {
     const q = new URLSearchParams();
@@ -84,8 +113,10 @@ export const api = {
     return get<DecodedEvent[]>(`/events?${q}`);
   },
   event:    (seq: number)     => get<DecodedEvent>(`/events/${seq}`),
-  contract: (id: string)      => get<ContractMeta>(`/contracts/${id}`),
+  contract:        (id: string) => get<ContractMeta>(`/contracts/${id}`),
+  migrationStatus: (id: string) => get<MigrationStatus>(`/contracts/${id}/migration-status`),
   wallet:   (address: string) => get<DecodedEvent[]>(`/wallet/${address}`),
+  roles:    (id: string)      => get<PrivilegedRole[]>(`/contracts/${id}/roles`),
 
   downloadAbi: async (id: string) => {
     const res = await fetch(`${BASE}/contracts/${id}/abi`);
