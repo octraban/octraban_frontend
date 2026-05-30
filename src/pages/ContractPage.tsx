@@ -4,8 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../api";
 import EventTable from "../components/EventTable";
 import RustCodeViewer from "../components/RustCodeViewer";
+import MigrationBanner from "../components/MigrationBanner";
+import SourceFileTree from "../components/SourceFileTree";
 import SimulateButton from "../components/SimulateButton";
 import InvocationFlowChart, { type InvocationNode } from "../components/InvocationFlowChart";
+import PrivilegedRoles from "../components/PrivilegedRoles";
 
 // Demo source shown when no verified source is uploaded
 const DEMO_SOURCE = `// Verified source not yet uploaded for this contract.
@@ -42,7 +45,7 @@ const DEMO_TREE: InvocationNode = {
   ],
 };
 
-type Tab = "overview" | "source" | "simulate" | "flow";
+type Tab = "overview" | "source" | "simulate" | "flow" | "roles";
 
 export default function ContractPage() {
   const { id = "" } = useParams();
@@ -61,6 +64,12 @@ export default function ContractPage() {
     enabled: !!id,
   });
 
+  const { data: migrationStatus } = useQuery({
+    queryKey: ["migration-status", id],
+    queryFn: () => api.migrationStatus(id),
+    enabled: !!id,
+  });
+
   const downloadAbi = () => {
     api.downloadAbi(id).catch(err => console.error("Download ABI failed:", err));
   };
@@ -73,10 +82,16 @@ export default function ContractPage() {
     { key: "source",   label: "Source Code" },
     { key: "simulate", label: "Simulate" },
     { key: "flow",     label: "Invocation Flow" },
+    { key: "roles",    label: "Privileged Roles" },
   ];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Issue #84: SEP-49 migration pending banner */}
+      {migrationStatus?.pending && migrationStatus.upgradedAtLedger != null && (
+        <MigrationBanner upgradedAtLedger={migrationStatus.upgradedAtLedger} />
+      )}
+
       {/* Header */}
       <div className="card">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -144,12 +159,14 @@ export default function ContractPage() {
         </>
       )}
 
-      {/* Tab: Source Code — Issue #45 */}
+      {/* Tab: Source Code — Issues #45, #85 */}
       {tab === "source" && (
-        <RustCodeViewer
-          source={(meta as any).source ?? DEMO_SOURCE}
-          filename={(meta as any).source_file ?? `${id.slice(0, 8)}.rs`}
-        />
+        meta.source_files && meta.source_files.length > 0
+          ? <SourceFileTree files={meta.source_files} />
+          : <RustCodeViewer
+              source={meta.source ?? DEMO_SOURCE}
+              filename={meta.source_file ?? `${id.slice(0, 8)}.rs`}
+            />
       )}
 
       {/* Tab: Simulate — Issue #46 */}
@@ -181,6 +198,9 @@ export default function ContractPage() {
       {tab === "flow" && (
         <InvocationFlowChart root={(meta as any).invocation_tree ?? DEMO_TREE} />
       )}
+
+      {/* Tab: Privileged Roles */}
+      {tab === "roles" && <PrivilegedRoles contractId={id} />}
     </div>
   );
 }
