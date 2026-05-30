@@ -23,15 +23,29 @@ async function get<T>(path: string): Promise<T> {
   return res.json();
 }
 
+export interface SimResult {
+  success: boolean;
+  returnValue?: string;
+  cost?: { cpuInsns: string; memBytes: string };
+  error?: string;
+}
+
 export const api = {
-  events: (params: { contract?: string; fn?: string; page?: number }) => {
+  events: (params: { contract?: string; fn?: string; page?: number; type?: string }) => {
     const q = new URLSearchParams();
     if (params.contract) q.set("contract", params.contract);
     if (params.fn)       q.set("fn", params.fn);
     if (params.page)     q.set("page", String(params.page));
+    if (params.type)     q.set("type", params.type);
     return get<DecodedEvent[]>(`/events?${q}`);
   },
   event:    (seq: number)     => get<DecodedEvent>(`/events/${seq}`),
   contract: (id: string)      => get<ContractMeta>(`/contracts/${id}`),
   wallet:   (address: string) => get<DecodedEvent[]>(`/wallet/${address}`),
+  simulate: (contractId: string, fn: string, args: unknown[]) =>
+    fetch(`${BASE}/simulate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contractId, fn, args }),
+    }).then(r => r.json() as Promise<SimResult>),
 };
