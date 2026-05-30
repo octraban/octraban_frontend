@@ -40,6 +40,14 @@ export interface ContractMeta {
   functions: { name: string; description: string }[];
 }
 
+export interface BurnAlert {
+  contractId: string;
+  ledger: number;
+  burnedPct: number;
+  burnedAmount: string;
+  flaggedAt: number;
+}
+
 // Issue #38: paginated contract transaction response
 export interface ContractTransactionsResponse {
   data: DecodedEvent[];
@@ -77,7 +85,7 @@ export const api = {
   event:    (seq: number)     => get<DecodedEvent>(`/events/${seq}`),
   contract: (id: string)      => get<ContractMeta>(`/contracts/${id}`),
   wallet:   (address: string) => get<DecodedEvent[]>(`/wallet/${address}`),
-
+  burnAlerts: (contractId: string) => get<BurnAlert[]>(`/burn-alerts?contract=${contractId}`),
   downloadAbi: async (id: string) => {
     const res = await fetch(`${BASE}/contracts/${id}/abi`);
     if (!res.ok) throw new Error(`API ${res.status}: /contracts/${id}/abi`);

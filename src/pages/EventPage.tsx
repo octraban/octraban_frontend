@@ -3,6 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../api";
 import ResourceCosts from "../components/ResourceCosts";
 import StorageTierBreakdown from "../components/StorageTierBreakdown";
+import FiatValue from "../components/FiatValue";
+
+/** Parse amount and symbol from a transfer description. */
+function parseTransfer(description: string): { amount: number; symbol: string } | null {
+  const m = description.match(/transferred\s+([\d,.]+)\s+([A-Z]{2,10})/i);
+  if (!m) return null;
+  const amount = parseFloat(m[1].replace(/,/g, ""));
+  return isNaN(amount) ? null : { amount, symbol: m[2].toUpperCase() };
+}
 
 export default function EventPage() {
   const { seq = "0" } = useParams();
@@ -22,6 +31,12 @@ export default function EventPage() {
       <div className="card" style={{ display: "grid", gap: 12 }}>
         <Row label="Description" value={ev.description} highlight />
         <Row label="Function"    value={ev.function} badge />
+        {ev.function === "transfer" && (() => {
+          const t = parseTransfer(ev.description);
+          return t ? (
+            <Row label="Est. Value" value={<FiatValue amount={t.amount} symbol={t.symbol} />} />
+          ) : null;
+        })()}
         <Row label="Ledger"      value={ev.ledger.toLocaleString()} />
         <Row label="Contract"    value={<Link to={`/contract/${ev.contract_id}`}>{ev.contract_id}</Link>} />
         {ev.tx_hash && <Row label="Tx Hash" value={ev.tx_hash} mono />}
