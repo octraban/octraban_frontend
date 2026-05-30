@@ -18,15 +18,37 @@ export default function ContractPage() {
     enabled: !!id,
   });
 
+  const downloadAbi = () => {
+    api.downloadAbi(id).catch(err => console.error("Download ABI failed:", err));
+  };
+
   if (metaLoading) return <p style={{ color: "var(--muted)" }}>Loading…</p>;
   if (!meta) return <p>Contract not found.</p>;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div className="card">
-        <h2 style={{ marginBottom: 8 }}>{meta.name}</h2>
-        <p style={{ color: "var(--muted)", marginBottom: 12 }}>{meta.description}</p>
-        <code style={{ fontSize: 12, color: "var(--muted)", wordBreak: "break-all" }}>{id}</code>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <h2 style={{ marginBottom: 8 }}>{meta.name}</h2>
+            <p style={{ color: "var(--muted)", marginBottom: 12 }}>{meta.description}</p>
+            <code style={{ fontSize: 12, color: "var(--muted)", wordBreak: "break-all" }}>{id}</code>
+          </div>
+          <button
+            onClick={downloadAbi}
+            style={{
+              padding: "8px 16px",
+              background: "var(--accent)",
+              color: "#fff",
+              border: "none",
+              borderRadius: 4,
+              cursor: "pointer",
+              fontSize: 13,
+            }}
+          >
+            Download ABI
+          </button>
+        </div>
 
         {meta.functions.length > 0 && (
           <div style={{ marginTop: 16 }}>
