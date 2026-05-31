@@ -5,6 +5,7 @@ import ContractPage from "./pages/ContractPage";
 import WalletPage from "./pages/WalletPage";
 import EventPage from "./pages/EventPage";
 import XdrInspector from "./pages/XdrInspector";
+import DeveloperWorkspace from "./pages/DeveloperWorkspace";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/contract/:id" element={<ContractPage />} />
+          <Route path="/contract/:id/workspace" element={<DeveloperWorkspace />} />
           <Route path="/wallet/:address" element={<WalletPage />} />
           <Route path="/event/:seq" element={<EventPage />} />
           <Route path="/xdr" element={<XdrInspector />} />

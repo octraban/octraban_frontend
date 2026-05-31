@@ -103,6 +103,40 @@ export interface PrivilegedRole {
   updated_at: string;
 }
 
+// Issue #124: Network Comparison
+export interface NetworkStatus {
+  network: "mainnet" | "testnet" | "futurenet";
+  deployed: boolean;
+  wasmHash?: string;
+  balance?: string;
+  error?: string;
+}
+
+export interface NetworkComparisonResult {
+  contractId: string;
+  statuses: NetworkStatus[];
+  hasVersionMismatch: boolean;
+}
+
+// Issue #126: Address Connection Graph
+export interface GraphNode {
+  id: string;
+  label: string;
+  type: "contract" | "wallet";
+}
+
+export interface GraphEdge {
+  source: string;
+  target: string;
+  label?: string;
+  amount?: string;
+}
+
+export interface AddressGraphData {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+}
+
 export const api = {
   events: (params: { contract?: string; fn?: string; page?: number; type?: string }) => {
     const q = new URLSearchParams();
@@ -117,6 +151,8 @@ export const api = {
   migrationStatus: (id: string) => get<MigrationStatus>(`/contracts/${id}/migration-status`),
   wallet:   (address: string) => get<DecodedEvent[]>(`/wallet/${address}`),
   roles:    (id: string)      => get<PrivilegedRole[]>(`/contracts/${id}/roles`),
+  networkComparison: (id: string) => get<NetworkComparisonResult>(`/contracts/${id}/network-comparison`),
+  addressGraph:      (id: string) => get<AddressGraphData>(`/contracts/${id}/address-graph`),
 
   downloadAbi: async (id: string) => {
     const res = await fetch(`${BASE}/contracts/${id}/abi`);
