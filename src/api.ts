@@ -103,6 +103,44 @@ export interface PrivilegedRole {
   updated_at: string;
 }
 
+// ── Full contract spec (functions + custom types) ──────────────────────────
+
+export interface SpecField {
+  name: string;
+  type: string;
+}
+
+export interface SpecCase {
+  name: string;
+  /** Numeric discriminant for enum/error_enum variants */
+  value?: number;
+  /** Payload types for union tuple variants */
+  types?: string[];
+}
+
+export interface SpecType {
+  kind: "struct" | "enum" | "union" | "error_enum";
+  name: string;
+  doc?: string;
+  /** Present for struct */
+  fields?: SpecField[];
+  /** Present for enum, union, error_enum */
+  cases?: SpecCase[];
+}
+
+export interface SpecFunction {
+  kind: "function";
+  name: string;
+  doc?: string;
+  inputs: SpecField[];
+  outputs: string[];
+}
+
+export interface FullSpec {
+  functions: SpecFunction[];
+  types: SpecType[];
+}
+
 export const api = {
   events: (params: { contract?: string; fn?: string; page?: number; type?: string }) => {
     const q = new URLSearchParams();
@@ -117,6 +155,7 @@ export const api = {
   migrationStatus: (id: string) => get<MigrationStatus>(`/contracts/${id}/migration-status`),
   wallet:   (address: string) => get<DecodedEvent[]>(`/wallet/${address}`),
   roles:    (id: string)      => get<PrivilegedRole[]>(`/contracts/${id}/roles`),
+  specFull: (id: string)      => get<FullSpec>(`/spec/${id}/full`),
 
   downloadAbi: async (id: string) => {
     const res = await fetch(`${BASE}/contracts/${id}/abi`);
