@@ -12,6 +12,7 @@ import InvocationFlowChart, { type InvocationNode } from "../components/Invocati
 import PrivilegedRoles from "../components/PrivilegedRoles";
 import SdkSnippet from "../components/SdkSnippet";
 import CircuitBreakerStatus from "../components/CircuitBreakerStatus";
+import RwaMetadataDisplay from "../components/RwaMetadataDisplay";
 
 // Demo source shown when no verified source is uploaded
 const DEMO_SOURCE = `// Verified source not yet uploaded for this contract.
@@ -156,6 +157,9 @@ export default function ContractPage() {
 
       {/* Issue #86: Circuit breaker status banner */}
       <CircuitBreakerStatus contractId={id} />
+
+      {/* Issue #81: RWA metadata display */}
+      <RwaMetadataDisplay contractId={id} />
 
       {/* Header */}
       <div className="card">
