@@ -29,6 +29,22 @@ export interface FeeBumpInfo {
   actual_caller: string | null;
 }
 
+// Issue #164: CAP-0080 ZK host function types
+export interface ZkHostCall {
+  fn_name: string;
+  curve: "BN254" | "BLS12-381";
+  kind: "msm" | "pairing" | "scalar_field" | "map_to_curve" | "hash_to_curve" | "other";
+  cpu_native: number;
+  cpu_legacy: number;
+}
+
+export interface ZkCostDelta {
+  total_native: number;
+  total_legacy: number;
+  saved_cpu: number;
+  saved_pct: number;
+}
+
 export interface DecodedEvent {
   seq: number;
   contract_id: string;
@@ -131,6 +147,23 @@ export interface ContractTransactionsResponse {
   };
 }
 
+// Issue #142: contract dependency graph
+export interface GraphNode3D {
+  id: string;
+  callCount: number;
+}
+
+export interface GraphLink3D {
+  source: string;
+  target: string;
+  value: number;
+}
+
+export interface ContractGraphData {
+  nodes: GraphNode3D[];
+  links: GraphLink3D[];
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(BASE + path);
   if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
@@ -191,6 +224,14 @@ export interface TxStatusResponse {
   error?: string | null;
 }
 
+// Issue #165: Live TTL status for contract instance and code entries
+export interface ContractTTL {
+  contract_id: string;
+  current_ledger: number;
+  instance: { live_until_ledger: number | null };
+  code:     { live_until_ledger: number | null };
+}
+
 export interface CircuitBreakerStatus {
   has_circuit_breaker: boolean;
   is_paused: boolean;
@@ -212,6 +253,7 @@ export const api = {
     return get<DecodedEvent[]>(`/events?${q}`);
   },
   event:    (seq: number)     => get<DecodedEvent>(`/events/${seq}`),
+  zkCosts:  (seq: number)     => get<{ calls: ZkHostCall[]; delta: ZkCostDelta | null }>(`/events/${seq}/zk-costs`),
   contract:        (id: string) => get<ContractMeta>(`/contracts/${id}`),
   burnAlerts:      (contract: string) => get<BurnAlert[]>(`/burn-alerts?contract=${contract}`),
   migrationStatus: (id: string) => get<MigrationStatus>(`/contracts/${id}/migration-status`),
@@ -261,15 +303,15 @@ export const api = {
       body: JSON.stringify(body),
     }).then(r => { if (!r.ok) throw new Error(`API ${r.status}`); return r.json(); }),
 
+  // Issue #165: live TTL status (instance + code expiration ledgers)
+  contractTTL: (id: string) => get<ContractTTL>(`/contracts/${id}/ttl`),
+
   // Issue #140: state-diff timeline
   stateDiffs: (id: string, key?: string) => {
     const q = key ? `?key=${encodeURIComponent(key)}` : "";
     return get<StateDiff[]>(`/contracts/${id}/state-diffs${q}`);
   },
 
-  // Issue #167: archival eviction history for a contract
-  archivalEvictions: (id: string) =>
-    get<{ id: number; contract_id: string; ledger: number; tx_hash: string | null; key_type: string; key_label: string; durability: string | null; wasm_hash: string | null; created_at: string }[]>(
-      `/contracts/${id}/archival-evictions`
-    ),
+  // Issue #142: global contract dependency graph
+  contractGraph: (limit = 500) => get<ContractGraphData>(`/contract-graph?limit=${limit}`),
 };
