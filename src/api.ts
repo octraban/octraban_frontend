@@ -56,6 +56,8 @@ export interface DecodedEvent {
     min_extension: number | null;
     max_extension: number | null;
   };
+  // Issue #168: SAC implicit side-effect on the recipient address
+  sac_side_effect?: "account_created" | "trustline_opened";
 }
 
 export interface SourceFile {
