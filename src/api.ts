@@ -21,7 +21,7 @@ export interface StorageTiers {
 }
 
 export interface FeeBumpInfo {
-  /** Outer fee-paying account (the sponsor). */
+  /** Outer fee-bump feeSource — pays the network fee. */
   sponsor: string;
   /** Inner transaction source account (channel account — provides sequence number for parallel execution). */
   inner_source: string;
