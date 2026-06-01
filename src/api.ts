@@ -27,6 +27,22 @@ export interface FeeBumpInfo {
   inner_source: string;
 }
 
+// Issue #164: CAP-0080 ZK host function types
+export interface ZkHostCall {
+  fn_name: string;
+  curve: "BN254" | "BLS12-381";
+  kind: "msm" | "pairing" | "scalar_field" | "map_to_curve" | "hash_to_curve" | "other";
+  cpu_native: number;
+  cpu_legacy: number;
+}
+
+export interface ZkCostDelta {
+  total_native: number;
+  total_legacy: number;
+  saved_cpu: number;
+  saved_pct: number;
+}
+
 export interface DecodedEvent {
   seq: number;
   contract_id: string;
@@ -55,6 +71,11 @@ export interface DecodedEvent {
     extend_to: number | null;
     min_extension: number | null;
     max_extension: number | null;
+  };
+  // Issue #164: CAP-0080 ZK host function calls and cost delta
+  zk_host_calls?: {
+    calls: ZkHostCall[];
+    delta: ZkCostDelta;
   };
 }
 
@@ -194,6 +215,7 @@ export const api = {
     return get<DecodedEvent[]>(`/events?${q}`);
   },
   event:    (seq: number)     => get<DecodedEvent>(`/events/${seq}`),
+  zkCosts:  (seq: number)     => get<{ calls: ZkHostCall[]; delta: ZkCostDelta | null }>(`/events/${seq}/zk-costs`),
   contract:        (id: string) => get<ContractMeta>(`/contracts/${id}`),
   burnAlerts:      (contract: string) => get<BurnAlert[]>(`/burn-alerts?contract=${contract}`),
   migrationStatus: (id: string) => get<MigrationStatus>(`/contracts/${id}/migration-status`),
