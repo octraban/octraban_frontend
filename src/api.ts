@@ -60,6 +60,20 @@ export interface DecodedEvent {
   };
   // Issue #169: fee-bump chain of custody
   fee_bump?: FeeBumpInfo | null;
+  // Issue #167: state archival / restoration info (RestoreFootprintOp)
+  archival_info?: {
+    isRestoreOp: boolean;
+    revivedKeys: {
+      type: string;
+      label: string;
+      contractId?: string;
+      wasmHash?: string;
+      dataKey?: string;
+      durability?: string;
+    }[];
+    keyCount: number;
+    feePaid: number | null;
+  } | null;
 }
 
 export interface SourceFile {
@@ -252,4 +266,10 @@ export const api = {
     const q = key ? `?key=${encodeURIComponent(key)}` : "";
     return get<StateDiff[]>(`/contracts/${id}/state-diffs${q}`);
   },
+
+  // Issue #167: archival eviction history for a contract
+  archivalEvictions: (id: string) =>
+    get<{ id: number; contract_id: string; ledger: number; tx_hash: string | null; key_type: string; key_label: string; durability: string | null; wasm_hash: string | null; created_at: string }[]>(
+      `/contracts/${id}/archival-evictions`
+    ),
 };
