@@ -113,6 +113,23 @@ export interface ContractTransactionsResponse {
   };
 }
 
+// Issue #142: contract dependency graph
+export interface GraphNode3D {
+  id: string;
+  callCount: number;
+}
+
+export interface GraphLink3D {
+  source: string;
+  target: string;
+  value: number;
+}
+
+export interface ContractGraphData {
+  nodes: GraphNode3D[];
+  links: GraphLink3D[];
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(BASE + path);
   if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
@@ -248,4 +265,7 @@ export const api = {
     const q = key ? `?key=${encodeURIComponent(key)}` : "";
     return get<StateDiff[]>(`/contracts/${id}/state-diffs${q}`);
   },
+
+  // Issue #142: global contract dependency graph
+  contractGraph: (limit = 500) => get<ContractGraphData>(`/contract-graph?limit=${limit}`),
 };
