@@ -11,8 +11,12 @@ import SimulateButton from "../components/SimulateButton";
 import InvocationFlowChart, { type InvocationNode } from "../components/InvocationFlowChart";
 import PrivilegedRoles from "../components/PrivilegedRoles";
 import SdkSnippet from "../components/SdkSnippet";
-import SourceVerificationBadge from "../components/SourceVerificationBadge";
-import StateDiffTimeline from "../components/StateDiffTimeline";
+import AbiUploadZone from "../components/AbiUploadZone";
+import LocalAbiEventTable from "../components/LocalAbiEventTable";
+import NetworkComparison from "../components/NetworkComparison";
+import AddressConnectionGraph from "../components/AddressConnectionGraph";
+import WasmHashZone from "../components/WasmHashZone";
+import { useLocalAbi } from "../hooks/useLocalAbi";
 
 // Demo source shown when no verified source is uploaded
 const DEMO_SOURCE = `// Verified source not yet uploaded for this contract.
@@ -319,6 +323,23 @@ export default function ContractPage() {
               </div>
             </details>
           )}
+
+          {/* Issue #72: WASM binary hash calculator */}
+          <details
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 8,
+              padding: "10px 16px",
+            }}
+          >
+            <summary style={{ cursor: "pointer", fontSize: 13, color: "var(--muted)", userSelect: "none", listStyle: "none" }}>
+              ▶ Compute WASM deploy hash locally
+            </summary>
+            <div style={{ marginTop: 12 }}>
+              <WasmHashZone />
+            </div>
+          </details>
 
           {meta.functions.length > 0 && (
             <div className="card">

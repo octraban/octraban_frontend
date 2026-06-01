@@ -1,5 +1,12 @@
 const BASE = "/api";
 
+export interface SpecType {
+  kind: "struct" | "enum" | "union" | "error_enum";
+  name: string;
+  fields?: { name: string; type: string }[];
+  cases?: { name: string; value?: number; types?: string[] }[];
+}
+
 export interface StorageWrite {
   tier: "instance" | "persistent" | "temporary";
   contractId: string;
@@ -40,6 +47,8 @@ export interface DecodedEvent {
   storage_tiers?: StorageTiers;
   // Issue #74: clawback compliance flag
   is_clawback?: boolean;
+  // Issue #75: AMM swap path hops ["10 USDC", "9.1 EURC", "5.2 XLM"]
+  swap_path?: string[];
 }
 
 export interface SourceFile {
