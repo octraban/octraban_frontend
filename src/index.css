@@ -55,7 +55,7 @@ button:hover { opacity: 0.85; }
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 16px;
+  padding: 17px;
   transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
 }
 
