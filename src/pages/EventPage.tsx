@@ -8,6 +8,7 @@ import GasLimitAlert from "../components/GasLimitAlert";
 import FeeSponsorBanner from "../components/FeeSponsorBanner";
 import RestoreFootprintPanel from "../components/RestoreFootprintPanel";
 import HeuristicParams from "../components/HeuristicParams";
+import ZkCostDelta from "../components/ZkCostDelta";
 
 /** Parse amount and symbol from a transfer description. */
 function parseTransfer(description: string): { amount: number; symbol: string } | null {
