@@ -111,6 +111,8 @@ export interface DecodedEvent {
     keyCount: number;
     feePaid: number | null;
   } | null;
+  // Issue #191: CAP-0080 ZK host function telemetry (Protocol 26)
+  zk_host_calls?: { calls: ZkHostCall[]; delta: ZkCostDelta | null };
   // Heuristic fallback params: present when no ABI is registered
   heuristic_params?: HeuristicParam[];
 }
