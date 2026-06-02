@@ -58,6 +58,14 @@ export interface ZkCostDelta {
   saved_pct: number;
 }
 
+export interface HeuristicParam {
+  index: number;
+  raw: string;
+  type: "Address" | "ContractId" | "Amount" | "Hash" | "Symbol" | "Boolean" | "Unknown";
+  value: string;
+  confidence: "likely" | "possible";
+}
+
 export interface DecodedEvent {
   seq: number;
   contract_id: string;
@@ -103,6 +111,8 @@ export interface DecodedEvent {
     keyCount: number;
     feePaid: number | null;
   } | null;
+  // Heuristic fallback params: present when no ABI is registered
+  heuristic_params?: HeuristicParam[];
 }
 
 export interface SourceFile {

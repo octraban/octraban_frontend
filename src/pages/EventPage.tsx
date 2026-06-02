@@ -7,6 +7,7 @@ import FiatValue from "../components/FiatValue";
 import GasLimitAlert from "../components/GasLimitAlert";
 import FeeSponsorBanner from "../components/FeeSponsorBanner";
 import RestoreFootprintPanel from "../components/RestoreFootprintPanel";
+import HeuristicParams from "../components/HeuristicParams";
 
 /** Parse amount and symbol from a transfer description. */
 function parseTransfer(description: string): { amount: number; symbol: string } | null {
@@ -82,6 +83,9 @@ export default function EventPage() {
           <Row label="Topics" value={ev.raw_topics.join(", ")} mono />
         )}
       </div>
+
+      {/* Heuristic parameter guesses when no ABI is registered */}
+      {ev.heuristic_params && <HeuristicParams params={ev.heuristic_params} />}
 
       {/* Fee-Bump sponsorship banner */}
       {ev.fee_bump && <FeeSponsorBanner feeBump={ev.fee_bump} />}
