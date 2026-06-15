@@ -8,6 +8,7 @@ import XdrInspector from "./pages/XdrInspector";
 import RpcMetricsDashboard from "./pages/RpcMetricsDashboard";
 import GraphPage from "./pages/GraphPage";
 import SandboxPage from "./pages/SandboxPage";
+import DeveloperWorkspace from "./pages/DeveloperWorkspace";
 
 export default function App() {
   return (
