@@ -231,6 +231,7 @@ export default function ContractPage() {
             </div>
           </div>
         )}
+      </div>
 
       {/* Tab bar */}
       <div style={{ display: "flex", gap: 4, borderBottom: "1px solid var(--border)", paddingBottom: 0 }}>
