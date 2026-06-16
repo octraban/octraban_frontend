@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Nav from "./components/Nav";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Home from "./pages/Home";
 import ContractPage from "./pages/ContractPage";
 import WalletPage from "./pages/WalletPage";
@@ -12,7 +13,7 @@ import DeveloperWorkspace from "./pages/DeveloperWorkspace";
 
 export default function App() {
   return (
-    <>
+    <ErrorBoundary>
       <Nav />
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 16px" }}>
         <Routes>
@@ -27,6 +28,6 @@ export default function App() {
           <Route path="/sandbox" element={<SandboxPage />} />
         </Routes>
       </main>
-    </>
+    </ErrorBoundary>
   );
 }
