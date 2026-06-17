@@ -1,6 +1,6 @@
-import React from 'react';
-import { listTemplates } from '../services/templates';
-import '../styles/TemplateSelector.css';
+import React from "react";
+import { listTemplates } from "../services/templates";
+import "../styles/TemplateSelector.css";
 
 interface TemplateSelectorProps {
   onSelect: (templateId: string) => void;

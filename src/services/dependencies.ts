@@ -4,7 +4,7 @@ export interface PackageNode {
   dependencies?: Record<string, string>;
   vulnerabilities?: Array<{
     id: string;
-    severity: 'critical' | 'high' | 'medium' | 'low';
+    severity: "critical" | "high" | "medium" | "low";
     title: string;
   }>;
 }
@@ -28,27 +28,27 @@ export function parseDependencies(packageJson: string): Record<string, string> {
 
 // Mock vulnerability database (in production, would query a real DB)
 const KNOWN_VULNERABILITIES: Record<string, any[]> = {
-  'lodash': [
+  lodash: [
     {
-      id: 'npm-lodash-1',
-      severity: 'high',
-      title: 'Prototype Pollution in defaultsDeep',
-      versions: '<4.17.21',
+      id: "npm-lodash-1",
+      severity: "high",
+      title: "Prototype Pollution in defaultsDeep",
+      versions: "<4.17.21",
     },
   ],
-  'express': [
+  express: [
     {
-      id: 'npm-express-1',
-      severity: 'medium',
-      title: 'Open Redirect vulnerability',
-      versions: '<4.19.0',
+      id: "npm-express-1",
+      severity: "medium",
+      title: "Open Redirect vulnerability",
+      versions: "<4.19.0",
     },
   ],
 };
 
 export async function fetchVulnerabilities(
   packageName: string,
-  version: string
+  version: string,
 ): Promise<Array<{ id: string; severity: string; title: string }>> {
   // In production, call a real API like npm audit, Snyk, or safety-db
   const vulnerabilities = KNOWN_VULNERABILITIES[packageName] || [];
@@ -56,7 +56,10 @@ export async function fetchVulnerabilities(
   return vulnerabilities
     .filter((vuln) => {
       // Simple version comparison (in production, use semver)
-      return version.replace(/^[^0-9]/, '') < (vuln.versions.replace(/^</, '') || '999.999.999');
+      return (
+        version.replace(/^[^0-9]/, "") <
+        (vuln.versions.replace(/^</, "") || "999.999.999")
+      );
     })
     .map((vuln) => ({
       id: vuln.id,
@@ -66,7 +69,7 @@ export async function fetchVulnerabilities(
 }
 
 export async function buildDependencyTree(
-  dependencies: Record<string, string>
+  dependencies: Record<string, string>,
 ): Promise<DependencyTree> {
   const tree: DependencyTree = {};
 
@@ -76,22 +79,31 @@ export async function buildDependencyTree(
     tree[name] = {
       name,
       version,
-      vulnerabilities: vulnerabilities.length > 0 ? (vulnerabilities as Array<{ id: string; severity: "medium" | "critical" | "high" | "low"; title: string }>) : undefined,
+      vulnerabilities:
+        vulnerabilities.length > 0
+          ? (vulnerabilities as Array<{
+              id: string;
+              severity: "medium" | "critical" | "high" | "low";
+              title: string;
+            }>)
+          : undefined,
     };
   }
 
   return tree;
 }
 
-export function calculateBundleSize(dependencies: Record<string, string>): string {
+export function calculateBundleSize(
+  dependencies: Record<string, string>,
+): string {
   // Rough estimation based on common package sizes
   const sizes: Record<string, number> = {
-    'react': 42,
-    'vue': 33,
-    'angular': 80,
-    'lodash': 71,
-    'moment': 64,
-    '@stellar/stellar-sdk': 250,
+    react: 42,
+    vue: 33,
+    angular: 80,
+    lodash: 71,
+    moment: 64,
+    "@stellar/stellar-sdk": 250,
   };
 
   let total = 0;

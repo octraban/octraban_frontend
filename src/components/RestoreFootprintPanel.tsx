@@ -22,10 +22,10 @@ interface Props {
 
 const TYPE_COLORS: Record<string, string> = {
   contractInstance: "#6366f1",
-  contractData:     "#0ea5e9",
-  contractCode:     "#8b5cf6",
-  account:          "#10b981",
-  trustline:        "#f59e0b",
+  contractData: "#0ea5e9",
+  contractCode: "#8b5cf6",
+  account: "#10b981",
+  trustline: "#f59e0b",
 };
 
 export default function RestoreFootprintPanel({ restore }: Props) {
@@ -37,7 +37,14 @@ export default function RestoreFootprintPanel({ restore }: Props) {
       style={{ borderLeft: "4px solid #6366f1", padding: "12px 16px" }}
       aria-label="State Restoration Operation"
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 12,
+        }}
+      >
         <span
           style={{
             background: "#6366f1",
@@ -52,11 +59,15 @@ export default function RestoreFootprintPanel({ restore }: Props) {
           State Restoration (RestoreFootprintOp)
         </span>
         <span style={{ color: "var(--muted)", fontSize: 13 }}>
-          {restore.keyCount} ledger key{restore.keyCount !== 1 ? "s" : ""} revived from archive
+          {restore.keyCount} ledger key{restore.keyCount !== 1 ? "s" : ""}{" "}
+          revived from archive
         </span>
         {restore.feePaid != null && (
-          <span style={{ marginLeft: "auto", color: "var(--muted)", fontSize: 12 }}>
-            Fee paid: <strong>{restore.feePaid.toLocaleString()} stroops</strong>
+          <span
+            style={{ marginLeft: "auto", color: "var(--muted)", fontSize: 12 }}
+          >
+            Fee paid:{" "}
+            <strong>{restore.feePaid.toLocaleString()} stroops</strong>
           </span>
         )}
       </div>
@@ -91,11 +102,23 @@ export default function RestoreFootprintPanel({ restore }: Props) {
               >
                 {key.type}
               </span>
-              <span style={{ fontFamily: "monospace", color: "var(--text)", wordBreak: "break-all" }}>
+              <span
+                style={{
+                  fontFamily: "monospace",
+                  color: "var(--text)",
+                  wordBreak: "break-all",
+                }}
+              >
                 {key.label}
               </span>
               {key.durability && (
-                <span style={{ marginLeft: "auto", color: "var(--muted)", fontSize: 11 }}>
+                <span
+                  style={{
+                    marginLeft: "auto",
+                    color: "var(--muted)",
+                    fontSize: 11,
+                  }}
+                >
                   {key.durability}
                 </span>
               )}

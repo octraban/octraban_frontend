@@ -1,9 +1,9 @@
-import JSZip from 'jszip';
-import { SandboxFile } from './webcontainer';
+import JSZip from "jszip";
+import { SandboxFile } from "./webcontainer";
 
 export async function exportAsZip(
   files: Map<string, SandboxFile>,
-  _projectName: string = 'soroban-sandbox'
+  _projectName: string = "soroban-sandbox",
 ): Promise<Blob> {
   const zip = new JSZip();
 
@@ -11,12 +11,12 @@ export async function exportAsZip(
     zip.file(file.path, file.content);
   }
 
-  return zip.generateAsync({ type: 'blob' });
+  return zip.generateAsync({ type: "blob" });
 }
 
 export function downloadZip(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
   link.download = filename;
   document.body.appendChild(link);
@@ -26,7 +26,10 @@ export function downloadZip(blob: Blob, filename: string): void {
 }
 
 export function generateSandboxId(): string {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
 }
 
 export function createShareableUrl(sandboxId: string): string {
@@ -37,7 +40,7 @@ export function createShareableUrl(sandboxId: string): string {
 export function copySandboxUrl(sandboxId: string): void {
   const url = createShareableUrl(sandboxId);
   navigator.clipboard.writeText(url).then(() => {
-    console.log('Sandbox URL copied to clipboard:', url);
+    console.log("Sandbox URL copied to clipboard:", url);
   });
 }
 

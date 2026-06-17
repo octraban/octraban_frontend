@@ -1,4 +1,4 @@
-import { WebContainer } from '@webcontainer/api';
+import { WebContainer } from "@webcontainer/api";
 
 export interface SandboxFile {
   path: string;
@@ -14,9 +14,9 @@ export interface FileSystemTree {
 }
 
 export const NODE_SDK_TEMPLATE: Record<string, SandboxFile> = {
-  'src/index.js': {
-    path: 'src/index.js',
-    language: 'javascript',
+  "src/index.js": {
+    path: "src/index.js",
+    language: "javascript",
     content: `import { SorobanExplorer } from 'soroban-explorer-sdk';
 import dotenv from 'dotenv';
 
@@ -47,9 +47,9 @@ console.log('Listening for events...');
 await explorer.start();
 `,
   },
-  'package.json': {
-    path: 'package.json',
-    language: 'json',
+  "package.json": {
+    path: "package.json",
+    language: "json",
     content: `{
   "name": "soroban-explorer-demo",
   "version": "1.0.0",
@@ -65,9 +65,9 @@ await explorer.start();
 }
 `,
   },
-  '.env': {
-    path: '.env',
-    language: 'plaintext',
+  ".env": {
+    path: ".env",
+    language: "plaintext",
     content: `SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
 EXPLORER_CONTRACT_ID=CABCD1234567890ABCD1234567890ABCD1234567890ABCD1234567890ABC
 `,
@@ -77,22 +77,22 @@ EXPLORER_CONTRACT_ID=CABCD1234567890ABCD1234567890ABCD1234567890ABCD1234567890AB
 export async function initWebContainer(): Promise<WebContainer> {
   try {
     const container = await WebContainer.boot();
-    console.log('WebContainer initialized');
+    console.log("WebContainer initialized");
     return container;
   } catch (error) {
-    console.error('Failed to initialize WebContainer:', error);
+    console.error("Failed to initialize WebContainer:", error);
     throw error;
   }
 }
 
 export async function mountFiles(
   container: WebContainer,
-  files: Map<string, SandboxFile>
+  files: Map<string, SandboxFile>,
 ): Promise<void> {
   const tree: FileSystemTree = {};
 
   for (const [, file] of files) {
-    const parts = file.path.split('/').filter(Boolean);
+    const parts = file.path.split("/").filter(Boolean);
     let current = tree;
 
     for (let i = 0; i < parts.length - 1; i++) {
@@ -113,9 +113,9 @@ export async function mountFiles(
 export async function runCommand(
   container: WebContainer,
   command: string,
-  onOutput: (line: string) => void
+  onOutput: (line: string) => void,
 ): Promise<number> {
-  const [cmd, ...args] = command.split(' ');
+  const [cmd, ...args] = command.split(" ");
   const process = await container.spawn(cmd, args);
 
   let exitCode = 0;
@@ -125,7 +125,7 @@ export async function runCommand(
       write(chunk) {
         onOutput(chunk);
       },
-    })
+    }),
   );
 
   exitCode = await process.exit;

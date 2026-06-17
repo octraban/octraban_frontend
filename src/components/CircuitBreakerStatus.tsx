@@ -5,7 +5,9 @@ interface CircuitBreakerStatusProps {
   contractId: string;
 }
 
-export default function CircuitBreakerStatus({ contractId }: CircuitBreakerStatusProps) {
+export default function CircuitBreakerStatus({
+  contractId,
+}: CircuitBreakerStatusProps) {
   const { data: status, isLoading } = useQuery({
     queryKey: ["circuit-breaker", contractId],
     queryFn: () => api.circuitBreakerStatus(contractId),
@@ -14,9 +16,7 @@ export default function CircuitBreakerStatus({ contractId }: CircuitBreakerStatu
 
   if (isLoading) {
     return (
-      <div style={{ color: "var(--muted)", fontSize: 13 }}>
-        Loading status…
-      </div>
+      <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading status…</div>
     );
   }
 
@@ -25,11 +25,15 @@ export default function CircuitBreakerStatus({ contractId }: CircuitBreakerStatu
   }
 
   const isPaused = status.is_paused;
-  const bgColor = isPaused ? "rgba(239, 68, 68, 0.1)" : "rgba(34, 197, 94, 0.1)";
+  const bgColor = isPaused
+    ? "rgba(239, 68, 68, 0.1)"
+    : "rgba(34, 197, 94, 0.1)";
   const borderColor = isPaused ? "#ef4444" : "#22c55e";
   const textColor = isPaused ? "#dc2626" : "#16a34a";
   const icon = isPaused ? "⛔" : "✓";
-  const statusText = isPaused ? "Status: Paused by Emergency Administration" : "Status: Operational";
+  const statusText = isPaused
+    ? "Status: Paused by Emergency Administration"
+    : "Status: Operational";
 
   return (
     <div

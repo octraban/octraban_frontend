@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   parseDependencies,
   buildDependencyTree,
   calculateBundleSize,
-} from '../services/dependencies';
-import '../styles/DependencyVisualizer.css';
+} from "../services/dependencies";
+import "../styles/DependencyVisualizer.css";
 
 interface DependencyVisualizerProps {
   packageJsonContent: string;
@@ -16,7 +16,7 @@ const DependencyVisualizer: React.FC<DependencyVisualizerProps> = ({
   isVisible,
 }) => {
   const [deps, setDeps] = useState<Record<string, any>>({});
-  const [bundleSize, setBundleSize] = useState('0 KB');
+  const [bundleSize, setBundleSize] = useState("0 KB");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const DependencyVisualizer: React.FC<DependencyVisualizerProps> = ({
         setDeps(tree);
         setBundleSize(size);
       } catch (error) {
-        console.error('Failed to analyze dependencies:', error);
+        console.error("Failed to analyze dependencies:", error);
       } finally {
         setLoading(false);
       }
@@ -44,11 +44,11 @@ const DependencyVisualizer: React.FC<DependencyVisualizerProps> = ({
   if (!isVisible) return null;
 
   const criticalVulns = Object.values(deps).filter((d: any) =>
-    d.vulnerabilities?.some((v: any) => v.severity === 'critical')
+    d.vulnerabilities?.some((v: any) => v.severity === "critical"),
   );
 
   const highVulns = Object.values(deps).filter((d: any) =>
-    d.vulnerabilities?.some((v: any) => v.severity === 'high')
+    d.vulnerabilities?.some((v: any) => v.severity === "high"),
   );
 
   return (
@@ -71,7 +71,7 @@ const DependencyVisualizer: React.FC<DependencyVisualizerProps> = ({
               {dep.vulnerabilities?.length > 0 && (
                 <span
                   className={`vuln-badge ${
-                    dep.vulnerabilities[0]?.severity || 'info'
+                    dep.vulnerabilities[0]?.severity || "info"
                   }`}
                 >
                   ⚠

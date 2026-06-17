@@ -4,12 +4,12 @@
  */
 
 const COINGECKO_IDS: Record<string, string> = {
-  XLM:   "stellar",
-  USDC:  "usd-coin",
-  USDT:  "tether",
+  XLM: "stellar",
+  USDC: "usd-coin",
+  USDT: "tether",
   PYUSD: "paypal-usd",
-  BTC:   "bitcoin",
-  ETH:   "ethereum",
+  BTC: "bitcoin",
+  ETH: "ethereum",
 };
 
 // Simple in-memory cache: symbol → { usd, fetchedAt }
@@ -26,7 +26,7 @@ export async function getUsdRate(symbol: string): Promise<number | null> {
 
   try {
     const res = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`,
     );
     if (!res.ok) return null;
     const json = await res.json();
@@ -43,7 +43,10 @@ export async function getUsdRate(symbol: string): Promise<number | null> {
  * Format a fiat value as "~$XX.XX USD".
  * Returns null if the rate is unavailable.
  */
-export async function fiatLabel(amount: number, symbol: string): Promise<string | null> {
+export async function fiatLabel(
+  amount: number,
+  symbol: string,
+): Promise<string | null> {
   const rate = await getUsdRate(symbol);
   if (rate === null) return null;
   const value = amount * rate;

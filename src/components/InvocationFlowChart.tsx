@@ -17,13 +17,16 @@ function short(id: string) {
 
 const NODE_W = 180;
 const NODE_H = 52;
-const H_GAP = 40;  // horizontal gap between levels
-const V_GAP = 16;  // vertical gap between siblings
+const H_GAP = 40; // horizontal gap between levels
+const V_GAP = 16; // vertical gap between siblings
 
 // Measure total height needed for a subtree
 function treeHeight(node: InvocationNode): number {
   if (!node.children?.length) return NODE_H;
-  const childrenH = node.children.reduce((s, c) => s + treeHeight(c) + V_GAP, -V_GAP);
+  const childrenH = node.children.reduce(
+    (s, c) => s + treeHeight(c) + V_GAP,
+    -V_GAP,
+  );
   return Math.max(NODE_H, childrenH);
 }
 
@@ -40,7 +43,7 @@ function layout(node: InvocationNode, x: number, y: number): Positioned {
 
   const childX = x + NODE_W + H_GAP;
   let cursor = y;
-  const children: Positioned[] = kids.map(child => {
+  const children: Positioned[] = kids.map((child) => {
     const h = treeHeight(child);
     const childY = cursor + (h - NODE_H) / 2;
     cursor += h + V_GAP;
@@ -55,7 +58,9 @@ function layout(node: InvocationNode, x: number, y: number): Positioned {
   return { node, x, y: centredY, children };
 }
 
-function collectEdges(p: Positioned): { x1: number; y1: number; x2: number; y2: number }[] {
+function collectEdges(
+  p: Positioned,
+): { x1: number; y1: number; x2: number; y2: number }[] {
   const edges: { x1: number; y1: number; x2: number; y2: number }[] = [];
   for (const child of p.children) {
     edges.push({
@@ -77,15 +82,18 @@ function NodeBox({ p }: { p: Positioned }) {
   return (
     <g>
       <rect
-        x={p.x} y={p.y}
-        width={NODE_W} height={NODE_H}
+        x={p.x}
+        y={p.y}
+        width={NODE_W}
+        height={NODE_H}
         rx={6}
         fill="var(--surface)"
         stroke="var(--accent)"
         strokeWidth={1.5}
       />
       <text
-        x={p.x + NODE_W / 2} y={p.y + 18}
+        x={p.x + NODE_W / 2}
+        y={p.y + 18}
         textAnchor="middle"
         fill="var(--accent)"
         fontSize={11}
@@ -94,7 +102,8 @@ function NodeBox({ p }: { p: Positioned }) {
         {short(p.node.contract)}
       </text>
       <text
-        x={p.x + NODE_W / 2} y={p.y + 36}
+        x={p.x + NODE_W / 2}
+        y={p.y + 36}
         textAnchor="middle"
         fill="var(--text)"
         fontSize={12}
@@ -113,9 +122,9 @@ export default function InvocationFlowChart({ root }: Props) {
   const edges = collectEdges(tree);
 
   // Compute bounding box
-  const maxX = Math.max(...nodes.map(n => n.x + NODE_W));
-  const minY = Math.min(...nodes.map(n => n.y));
-  const maxY = Math.max(...nodes.map(n => n.y + NODE_H));
+  const maxX = Math.max(...nodes.map((n) => n.x + NODE_W));
+  const minY = Math.min(...nodes.map((n) => n.y));
+  const maxY = Math.max(...nodes.map((n) => n.y + NODE_H));
   const pad = 16;
   const width = maxX + pad;
   const height = maxY - minY + pad * 2;
@@ -123,7 +132,14 @@ export default function InvocationFlowChart({ root }: Props) {
 
   return (
     <div className="card" style={{ overflowX: "auto", padding: 0 }}>
-      <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--border)", fontSize: 13, color: "var(--muted)" }}>
+      <div
+        style={{
+          padding: "10px 16px",
+          borderBottom: "1px solid var(--border)",
+          fontSize: 13,
+          color: "var(--muted)",
+        }}
+      >
         Cross-Contract Invocation Flow
       </div>
       <svg
@@ -148,11 +164,20 @@ export default function InvocationFlowChart({ root }: Props) {
             );
           })}
           <defs>
-            <marker id="arrow" markerWidth={8} markerHeight={8} refX={8} refY={3} orient="auto">
+            <marker
+              id="arrow"
+              markerWidth={8}
+              markerHeight={8}
+              refX={8}
+              refY={3}
+              orient="auto"
+            >
               <path d="M0,0 L0,6 L8,3 z" fill="var(--muted)" />
             </marker>
           </defs>
-          {nodes.map((p, i) => <NodeBox key={i} p={p} />)}
+          {nodes.map((p, i) => (
+            <NodeBox key={i} p={p} />
+          ))}
         </g>
       </svg>
     </div>

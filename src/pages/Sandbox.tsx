@@ -1,17 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
-import '../styles/Sandbox.css';
-import Editor from '../components/Editor';
-import FileExplorer from '../components/FileExplorer';
-import Terminal from '../components/Terminal';
-import Preview from '../components/Preview';
-import ActionBar from '../components/ActionBar';
-import TemplateSelector from '../components/TemplateSelector';
-import { initWebContainer, mountFiles, runCommand, SandboxFile } from '../services/webcontainer';
-import { getTemplate } from '../services/templates';
-import { generateSandboxId } from '../services/export';
-import { saveSandbox } from '../services/sandbox-api';
-import { createAutoSaver } from '../services/session';
-import { WebContainer } from '@webcontainer/api';
+import React, { useState, useRef, useEffect } from "react";
+import "../styles/Sandbox.css";
+import Editor from "../components/Editor";
+import FileExplorer from "../components/FileExplorer";
+import Terminal from "../components/Terminal";
+import Preview from "../components/Preview";
+import ActionBar from "../components/ActionBar";
+import TemplateSelector from "../components/TemplateSelector";
+import {
+  initWebContainer,
+  mountFiles,
+  runCommand,
+  SandboxFile,
+} from "../services/webcontainer";
+import { getTemplate } from "../services/templates";
+import { generateSandboxId } from "../services/export";
+import { saveSandbox } from "../services/sandbox-api";
+import { createAutoSaver } from "../services/session";
+import { WebContainer } from "@webcontainer/api";
 
 const Sandbox: React.FC = () => {
   const [files, setFiles] = useState<Map<string, SandboxFile>>(new Map());
@@ -20,7 +25,7 @@ const Sandbox: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(true);
   const [sandboxId] = useState(generateSandboxId());
-  const [templateId, setTemplateId] = useState<string>('');
+  const [templateId, setTemplateId] = useState<string>("");
   const webcontainerRef = useRef<WebContainer | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
   const autoSaverRef = useRef<(() => void) | null>(null);
@@ -33,28 +38,33 @@ const Sandbox: React.FC = () => {
       webcontainerRef.current = container;
 
       const template = getTemplate(templateId);
-      if (!template) throw new Error('Template not found');
+      if (!template) throw new Error("Template not found");
 
       const templateMap = new Map(Object.entries(template.files));
       setFiles(templateMap);
       setSelectedFile(Object.keys(template.files)[0]);
 
       await mountFiles(container, templateMap);
-      
+
       // Start auto-saver
       if (autoSaverRef.current) autoSaverRef.current();
-      autoSaverRef.current = createAutoSaver(sandboxId, templateId, templateMap, Object.keys(template.files)[0]);
+      autoSaverRef.current = createAutoSaver(
+        sandboxId,
+        templateId,
+        templateMap,
+        Object.keys(template.files)[0],
+      );
 
       // Persist to backend
       await saveSandbox(sandboxId, templateId, templateMap);
 
-      setTerminalOutput(['> Sandbox initialized with ' + template.name]);
+      setTerminalOutput(["> Sandbox initialized with " + template.name]);
       setShowTemplateSelector(false);
     } catch (error) {
-      console.error('Initialization error:', error);
+      console.error("Initialization error:", error);
       setTerminalOutput([
-        '✗ Failed to initialize WebContainer',
-        'Note: WebContainer requires COOP/COEP headers. Running in demo mode.',
+        "✗ Failed to initialize WebContainer",
+        "Note: WebContainer requires COOP/COEP headers. Running in demo mode.",
       ]);
       setShowTemplateSelector(false);
     } finally {
@@ -80,30 +90,33 @@ const Sandbox: React.FC = () => {
   useEffect(() => {
     if (files.size > 0 && templateId && sandboxId) {
       saveSandbox(sandboxId, templateId, files).catch((error) => {
-        console.warn('Failed to auto-save:', error);
+        console.warn("Failed to auto-save:", error);
       });
     }
   }, [files, templateId, sandboxId]);
 
   const handleRun = async () => {
     if (!webcontainerRef.current) {
-      setTerminalOutput((prev) => [...prev, '✗ WebContainer not available']);
+      setTerminalOutput((prev) => [...prev, "✗ WebContainer not available"]);
       return;
     }
 
     setIsRunning(true);
-    setTerminalOutput((prev) => [...prev, '$ npm start', '']);
+    setTerminalOutput((prev) => [...prev, "$ npm start", ""]);
 
     try {
-      await runCommand(webcontainerRef.current, 'npm install', (line) => {
+      await runCommand(webcontainerRef.current, "npm install", (line) => {
         setTerminalOutput((prev) => [...prev, line]);
       });
 
-      await runCommand(webcontainerRef.current, 'npm start', (line) => {
+      await runCommand(webcontainerRef.current, "npm start", (line) => {
         setTerminalOutput((prev) => [...prev, line]);
       });
     } catch (error) {
-      setTerminalOutput((prev) => [...prev, `✗ Error: ${error instanceof Error ? error.message : 'Unknown error'}`]);
+      setTerminalOutput((prev) => [
+        ...prev,
+        `✗ Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+      ]);
     } finally {
       setIsRunning(false);
     }
@@ -136,14 +149,18 @@ const Sandbox: React.FC = () => {
       <div className="sandbox-header">
         <h1>Soroban Sandbox</h1>
         <button onClick={handleRun} disabled={isRunning}>
-          {isRunning ? 'Running...' : 'Run'}
+          {isRunning ? "Running..." : "Run"}
         </button>
       </div>
 
       <ActionBar files={files} sandboxId={sandboxId} />
 
       <div className="sandbox-layout">
-        <FileExplorer files={Array.from(files.values())} selectedFile={selectedFile} onSelectFile={handleFileSelect} />
+        <FileExplorer
+          files={Array.from(files.values())}
+          selectedFile={selectedFile}
+          onSelectFile={handleFileSelect}
+        />
 
         <div className="editor-section">
           {currentFile ? (
@@ -154,7 +171,9 @@ const Sandbox: React.FC = () => {
         </div>
 
         <div className="right-panel">
-          <Preview packageJsonContent={files.get('package.json')?.content || ''} />
+          <Preview
+            packageJsonContent={files.get("package.json")?.content || ""}
+          />
           <Terminal output={terminalOutput} />
         </div>
       </div>

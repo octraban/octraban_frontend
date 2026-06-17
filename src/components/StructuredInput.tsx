@@ -21,7 +21,11 @@ import type { TypeIndex } from "./StructuredValue";
 function primitiveInputType(type: string): string {
   const t = type.toLowerCase();
   if (t === "bool") return "checkbox";
-  if (t.includes("int") || ["u32","i32","u64","i64","u128","i128","u256","i256"].includes(t)) return "number";
+  if (
+    t.includes("int") ||
+    ["u32", "i32", "u64", "i64", "u128", "i128", "u256", "i256"].includes(t)
+  )
+    return "number";
   return "text";
 }
 
@@ -108,7 +112,13 @@ interface StructInputProps {
   label: string;
 }
 
-function StructInput({ typeDef, value, onChange, typeIndex, label }: StructInputProps) {
+function StructInput({
+  typeDef,
+  value,
+  onChange,
+  typeIndex,
+  label,
+}: StructInputProps) {
   const fields = typeDef.fields ?? [];
   const current = value ?? {};
 
@@ -119,7 +129,10 @@ function StructInput({ typeDef, value, onChange, typeIndex, label }: StructInput
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={{ fontSize: 11, color: "var(--muted)", fontWeight: 600 }}>
-        {label} <span style={{ color: "var(--accent)", fontWeight: 400 }}>({typeDef.name})</span>
+        {label}{" "}
+        <span style={{ color: "var(--accent)", fontWeight: 400 }}>
+          ({typeDef.name})
+        </span>
       </span>
       <div
         style={{
@@ -130,8 +143,11 @@ function StructInput({ typeDef, value, onChange, typeIndex, label }: StructInput
           borderLeft: "2px solid var(--border)",
         }}
       >
-        {fields.map(field => (
-          <div key={field.name} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        {fields.map((field) => (
+          <div
+            key={field.name}
+            style={{ display: "flex", flexDirection: "column", gap: 3 }}
+          >
             <label style={{ fontSize: 11, color: "var(--muted)" }}>
               {field.name}{" "}
               <span style={{ color: "var(--accent)" }}>({field.type})</span>
@@ -139,7 +155,7 @@ function StructInput({ typeDef, value, onChange, typeIndex, label }: StructInput
             <StructuredInput
               type={field.type}
               value={current[field.name] ?? null}
-              onChange={v => handleFieldChange(field.name, v)}
+              onChange={(v) => handleFieldChange(field.name, v)}
               typeIndex={typeIndex}
             />
           </div>
@@ -169,10 +185,10 @@ function EnumInput({ typeDef, value, onChange, label }: EnumInputProps) {
       </span>
       <select
         value={selected}
-        onChange={e => onChange(Number(e.target.value))}
+        onChange={(e) => onChange(Number(e.target.value))}
         style={{ width: "100%" }}
       >
-        {cases.map(c => (
+        {cases.map((c) => (
           <option key={c.name} value={c.value ?? 0}>
             {c.name} ({c.value ?? 0})
           </option>
@@ -197,10 +213,16 @@ interface UnionInputProps {
   label: string;
 }
 
-function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputProps) {
+function UnionInput({
+  typeDef,
+  value,
+  onChange,
+  typeIndex,
+  label,
+}: UnionInputProps) {
   const cases = typeDef.cases ?? [];
   const selectedVariant = value?.variant ?? cases[0]?.name ?? "";
-  const matchedCase = cases.find(c => c.name === selectedVariant);
+  const matchedCase = cases.find((c) => c.name === selectedVariant);
   const payloadTypes = matchedCase?.types ?? [];
 
   function handleVariantChange(variant: string) {
@@ -218,11 +240,13 @@ function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputPr
       </span>
       <select
         value={selectedVariant}
-        onChange={e => handleVariantChange(e.target.value)}
+        onChange={(e) => handleVariantChange(e.target.value)}
         style={{ width: "100%" }}
       >
-        {cases.map(c => (
-          <option key={c.name} value={c.name}>{c.name}</option>
+        {cases.map((c) => (
+          <option key={c.name} value={c.name}>
+            {c.name}
+          </option>
         ))}
       </select>
 
@@ -240,7 +264,10 @@ function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputPr
           {payloadTypes.length === 1 ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
               <label style={{ fontSize: 11, color: "var(--muted)" }}>
-                data <span style={{ color: "var(--accent)" }}>({payloadTypes[0]})</span>
+                data{" "}
+                <span style={{ color: "var(--accent)" }}>
+                  ({payloadTypes[0]})
+                </span>
               </label>
               <StructuredInput
                 type={payloadTypes[0]}
@@ -251,16 +278,21 @@ function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputPr
             </div>
           ) : (
             payloadTypes.map((pt, i) => {
-              const dataArr = Array.isArray(value?.data) ? (value!.data as unknown[]) : [];
+              const dataArr = Array.isArray(value?.data)
+                ? (value!.data as unknown[])
+                : [];
               return (
-                <div key={i} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                <div
+                  key={i}
+                  style={{ display: "flex", flexDirection: "column", gap: 3 }}
+                >
                   <label style={{ fontSize: 11, color: "var(--muted)" }}>
                     [{i}] <span style={{ color: "var(--accent)" }}>({pt})</span>
                   </label>
                   <StructuredInput
                     type={pt}
                     value={dataArr[i] ?? null}
-                    onChange={v => {
+                    onChange={(v) => {
                       const next = [...dataArr];
                       next[i] = v;
                       handleDataChange(next);
@@ -295,7 +327,7 @@ function PrimitiveInput({ type, value, onChange, label }: PrimitiveInputProps) {
         <input
           type="checkbox"
           checked={value === true || value === "true"}
-          onChange={e => onChange(e.target.checked)}
+          onChange={(e) => onChange(e.target.checked)}
         />
         <span style={{ fontSize: 12, color: "var(--muted)" }}>{label}</span>
       </div>
@@ -307,7 +339,7 @@ function PrimitiveInput({ type, value, onChange, label }: PrimitiveInputProps) {
       type={inputKind}
       placeholder={`${label} (${type})`}
       value={value == null ? "" : String(value)}
-      onChange={e => onChange(e.target.value)}
+      onChange={(e) => onChange(e.target.value)}
       style={{ width: "100%" }}
     />
   );

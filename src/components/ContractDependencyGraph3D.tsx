@@ -24,7 +24,11 @@ export default function ContractDependencyGraph3D() {
   const dataRef = useRef<GraphData>({ nodes: [], links: [] });
   const [liveCount, setLiveCount] = useState(0);
 
-  const { data: initial, isLoading, error } = useQuery({
+  const {
+    data: initial,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["contract-graph"],
     queryFn: () => api.contractGraph(500),
   });
@@ -34,8 +38,8 @@ export default function ContractDependencyGraph3D() {
     if (!initial || !containerRef.current) return;
 
     dataRef.current = {
-      nodes: initial.nodes.map(n => ({ ...n })),
-      links: initial.links.map(l => ({ ...l })),
+      nodes: initial.nodes.map((n) => ({ ...n })),
+      links: initial.links.map((l) => ({ ...l })),
     };
 
     import("3d-force-graph").then(({ default: ForceGraph3D }) => {
@@ -45,7 +49,7 @@ export default function ContractDependencyGraph3D() {
         .backgroundColor("#0a0a14")
         .nodeId("id")
         .nodeLabel((n: any) => shortId(n.id))
-        .nodeColor((n: any) => n.callCount > 10 ? "#f59e0b" : "#6366f1")
+        .nodeColor((n: any) => (n.callCount > 10 ? "#f59e0b" : "#6366f1"))
         .nodeVal((n: any) => Math.max(1, Math.log2(n.callCount + 1)) * 2)
         .linkColor(() => "#4b5563")
         .linkWidth((l: any) => Math.min(Math.log2((l.value ?? 1) + 1), 4))
@@ -77,23 +81,30 @@ export default function ContractDependencyGraph3D() {
         const payload = JSON.parse(msg.data);
         if (payload.type !== "contract_link") return;
 
-        const { caller, callee } = payload.data as { caller: string; callee: string; fn: string; ledger: number };
+        const { caller, callee } = payload.data as {
+          caller: string;
+          callee: string;
+          fn: string;
+          ledger: number;
+        };
         const g = graphRef.current;
         if (!g) return;
 
         const { nodes, links } = dataRef.current;
 
         let changed = false;
-        if (!nodes.find(n => n.id === caller)) {
+        if (!nodes.find((n) => n.id === caller)) {
           nodes.push({ id: caller, callCount: 0 });
           changed = true;
         }
-        if (!nodes.find(n => n.id === callee)) {
+        if (!nodes.find((n) => n.id === callee)) {
           nodes.push({ id: callee, callCount: 0 });
           changed = true;
         }
 
-        const existing = links.find(l => l.source === caller && l.target === callee);
+        const existing = links.find(
+          (l) => l.source === caller && l.target === callee,
+        );
         if (existing) {
           existing.value = (existing.value ?? 1) + 1;
         } else {
@@ -101,48 +112,95 @@ export default function ContractDependencyGraph3D() {
           changed = true;
         }
 
-        const node = nodes.find(n => n.id === callee);
+        const node = nodes.find((n) => n.id === callee);
         if (node) node.callCount += 1;
 
         if (changed) g.graphData({ nodes: [...nodes], links: [...links] });
-        setLiveCount(c => c + 1);
-      } catch { /* ignore */ }
+        setLiveCount((c) => c + 1);
+      } catch {
+        /* ignore */
+      }
     };
 
     ws.onerror = (e) => console.error("[ws] graph error", e);
     return () => ws.close();
   }, []);
 
-  if (isLoading) return <p style={{ color: "var(--muted)", padding: 24 }}>Loading graph…</p>;
-  if (error) return <p style={{ color: "#ef4444", padding: 24 }}>Failed to load contract graph.</p>;
+  if (isLoading)
+    return <p style={{ color: "var(--muted)", padding: 24 }}>Loading graph…</p>;
+  if (error)
+    return (
+      <p style={{ color: "#ef4444", padding: 24 }}>
+        Failed to load contract graph.
+      </p>
+    );
 
   const nodeCount = initial?.nodes.length ?? 0;
   const linkCount = initial?.links.length ?? 0;
 
   return (
     <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-      <div style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        padding: "12px 16px", borderBottom: "1px solid var(--border)",
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "12px 16px",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
         <h2 style={{ margin: 0, fontSize: 15 }}>Contract Dependency Graph</h2>
-        <div style={{ display: "flex", gap: 20, fontSize: 12, color: "var(--muted)" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 20,
+            fontSize: 12,
+            color: "var(--muted)",
+          }}
+        >
           <span>
-            <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", background: "#6366f1", marginRight: 4 }} />
+            <span
+              style={{
+                display: "inline-block",
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: "#6366f1",
+                marginRight: 4,
+              }}
+            />
             Contract
           </span>
           <span>
-            <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", background: "#f59e0b", marginRight: 4 }} />
+            <span
+              style={{
+                display: "inline-block",
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: "#f59e0b",
+                marginRight: 4,
+              }}
+            />
             High-traffic (&gt;10 calls)
           </span>
-          <span>{nodeCount} nodes · {linkCount} edges</span>
+          <span>
+            {nodeCount} nodes · {linkCount} edges
+          </span>
           {liveCount > 0 && (
             <span style={{ color: "#22c55e" }}>+{liveCount} live</span>
           )}
         </div>
       </div>
       <div ref={containerRef} style={{ width: "100%", height: 600 }} />
-      <p style={{ fontSize: 11, color: "var(--muted)", padding: "8px 16px", margin: 0 }}>
+      <p
+        style={{
+          fontSize: 11,
+          color: "var(--muted)",
+          padding: "8px 16px",
+          margin: 0,
+        }}
+      >
         Scroll to zoom · Drag to rotate · Click a node to open its contract page
       </p>
     </div>

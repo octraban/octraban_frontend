@@ -20,10 +20,13 @@ export default function RwaMetadataDisplay({ contractId }: RwaMetadataProps) {
     return null;
   }
 
-  const typeLabel = {
-    benji: "Franklin Templeton Benji",
-    rwa: "Real-World Asset",
-  }[rwaInfo.rwa_type || "rwa"] || rwaInfo.rwa_type || "RWA Token";
+  const typeLabel =
+    {
+      benji: "Franklin Templeton Benji",
+      rwa: "Real-World Asset",
+    }[rwaInfo.rwa_type || "rwa"] ||
+    rwaInfo.rwa_type ||
+    "RWA Token";
 
   return (
     <div

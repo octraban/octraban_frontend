@@ -1,4 +1,4 @@
-import { SandboxFile } from './webcontainer';
+import { SandboxFile } from "./webcontainer";
 
 export interface Template {
   name: string;
@@ -7,13 +7,13 @@ export interface Template {
 }
 
 export const TEMPLATES: Record<string, Template> = {
-  'node-sdk': {
-    name: 'Node.js SDK',
-    description: 'Event listener using Soroban Explorer SDK',
+  "node-sdk": {
+    name: "Node.js SDK",
+    description: "Event listener using Soroban Explorer SDK",
     files: {
-      'src/index.js': {
-        path: 'src/index.js',
-        language: 'javascript',
+      "src/index.js": {
+        path: "src/index.js",
+        language: "javascript",
         content: `import { SorobanExplorer } from 'soroban-explorer-sdk';
 import dotenv from 'dotenv';
 
@@ -44,9 +44,9 @@ console.log('Listening for events...');
 await explorer.start();
 `,
       },
-      'package.json': {
-        path: 'package.json',
-        language: 'json',
+      "package.json": {
+        path: "package.json",
+        language: "json",
         content: `{
   "name": "soroban-explorer-demo",
   "version": "1.0.0",
@@ -62,22 +62,22 @@ await explorer.start();
 }
 `,
       },
-      '.env': {
-        path: '.env',
-        language: 'plaintext',
+      ".env": {
+        path: ".env",
+        language: "plaintext",
         content: `SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
 EXPLORER_CONTRACT_ID=CABCD1234567890ABCD1234567890ABCD1234567890ABCD1234567890ABC
 `,
       },
     },
   },
-  'react-spa': {
-    name: 'React SPA',
-    description: 'Full React app with explorer integration',
+  "react-spa": {
+    name: "React SPA",
+    description: "Full React app with explorer integration",
     files: {
-      'src/App.tsx': {
-        path: 'src/App.tsx',
-        language: 'typescript',
+      "src/App.tsx": {
+        path: "src/App.tsx",
+        language: "typescript",
         content: `import { useState, useEffect } from 'react';
 import { SorobanExplorer } from 'soroban-explorer-sdk';
 import './App.css';
@@ -145,9 +145,9 @@ export default function App() {
 }
 `,
       },
-      'src/main.tsx': {
-        path: 'src/main.tsx',
-        language: 'typescript',
+      "src/main.tsx": {
+        path: "src/main.tsx",
+        language: "typescript",
         content: `import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
@@ -159,9 +159,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 )
 `,
       },
-      'package.json': {
-        path: 'package.json',
-        language: 'json',
+      "package.json": {
+        path: "package.json",
+        language: "json",
         content: `{
   "name": "soroban-explorer-react",
   "version": "1.0.0",
@@ -185,21 +185,21 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 }
 `,
       },
-      '.env.example': {
-        path: '.env.example',
-        language: 'plaintext',
+      ".env.example": {
+        path: ".env.example",
+        language: "plaintext",
         content: `VITE_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
 `,
       },
     },
   },
-  'python-sdk': {
-    name: 'Python SDK',
-    description: 'Python event consumer using Stellar SDK',
+  "python-sdk": {
+    name: "Python SDK",
+    description: "Python event consumer using Stellar SDK",
     files: {
-      'main.py': {
-        path: 'main.py',
-        language: 'python',
+      "main.py": {
+        path: "main.py",
+        language: "python",
         content: `#!/usr/bin/env python3
 import os
 import asyncio
@@ -228,30 +228,30 @@ if __name__ == '__main__':
     asyncio.run(main())
 `,
       },
-      'requirements.txt': {
-        path: 'requirements.txt',
-        language: 'plaintext',
+      "requirements.txt": {
+        path: "requirements.txt",
+        language: "plaintext",
         content: `stellar-sdk==12.3.0
 python-dotenv==1.0.0
 aiohttp==3.9.0
 `,
       },
-      '.env': {
-        path: '.env',
-        language: 'plaintext',
+      ".env": {
+        path: ".env",
+        language: "plaintext",
         content: `SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
 EXPLORER_CONTRACT_ID=CABCD1234567890ABCD1234567890ABCD1234567890ABCD1234567890ABC
 `,
       },
     },
   },
-  'hardhat': {
-    name: 'Hardhat',
-    description: 'Hardhat scripts for Solidity-compatible contracts',
+  hardhat: {
+    name: "Hardhat",
+    description: "Hardhat scripts for Solidity-compatible contracts",
     files: {
-      'hardhat.config.js': {
-        path: 'hardhat.config.js',
-        language: 'javascript',
+      "hardhat.config.js": {
+        path: "hardhat.config.js",
+        language: "javascript",
         content: `require('@nomicfoundation/hardhat-toolbox');
 
 module.exports = {
@@ -265,9 +265,9 @@ module.exports = {
 };
 `,
       },
-      'scripts/deploy.js': {
-        path: 'scripts/deploy.js',
-        language: 'javascript',
+      "scripts/deploy.js": {
+        path: "scripts/deploy.js",
+        language: "javascript",
         content: `const hre = require('hardhat');
 
 async function main() {
@@ -286,9 +286,9 @@ main().catch(err => {
 });
 `,
       },
-      'package.json': {
-        path: 'package.json',
-        language: 'json',
+      "package.json": {
+        path: "package.json",
+        language: "json",
         content: `{
   "name": "hardhat-soroban",
   "version": "1.0.0",
@@ -304,13 +304,13 @@ main().catch(err => {
       },
     },
   },
-  'foundry': {
-    name: 'Foundry',
-    description: 'Fast Rust-based toolkit for Soroban',
+  foundry: {
+    name: "Foundry",
+    description: "Fast Rust-based toolkit for Soroban",
     files: {
-      'foundry.toml': {
-        path: 'foundry.toml',
-        language: 'toml',
+      "foundry.toml": {
+        path: "foundry.toml",
+        language: "toml",
         content: `[profile.default]
 src = "src"
 out = "out"
@@ -320,9 +320,9 @@ libs = ["lib"]
 testnet = "https://soroban-testnet.stellar.org"
 `,
       },
-      'src/Counter.sol': {
-        path: 'src/Counter.sol',
-        language: 'solidity',
+      "src/Counter.sol": {
+        path: "src/Counter.sol",
+        language: "solidity",
         content: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -338,9 +338,9 @@ contract Counter {
 }
 `,
       },
-      'script/Deploy.s.sol': {
-        path: 'script/Deploy.s.sol',
-        language: 'solidity',
+      "script/Deploy.s.sol": {
+        path: "script/Deploy.s.sol",
+        language: "solidity",
         content: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -363,7 +363,11 @@ export function getTemplate(name: string): Template | undefined {
   return TEMPLATES[name];
 }
 
-export function listTemplates(): Array<{ id: string; name: string; description: string }> {
+export function listTemplates(): Array<{
+  id: string;
+  name: string;
+  description: string;
+}> {
   return Object.entries(TEMPLATES).map(([id, template]) => ({
     id,
     name: template.name,

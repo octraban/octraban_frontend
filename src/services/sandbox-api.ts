@@ -1,4 +1,4 @@
-import { SandboxFile } from './webcontainer';
+import { SandboxFile } from "./webcontainer";
 
 declare global {
   interface ImportMeta {
@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 export interface SavedSandbox {
   sandboxId: string;
@@ -23,7 +23,7 @@ export async function saveSandbox(
   sandboxId: string,
   templateId: string,
   files: Map<string, SandboxFile>,
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>,
 ): Promise<void> {
   const filesObj: Record<string, SandboxFile> = {};
   for (const [key, file] of files) {
@@ -31,8 +31,8 @@ export async function saveSandbox(
   }
 
   const response = await fetch(`${API_BASE}/api/sandbox`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       sandboxId,
       templateId,
@@ -58,12 +58,14 @@ export async function loadSandbox(sandboxId: string): Promise<SavedSandbox> {
 
 export async function listSandboxes(
   limit: number = 20,
-  offset: number = 0
+  offset: number = 0,
 ): Promise<{
-  sandboxes: Omit<SavedSandbox, 'files'>[];
+  sandboxes: Omit<SavedSandbox, "files">[];
   total: number;
 }> {
-  const response = await fetch(`${API_BASE}/api/sandboxes?limit=${limit}&offset=${offset}`);
+  const response = await fetch(
+    `${API_BASE}/api/sandboxes?limit=${limit}&offset=${offset}`,
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to list sandboxes: ${response.statusText}`);
@@ -74,7 +76,7 @@ export async function listSandboxes(
 
 export async function deleteSandbox(sandboxId: string): Promise<void> {
   const response = await fetch(`${API_BASE}/api/sandbox/${sandboxId}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 
   if (!response.ok) {

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import FileExplorer from '../components/FileExplorer';
-import Terminal from '../components/Terminal';
-import { loadSandbox } from '../services/sandbox-api';
-import { SandboxFile } from '../services/webcontainer';
-import '../styles/Sandbox.css';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import FileExplorer from "../components/FileExplorer";
+import Terminal from "../components/Terminal";
+import { loadSandbox } from "../services/sandbox-api";
+import { SandboxFile } from "../services/webcontainer";
+import "../styles/Sandbox.css";
 
 const SharedSandbox: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,7 +16,7 @@ const SharedSandbox: React.FC = () => {
   useEffect(() => {
     const loadSharedSandbox = async () => {
       if (!id) {
-        setError('Sandbox ID not found');
+        setError("Sandbox ID not found");
         setLoading(false);
         return;
       }
@@ -27,7 +27,7 @@ const SharedSandbox: React.FC = () => {
         setFiles(fileMap);
         setSelectedFile(Object.keys(sandbox.files)[0]);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load sandbox');
+        setError(err instanceof Error ? err.message : "Failed to load sandbox");
       } finally {
         setLoading(false);
       }
@@ -53,7 +53,9 @@ const SharedSandbox: React.FC = () => {
         <div className="sandbox-header">
           <h1>Soroban Sandbox</h1>
         </div>
-        <div className="placeholder" style={{ color: '#f48771' }}>✗ {error}</div>
+        <div className="placeholder" style={{ color: "#f48771" }}>
+          ✗ {error}
+        </div>
       </div>
     );
   }
@@ -75,8 +77,25 @@ const SharedSandbox: React.FC = () => {
 
         <div className="editor-section">
           {currentFile ? (
-            <div style={{ height: '100%', overflow: 'hidden', background: '#1e1e1e' }}>
-              <div style={{ height: '100%', color: '#d4d4d4', fontSize: '12px', fontFamily: 'monospace', padding: '12px', overflow: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            <div
+              style={{
+                height: "100%",
+                overflow: "hidden",
+                background: "#1e1e1e",
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  color: "#d4d4d4",
+                  fontSize: "12px",
+                  fontFamily: "monospace",
+                  padding: "12px",
+                  overflow: "auto",
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                }}
+              >
                 {currentFile.content}
               </div>
             </div>
@@ -89,12 +108,12 @@ const SharedSandbox: React.FC = () => {
           <div className="preview">
             <div className="preview-header">Info</div>
             <div className="preview-content">
-              <p style={{ fontSize: '12px', color: '#bebebe' }}>
+              <p style={{ fontSize: "12px", color: "#bebebe" }}>
                 This is a read-only view of a shared Soroban Sandbox.
               </p>
             </div>
           </div>
-          <Terminal output={['> Shared sandbox loaded']} />
+          <Terminal output={["> Shared sandbox loaded"]} />
         </div>
       </div>
     </div>

@@ -27,12 +27,15 @@ export default function EventPage() {
 
       <div className="card" style={{ display: "grid", gap: 12 }}>
         <Row label="Description" value={ev.description} highlight />
-        <Row label="Function"    value={ev.function} badge />
+        <Row label="Function" value={ev.function} badge />
         {ev.is_clawback && (
           <Row
             label="Compliance"
             value={
-              <span className="badge clawback" title="Mandatory authority intervention">
+              <span
+                className="badge clawback"
+                title="Mandatory authority intervention"
+              >
                 ⚠ COMPLIANCE: CLAWBACK — mandatory authority intervention
               </span>
             }
@@ -48,13 +51,17 @@ export default function EventPage() {
                   alignItems: "center",
                   gap: 6,
                   padding: "3px 10px",
-                  background: ev.sac_side_effect === "account_created"
-                    ? "rgba(16,185,129,0.12)"
-                    : "rgba(59,130,246,0.12)",
+                  background:
+                    ev.sac_side_effect === "account_created"
+                      ? "rgba(16,185,129,0.12)"
+                      : "rgba(59,130,246,0.12)",
                   border: `1px solid ${ev.sac_side_effect === "account_created" ? "#10b981" : "#3b82f6"}`,
                   borderRadius: 4,
                   fontSize: 12,
-                  color: ev.sac_side_effect === "account_created" ? "#34d399" : "#60a5fa",
+                  color:
+                    ev.sac_side_effect === "account_created"
+                      ? "#34d399"
+                      : "#60a5fa",
                 }}
                 title={
                   ev.sac_side_effect === "account_created"
@@ -69,8 +76,13 @@ export default function EventPage() {
             }
           />
         )}
-        <Row label="Ledger"      value={ev.ledger.toLocaleString()} />
-        <Row label="Contract"    value={<Link to={`/contract/${ev.contract_id}`}>{ev.contract_id}</Link>} />
+        <Row label="Ledger" value={ev.ledger.toLocaleString()} />
+        <Row
+          label="Contract"
+          value={
+            <Link to={`/contract/${ev.contract_id}`}>{ev.contract_id}</Link>
+          }
+        />
         {ev.tx_hash && <Row label="Tx Hash" value={ev.tx_hash} mono />}
         {ev.raw_topics.length > 0 && (
           <Row label="Topics" value={ev.raw_topics.join(", ")} mono />
@@ -93,7 +105,10 @@ export default function EventPage() {
 
       {/* Issue #164 — CAP-0080 ZK host function cost delta */}
       {ev.zk_host_calls && (
-        <ZkCostDelta calls={ev.zk_host_calls.calls} delta={ev.zk_host_calls.delta} />
+        <ZkCostDelta
+          calls={ev.zk_host_calls.calls}
+          delta={ev.zk_host_calls.delta}
+        />
       )}
 
       {/* Issue #125 — Gas-Limit Alert Flag */}
@@ -110,7 +125,13 @@ export default function EventPage() {
   );
 }
 
-function Row({ label, value, highlight, badge, mono }: {
+function Row({
+  label,
+  value,
+  highlight,
+  badge,
+  mono,
+}: {
   label: string;
   value: React.ReactNode;
   highlight?: boolean;
@@ -120,15 +141,20 @@ function Row({ label, value, highlight, badge, mono }: {
   return (
     <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
       <span style={{ color: "var(--muted)", minWidth: 100 }}>{label}</span>
-      {badge
-        ? <FunctionBadge fn={String(value)} />
-        : <span style={{
+      {badge ? (
+        <FunctionBadge fn={String(value)} />
+      ) : (
+        <span
+          style={{
             fontWeight: highlight ? 600 : 400,
             fontFamily: mono ? "monospace" : undefined,
             fontSize: mono ? 12 : undefined,
             wordBreak: "break-all",
-          }}>{value}</span>
-      }
+          }}
+        >
+          {value}
+        </span>
+      )}
     </div>
   );
 }
@@ -138,7 +164,9 @@ function FunctionBadge({ fn }: { fn: string }) {
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
         <span className="badge wrap">Wrap Native Asset</span>
-        <span style={{ fontSize: 12, color: "var(--muted)" }}>Classic XLM → Soroban</span>
+        <span style={{ fontSize: 12, color: "var(--muted)" }}>
+          Classic XLM → Soroban
+        </span>
       </span>
     );
   }
@@ -146,7 +174,9 @@ function FunctionBadge({ fn }: { fn: string }) {
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
         <span className="badge unwrap">Unwrap Native Asset</span>
-        <span style={{ fontSize: 12, color: "var(--muted)" }}>Soroban → Classic XLM</span>
+        <span style={{ fontSize: 12, color: "var(--muted)" }}>
+          Soroban → Classic XLM
+        </span>
       </span>
     );
   }

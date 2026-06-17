@@ -7,7 +7,11 @@
 
 import { useEffect, useState } from "react";
 
-export type TxStatus = "pending" | "success" | "failed" | "resource_limit_exceeded";
+export type TxStatus =
+  | "pending"
+  | "success"
+  | "failed"
+  | "resource_limit_exceeded";
 
 export interface TxStatusPayload {
   tx_hash: string;
@@ -33,14 +37,16 @@ export function useTxStatus(txHash: string | null | undefined) {
         if (data.status === "success" || data.status === "failed") {
           es.close();
         }
-      } catch { /* ignore parse errors */ }
+      } catch {
+        /* ignore parse errors */
+      }
     };
 
     es.onerror = () => {
       es.close();
       // Fallback: single poll
       fetch(`/api/transactions/${txHash}/status`)
-        .then(r => r.json())
+        .then((r) => r.json())
         .then(setPayload)
         .catch(() => {});
     };

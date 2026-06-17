@@ -17,10 +17,14 @@ interface Props {
 }
 
 function buildArgList(args: { name: string; type?: string }[] = []): string {
-  return args.map(a => a.name).join(", ");
+  return args.map((a) => a.name).join(", ");
 }
 
-function jsSnippet(contractId: string, fnName: string, args: Props["args"] = []): string {
+function jsSnippet(
+  contractId: string,
+  fnName: string,
+  args: Props["args"] = [],
+): string {
   const argList = buildArgList(args);
   return `import { Contract, SorobanRpc, TransactionBuilder, Networks, BASE_FEE } from "@stellar/stellar-sdk";
 
@@ -39,7 +43,11 @@ const result = await rpc.sendTransaction(prepared);
 console.log(result);`;
 }
 
-function pythonSnippet(contractId: string, fnName: string, args: Props["args"] = []): string {
+function pythonSnippet(
+  contractId: string,
+  fnName: string,
+  args: Props["args"] = [],
+): string {
   const argList = buildArgList(args);
   return `from stellar_sdk import SorobanServer, Keypair, TransactionBuilder, Network
 from stellar_sdk.soroban_rpc import SendTransactionStatus
@@ -65,9 +73,14 @@ response = server.send_transaction(tx)
 print(response.status)`;
 }
 
-function rustSnippet(contractId: string, fnName: string, args: Props["args"] = []): string {
+function rustSnippet(
+  contractId: string,
+  fnName: string,
+  args: Props["args"] = [],
+): string {
   const argList = args.length
-    ? args.map(a => `    // ${a.name}: ${a.type ?? "ScVal"}`).join("\n") + "\n"
+    ? args.map((a) => `    // ${a.name}: ${a.type ?? "ScVal"}`).join("\n") +
+      "\n"
     : "";
   return `use soroban_sdk::{contract, contractimpl, Address, Env};
 // Client generated from contract spec:
@@ -84,8 +97,8 @@ ${argList}    let client = Client::new(env, contract_id);
 
 const LANGS: { key: Lang; label: string }[] = [
   { key: "javascript", label: "JavaScript" },
-  { key: "python",     label: "Python" },
-  { key: "rust",       label: "Rust" },
+  { key: "python", label: "Python" },
+  { key: "rust", label: "Rust" },
 ];
 
 export default function SdkSnippet({ contractId, fnName, args = [] }: Props) {
@@ -94,8 +107,8 @@ export default function SdkSnippet({ contractId, fnName, args = [] }: Props) {
 
   const snippets: Record<Lang, string> = {
     javascript: jsSnippet(contractId, fnName, args),
-    python:     pythonSnippet(contractId, fnName, args),
-    rust:       rustSnippet(contractId, fnName, args),
+    python: pythonSnippet(contractId, fnName, args),
+    rust: rustSnippet(contractId, fnName, args),
   };
 
   const snippet = snippets[lang];
@@ -110,16 +123,26 @@ export default function SdkSnippet({ contractId, fnName, args = [] }: Props) {
   return (
     <div style={{ marginTop: 8 }}>
       {/* Language tabs + copy button */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 6,
+        }}
+      >
         <div style={{ display: "flex", gap: 4 }}>
-          {LANGS.map(l => (
+          {LANGS.map((l) => (
             <button
               key={l.key}
               onClick={() => setLang(l.key)}
               style={{
                 padding: "3px 10px",
                 fontSize: 12,
-                background: lang === l.key ? "var(--accent, #7c3aed)" : "var(--bg2, #1e1e2e)",
+                background:
+                  lang === l.key
+                    ? "var(--accent, #7c3aed)"
+                    : "var(--bg2, #1e1e2e)",
                 color: lang === l.key ? "#fff" : "var(--muted)",
                 border: "1px solid var(--border, #333)",
                 borderRadius: 4,
@@ -148,17 +171,19 @@ export default function SdkSnippet({ contractId, fnName, args = [] }: Props) {
       </div>
 
       {/* Code block */}
-      <pre style={{
-        background: "var(--bg2, #1e1e2e)",
-        border: "1px solid var(--border, #333)",
-        borderRadius: 6,
-        padding: "12px 14px",
-        fontSize: 12,
-        overflowX: "auto",
-        margin: 0,
-        color: "var(--fg, #e2e8f0)",
-        lineHeight: 1.6,
-      }}>
+      <pre
+        style={{
+          background: "var(--bg2, #1e1e2e)",
+          border: "1px solid var(--border, #333)",
+          borderRadius: 6,
+          padding: "12px 14px",
+          fontSize: 12,
+          overflowX: "auto",
+          margin: 0,
+          color: "var(--fg, #e2e8f0)",
+          lineHeight: 1.6,
+        }}
+      >
         <code>{snippet}</code>
       </pre>
     </div>

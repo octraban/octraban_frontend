@@ -6,15 +6,37 @@ import EventTable from "../components/EventTable";
 import ExportButton from "../components/ExportButton";
 import { useEventStream } from "../hooks/useEventStream";
 
-const FUNCTIONS = ["", "swap", "transfer", "mint", "burn", "stake", "unstake", "wrap_native", "unwrap_native"];
+const FUNCTIONS = [
+  "",
+  "swap",
+  "transfer",
+  "mint",
+  "burn",
+  "stake",
+  "unstake",
+  "wrap_native",
+  "unwrap_native",
+];
 
 // Issue #48 — transaction type filter
 type TxType = "all" | "soroban" | "classic";
 
 const TYPE_LABELS: { key: TxType; label: string; title: string }[] = [
-  { key: "all",     label: "All Transactions",       title: "Show all transaction types" },
-  { key: "soroban", label: "Soroban Only",            title: "Contract deployments and invocations only" },
-  { key: "classic", label: "Classic Operations Only", title: "Payments, offers, and other classic ops" },
+  {
+    key: "all",
+    label: "All Transactions",
+    title: "Show all transaction types",
+  },
+  {
+    key: "soroban",
+    label: "Soroban Only",
+    title: "Contract deployments and invocations only",
+  },
+  {
+    key: "classic",
+    label: "Classic Operations Only",
+    title: "Payments, offers, and other classic ops",
+  },
 ];
 
 export default function Home() {
@@ -25,38 +47,64 @@ export default function Home() {
   const queryClient = useQueryClient();
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["events", fnFilter, page, txType],
-    queryFn: () => api.events({
-      fn:   fnFilter || undefined,
-      page,
-      type: txType !== "all" ? txType : undefined,
-    }),
+    queryFn: () =>
+      api.events({
+        fn: fnFilter || undefined,
+        page,
+        type: txType !== "all" ? txType : undefined,
+      }),
   });
 
   // Issue #39 — invalidate the event list when a live event arrives on page 1
-  const handleLiveEvent = useCallback((ev: DecodedEvent) => {
-    if (page === 1 && (!fnFilter || ev.function === fnFilter)) {
-      queryClient.invalidateQueries({ queryKey: ["events", fnFilter, 1] });
-    }
-  }, [page, fnFilter, queryClient]);
+  const handleLiveEvent = useCallback(
+    (ev: DecodedEvent) => {
+      if (page === 1 && (!fnFilter || ev.function === fnFilter)) {
+        queryClient.invalidateQueries({ queryKey: ["events", fnFilter, 1] });
+      }
+    },
+    [page, fnFilter, queryClient],
+  );
 
   useEventStream(handleLiveEvent);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
-        <h1 style={{ fontSize: 22, marginBottom: 4 }}>Soroban Smart Block Explorer</h1>
-        <p style={{ color: "var(--muted)" }}>Human-readable Soroban contract events on Stellar.</p>
+        <h1 style={{ fontSize: 22, marginBottom: 4 }}>
+          Soroban Smart Block Explorer
+        </h1>
+        <p style={{ color: "var(--muted)" }}>
+          Human-readable Soroban contract events on Stellar.
+        </p>
       </div>
 
       {/* Filters row */}
-      <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 16,
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
         {/* Issue #48 — type toggle */}
-        <div style={{ display: "flex", gap: 0, borderRadius: 6, overflow: "hidden", border: "1px solid var(--border)" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 0,
+            borderRadius: 6,
+            overflow: "hidden",
+            border: "1px solid var(--border)",
+          }}
+        >
           {TYPE_LABELS.map(({ key, label, title }) => (
             <button
               key={key}
               title={title}
-              onClick={() => { setTxType(key); setPage(1); }}
+              onClick={() => {
+                setTxType(key);
+                setPage(1);
+              }}
               style={{
                 background: txType === key ? "var(--accent)" : "var(--surface)",
                 color: txType === key ? "#0d1117" : "var(--muted)",
@@ -74,31 +122,52 @@ export default function Home() {
         {/* Function filter */}
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <label style={{ color: "var(--muted)" }}>Function:</label>
-          <select value={fnFilter} onChange={e => { setFnFilter(e.target.value); setPage(1); }}>
-            {FUNCTIONS.map(f => <option key={f} value={f}>{f || "All"}</option>)}
+          <select
+            value={fnFilter}
+            onChange={(e) => {
+              setFnFilter(e.target.value);
+              setPage(1);
+            }}
+          >
+            {FUNCTIONS.map((f) => (
+              <option key={f} value={f}>
+                {f || "All"}
+              </option>
+            ))}
           </select>
         </div>
 
         <ExportButton
           target="events"
           params={{
-            fn:   fnFilter || undefined,
+            fn: fnFilter || undefined,
             type: txType !== "all" ? txType : undefined,
           }}
         />
       </div>
 
       <div className="card">
-        {isLoading
-          ? <p style={{ color: "var(--muted)" }}>Loading…</p>
-          : <EventTable events={events} />}
+        {isLoading ? (
+          <p style={{ color: "var(--muted)" }}>Loading…</p>
+        ) : (
+          <EventTable events={events} />
+        )}
       </div>
 
       {/* Pagination */}
       <div style={{ display: "flex", gap: 8 }}>
-        <button disabled={page === 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
-        <span style={{ padding: "6px 10px", color: "var(--muted)" }}>Page {page}</span>
-        <button disabled={events.length < 25} onClick={() => setPage(p => p + 1)}>Next →</button>
+        <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
+          ← Prev
+        </button>
+        <span style={{ padding: "6px 10px", color: "var(--muted)" }}>
+          Page {page}
+        </span>
+        <button
+          disabled={events.length < 25}
+          onClick={() => setPage((p) => p + 1)}
+        >
+          Next →
+        </button>
       </div>
     </div>
   );

@@ -6,24 +6,42 @@ type TreeNode = string | { [key: string]: TreeNode } | TreeNode[];
 function scValToTree(val: xdr.ScVal): TreeNode {
   const type = val.switch().name;
   switch (val.switch()) {
-    case xdr.ScValType.scvBool():    return { bool: String(val.b()) };
-    case xdr.ScValType.scvVoid():    return "void";
-    case xdr.ScValType.scvU32():     return { u32: String(val.u32()) };
-    case xdr.ScValType.scvI32():     return { i32: String(val.i32()) };
-    case xdr.ScValType.scvU64():     return { u64: String(val.u64()) };
-    case xdr.ScValType.scvI64():     return { i64: String(val.i64()) };
+    case xdr.ScValType.scvBool():
+      return { bool: String(val.b()) };
+    case xdr.ScValType.scvVoid():
+      return "void";
+    case xdr.ScValType.scvU32():
+      return { u32: String(val.u32()) };
+    case xdr.ScValType.scvI32():
+      return { i32: String(val.i32()) };
+    case xdr.ScValType.scvU64():
+      return { u64: String(val.u64()) };
+    case xdr.ScValType.scvI64():
+      return { i64: String(val.i64()) };
     case xdr.ScValType.scvU128(): {
       const u = val.u128();
-      return { u128: String((BigInt(u.hi().toString()) << 64n) | BigInt(u.lo().toString())) };
+      return {
+        u128: String(
+          (BigInt(u.hi().toString()) << 64n) | BigInt(u.lo().toString()),
+        ),
+      };
     }
     case xdr.ScValType.scvI128(): {
       const i = val.i128();
-      return { i128: String((BigInt(i.hi().toString()) << 64n) | BigInt(i.lo().toString())) };
+      return {
+        i128: String(
+          (BigInt(i.hi().toString()) << 64n) | BigInt(i.lo().toString()),
+        ),
+      };
     }
-    case xdr.ScValType.scvBytes():   return { bytes: val.bytes().toString("hex") };
-    case xdr.ScValType.scvString():  return { string: val.str().toString() };
-    case xdr.ScValType.scvSymbol():  return { symbol: val.sym().toString() };
-    case xdr.ScValType.scvAddress(): return { address: val.address().toString() };
+    case xdr.ScValType.scvBytes():
+      return { bytes: val.bytes().toString("hex") };
+    case xdr.ScValType.scvString():
+      return { string: val.str().toString() };
+    case xdr.ScValType.scvSymbol():
+      return { symbol: val.sym().toString() };
+    case xdr.ScValType.scvAddress():
+      return { address: val.address().toString() };
     case xdr.ScValType.scvVec(): {
       const items = val.vec();
       return { vec: items ? items.map(scValToTree) : [] };
@@ -32,13 +50,19 @@ function scValToTree(val: xdr.ScVal): TreeNode {
       const entries = val.map();
       if (!entries) return { map: {} };
       const obj: Record<string, TreeNode> = {};
-      entries.forEach(e => { obj[JSON.stringify(scValToTree(e.key()))] = scValToTree(e.val()); });
+      entries.forEach((e) => {
+        obj[JSON.stringify(scValToTree(e.key()))] = scValToTree(e.val());
+      });
       return { map: obj };
     }
-    case xdr.ScValType.scvContractInstance(): return { contractInstance: "…" };
-    case xdr.ScValType.scvLedgerKeyContractInstance(): return "ledgerKeyContractInstance";
-    case xdr.ScValType.scvLedgerKeyNonce(): return { ledgerKeyNonce: String(val.nonceKey()?.nonce()) };
-    default: return { [type]: "…" };
+    case xdr.ScValType.scvContractInstance():
+      return { contractInstance: "…" };
+    case xdr.ScValType.scvLedgerKeyContractInstance():
+      return "ledgerKeyContractInstance";
+    case xdr.ScValType.scvLedgerKeyNonce():
+      return { ledgerKeyNonce: String(val.nonceKey()?.nonce()) };
+    default:
+      return { [type]: "…" };
   }
 }
 
@@ -48,10 +72,14 @@ function muxedToGAddress(ma: xdr.MuxedAccount): string {
       return StrKey.encodeEd25519PublicKey(ma.med25519().ed25519());
     }
     return StrKey.encodeEd25519PublicKey(ma.ed25519());
-  } catch { return "unknown"; }
+  } catch {
+    return "unknown";
+  }
 }
 
-function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: string } {
+function tryDecode(
+  b64: string,
+): { tree: TreeNode; label: string } | { error: string } {
   const trimmed = b64.trim();
   if (!trimmed) return { error: "Paste a Base64 XDR string above." };
 
@@ -76,28 +104,37 @@ function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: st
               const auths = (body as any).invokeHostFunction().auth() ?? [];
               for (const authEntry of auths) {
                 const creds = authEntry.credentials();
-                if (creds.switch().name === "sorobanCredentialsSourceAccount") continue;
+                if (creds.switch().name === "sorobanCredentialsSourceAccount")
+                  continue;
                 try {
                   const scAddr = creds.address().address();
                   const addrType = scAddr.switch().name;
                   if (addrType === "scAddressTypeAccount") {
-                    actual_caller = StrKey.encodeEd25519PublicKey(scAddr.accountId().ed25519());
+                    actual_caller = StrKey.encodeEd25519PublicKey(
+                      scAddr.accountId().ed25519(),
+                    );
                     break outer;
                   }
                   if (addrType === "scAddressTypeContract") {
                     actual_caller = StrKey.encodeContract(scAddr.contractId());
                     break outer;
                   }
-                } catch { /* skip */ }
+                } catch {
+                  /* skip */
+                }
               }
             }
-          } catch { /* leave null */ }
+          } catch {
+            /* leave null */
+          }
 
           const chain_of_custody: Record<string, string> = {
             "Tier 1 — Sponsor Wallet (pays fee)": sponsor,
             "Tier 2 — Channel Account (sequence)": channel_account,
           };
-          if (actual_caller) chain_of_custody["Tier 3 — Actual Caller (contract logic)"] = actual_caller;
+          if (actual_caller)
+            chain_of_custody["Tier 3 — Actual Caller (contract logic)"] =
+              actual_caller;
 
           return {
             type: "FeeBumpTransactionEnvelope",
@@ -107,16 +144,26 @@ function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: st
               const name = body.switch().name;
               if (name === "invokeHostFunction") {
                 const hf = (body as any).invokeHostFunction().hostFunction();
-                if (hf.switch() === xdr.HostFunctionType.hostFunctionTypeInvokeContract()) {
+                if (
+                  hf.switch() ===
+                  xdr.HostFunctionType.hostFunctionTypeInvokeContract()
+                ) {
                   const inv = hf.invokeContract();
-                  return { operation: "invokeHostFunction", contract: inv.contractAddress().toString(), function: inv.functionName().toString(), args: inv.args().map(scValToTree) };
+                  return {
+                    operation: "invokeHostFunction",
+                    contract: inv.contractAddress().toString(),
+                    function: inv.functionName().toString(),
+                    args: inv.args().map(scValToTree),
+                  };
                 }
               }
               return { operation: name };
             }),
           } as TreeNode;
         }
-        const tx = env.value().tx ? env.value().tx() : (env as any).v0?.().tx?.();
+        const tx = env.value().tx
+          ? env.value().tx()
+          : (env as any).v0?.().tx?.();
         const ops = (tx as any).operations?.() ?? [];
         return {
           type: "TransactionEnvelope",
@@ -125,9 +172,17 @@ function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: st
             const name = body.switch().name;
             if (name === "invokeHostFunction") {
               const hf = (body as any).invokeHostFunction().hostFunction();
-              if (hf.switch() === xdr.HostFunctionType.hostFunctionTypeInvokeContract()) {
+              if (
+                hf.switch() ===
+                xdr.HostFunctionType.hostFunctionTypeInvokeContract()
+              ) {
                 const inv = hf.invokeContract();
-                return { operation: "invokeHostFunction", contract: inv.contractAddress().toString(), function: inv.functionName().toString(), args: inv.args().map(scValToTree) };
+                return {
+                  operation: "invokeHostFunction",
+                  contract: inv.contractAddress().toString(),
+                  function: inv.functionName().toString(),
+                  args: inv.args().map(scValToTree),
+                };
               }
             }
             return { operation: name };
@@ -135,23 +190,62 @@ function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: st
         } as TreeNode;
       },
     },
-    { label: "ScVal",            fn: () => scValToTree(xdr.ScVal.fromXDR(trimmed, "base64")) },
-    { label: "OperationResult",  fn: () => { const r = xdr.OperationResult.fromXDR(trimmed, "base64"); return { operationResult: r.switch().name }; } },
-    { label: "TransactionResult",fn: () => { const r = xdr.TransactionResult.fromXDR(trimmed, "base64"); return { result: r.result().switch().name, feeCharged: String(r.feeCharged()) }; } },
+    {
+      label: "ScVal",
+      fn: () => scValToTree(xdr.ScVal.fromXDR(trimmed, "base64")),
+    },
+    {
+      label: "OperationResult",
+      fn: () => {
+        const r = xdr.OperationResult.fromXDR(trimmed, "base64");
+        return { operationResult: r.switch().name };
+      },
+    },
+    {
+      label: "TransactionResult",
+      fn: () => {
+        const r = xdr.TransactionResult.fromXDR(trimmed, "base64");
+        return {
+          result: r.result().switch().name,
+          feeCharged: String(r.feeCharged()),
+        };
+      },
+    },
   ];
 
   for (const d of decoders) {
-    try { return { tree: d.fn(), label: d.label }; } catch { /* try next */ }
+    try {
+      return { tree: d.fn(), label: d.label };
+    } catch {
+      /* try next */
+    }
   }
-  return { error: "Could not decode XDR. Ensure it is a valid Base64-encoded Soroban XDR string." };
+  return {
+    error:
+      "Could not decode XDR. Ensure it is a valid Base64-encoded Soroban XDR string.",
+  };
 }
 
 // Color map for known type keys
 const KEY_COLORS: Record<string, string> = {
-  bool: "#d29922", u32: "#58a6ff", i32: "#58a6ff", u64: "#58a6ff", i64: "#58a6ff",
-  u128: "#58a6ff", i128: "#58a6ff", bytes: "#8b949e", string: "#3fb950", symbol: "#3fb950",
-  address: "#e8a44a", vec: "#c9d1d9", map: "#c9d1d9", type: "#d29922",
-  operation: "#d29922", contract: "#e8a44a", function: "#3fb950", args: "#c9d1d9",
+  bool: "#d29922",
+  u32: "#58a6ff",
+  i32: "#58a6ff",
+  u64: "#58a6ff",
+  i64: "#58a6ff",
+  u128: "#58a6ff",
+  i128: "#58a6ff",
+  bytes: "#8b949e",
+  string: "#3fb950",
+  symbol: "#3fb950",
+  address: "#e8a44a",
+  vec: "#c9d1d9",
+  map: "#c9d1d9",
+  type: "#d29922",
+  operation: "#d29922",
+  contract: "#e8a44a",
+  function: "#3fb950",
+  args: "#c9d1d9",
 };
 
 function valueColor(key: string): string {
@@ -171,9 +265,14 @@ function CopyButton({ value }: { value: string }) {
       onClick={copy}
       title="Copy value"
       style={{
-        background: "none", color: copied ? "var(--green)" : "var(--muted)",
-        padding: "0 4px", fontSize: 11, fontWeight: 400, marginLeft: 4,
-        border: "1px solid var(--border)", borderRadius: 4,
+        background: "none",
+        color: copied ? "var(--green)" : "var(--muted)",
+        padding: "0 4px",
+        fontSize: 11,
+        fontWeight: 400,
+        marginLeft: 4,
+        border: "1px solid var(--border)",
+        borderRadius: 4,
       }}
     >
       {copied ? "✓" : "⎘"}
@@ -195,12 +294,19 @@ function TreeView({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
   }
 
   if (Array.isArray(node)) {
-    if (node.length === 0) return <span style={{ color: "var(--muted)" }}>[]</span>;
+    if (node.length === 0)
+      return <span style={{ color: "var(--muted)" }}>[]</span>;
     return (
       <span>
         <button
-          onClick={() => setCollapsed(c => !c)}
-          style={{ background: "none", color: "var(--accent)", padding: "0 4px", fontSize: 12, fontWeight: 400 }}
+          onClick={() => setCollapsed((c) => !c)}
+          style={{
+            background: "none",
+            color: "var(--accent)",
+            padding: "0 4px",
+            fontSize: 12,
+            fontWeight: 400,
+          }}
         >
           {collapsed ? "▶" : "▼"} [{node.length}]
         </button>
@@ -208,7 +314,9 @@ function TreeView({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
           <div style={{ marginLeft: indent + 16 }}>
             {node.map((item, i) => (
               <div key={i} style={{ marginTop: 2 }}>
-                <span style={{ color: "var(--muted)", fontSize: 11 }}>[{i}] </span>
+                <span style={{ color: "var(--muted)", fontSize: 11 }}>
+                  [{i}]{" "}
+                </span>
                 <TreeView node={item} depth={depth + 1} />
               </div>
             ))}
@@ -225,7 +333,9 @@ function TreeView({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
         const isLeaf = typeof v === "string";
         return (
           <div key={k} style={{ marginTop: 4, marginLeft: indent }}>
-            <span style={{ color: "var(--accent)", fontWeight: 600 }}>{k}: </span>
+            <span style={{ color: "var(--accent)", fontWeight: 600 }}>
+              {k}:{" "}
+            </span>
             {isLeaf ? (
               <span>
                 <span style={{ color: valueColor(k) }}>{v}</span>
@@ -256,17 +366,24 @@ export default function XdrInspector() {
       <div className="card">
         <h2 style={{ marginBottom: 8 }}>XDR-to-JSON Workbench</h2>
         <p style={{ color: "var(--muted)", marginBottom: 12, fontSize: 13 }}>
-          Paste a raw Base64-encoded Soroban XDR string to instantly view a decoded, color-coded JSON tree.
+          Paste a raw Base64-encoded Soroban XDR string to instantly view a
+          decoded, color-coded JSON tree.
         </p>
         <textarea
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Paste Base64 XDR here…"
           rows={4}
           style={{
-            width: "100%", background: "var(--bg)", border: "1px solid var(--border)",
-            borderRadius: 6, color: "var(--text)", padding: "8px 10px",
-            fontSize: 12, fontFamily: "monospace", resize: "vertical",
+            width: "100%",
+            background: "var(--bg)",
+            border: "1px solid var(--border)",
+            borderRadius: 6,
+            color: "var(--text)",
+            padding: "8px 10px",
+            fontSize: 12,
+            fontFamily: "monospace",
+            resize: "vertical",
           }}
         />
       </div>
@@ -277,20 +394,38 @@ export default function XdrInspector() {
             <p style={{ color: "#f85149", fontSize: 13 }}>{decoded.error}</p>
           ) : (
             <>
-              <div style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+              <div
+                style={{
+                  marginBottom: 12,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
                 <span className="badge">{decoded.label}</span>
-                <span style={{ color: "var(--muted)", fontSize: 12 }}>decoded successfully</span>
+                <span style={{ color: "var(--muted)", fontSize: 12 }}>
+                  decoded successfully
+                </span>
                 <button
                   onClick={copyAll}
                   style={{
-                    marginLeft: "auto", background: "var(--border)", color: "var(--text)",
-                    fontSize: 12, padding: "4px 12px",
+                    marginLeft: "auto",
+                    background: "var(--border)",
+                    color: "var(--text)",
+                    fontSize: 12,
+                    padding: "4px 12px",
                   }}
                 >
                   Copy JSON
                 </button>
               </div>
-              <div style={{ fontFamily: "monospace", fontSize: 13, lineHeight: 1.6 }}>
+              <div
+                style={{
+                  fontFamily: "monospace",
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                }}
+              >
                 <TreeView node={decoded.tree} />
               </div>
             </>

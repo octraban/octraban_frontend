@@ -104,7 +104,11 @@ export function parseAbiFile(raw: unknown, fileName: string): LocalAbi {
   const obj = raw as Record<string, unknown>;
 
   // ── Shape 2: full-spec format { functions, types } ───────────────────────
-  if (Array.isArray(obj.functions) && !("contractId" in obj) && !("name" in obj)) {
+  if (
+    Array.isArray(obj.functions) &&
+    !("contractId" in obj) &&
+    !("name" in obj)
+  ) {
     const functions = (obj.functions as unknown[]).map(normaliseFn);
     const types = Array.isArray(obj.types)
       ? (obj.types as LocalAbiType[])
@@ -120,16 +124,18 @@ export function parseAbiFile(raw: unknown, fileName: string): LocalAbi {
       : undefined;
     return {
       ...base,
-      contractId: typeof obj.contractId === "string" ? obj.contractId : undefined,
-      name:        typeof obj.name        === "string" ? obj.name        : undefined,
-      description: typeof obj.description === "string" ? obj.description : undefined,
+      contractId:
+        typeof obj.contractId === "string" ? obj.contractId : undefined,
+      name: typeof obj.name === "string" ? obj.name : undefined,
+      description:
+        typeof obj.description === "string" ? obj.description : undefined,
       functions,
       types,
     };
   }
 
   throw new Error(
-    'Unrecognised ABI format. Expected { functions: [...] } or an array of function definitions.'
+    "Unrecognised ABI format. Expected { functions: [...] } or an array of function definitions.",
   );
 }
 
@@ -158,11 +164,11 @@ function normaliseFn(raw: unknown): LocalAbiFn {
   });
 
   return {
-    name:     fn.name,
+    name: fn.name,
     template: typeof fn.template === "string" ? fn.template : undefined,
-    params:   params.length > 0 ? params : undefined,
-    outputs:  Array.isArray(fn.outputs) ? (fn.outputs as string[]) : undefined,
-    mutates:  typeof fn.mutates === "boolean" ? fn.mutates : undefined,
+    params: params.length > 0 ? params : undefined,
+    outputs: Array.isArray(fn.outputs) ? (fn.outputs as string[]) : undefined,
+    mutates: typeof fn.mutates === "boolean" ? fn.mutates : undefined,
   };
 }
 
@@ -181,7 +187,7 @@ export interface UseLocalAbiReturn {
 
 export function useLocalAbi(contractId: string): UseLocalAbiReturn {
   const [localAbi, setLocalAbi] = useState<LocalAbi | null>(() =>
-    contractId ? load(contractId) : null
+    contractId ? load(contractId) : null,
   );
   const [parseError, setParseError] = useState<string | null>(null);
 
@@ -204,7 +210,7 @@ export function useLocalAbi(contractId: string): UseLocalAbiReturn {
         setParseError(err instanceof Error ? err.message : String(err));
       }
     },
-    [contractId]
+    [contractId],
   );
 
   const clearAbi = useCallback(() => {

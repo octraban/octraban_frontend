@@ -49,7 +49,13 @@ export default function SDKSnippetGenerator({
   };
 
   return (
-    <div style={{ borderRadius: "8px", border: "1px solid #e5e7eb", overflow: "hidden" }}>
+    <div
+      style={{
+        borderRadius: "8px",
+        border: "1px solid #e5e7eb",
+        overflow: "hidden",
+      }}
+    >
       <div
         style={{
           padding: "12px 16px",
@@ -67,7 +73,8 @@ export default function SDKSnippetGenerator({
               onClick={() => setLanguage(lang)}
               style={{
                 padding: "6px 12px",
-                border: language === lang ? "2px solid #3b82f6" : "1px solid #d1d5db",
+                border:
+                  language === lang ? "2px solid #3b82f6" : "1px solid #d1d5db",
                 backgroundColor: language === lang ? "#dbeafe" : "#fff",
                 borderRadius: "4px",
                 cursor: "pointer",

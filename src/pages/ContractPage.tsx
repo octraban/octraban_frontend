@@ -7,7 +7,9 @@ import RustCodeViewer from "../components/RustCodeViewer";
 import MigrationBanner from "../components/MigrationBanner";
 import SourceFileTree from "../components/SourceFileTree";
 import SimulateButton from "../components/SimulateButton";
-import InvocationFlowChart, { type InvocationNode } from "../components/InvocationFlowChart";
+import InvocationFlowChart, {
+  type InvocationNode,
+} from "../components/InvocationFlowChart";
 import PrivilegedRoles from "../components/PrivilegedRoles";
 import SdkSnippet from "../components/SdkSnippet";
 import AbiUploadZone from "../components/AbiUploadZone";
@@ -51,15 +53,21 @@ const DEMO_TREE: InvocationNode = {
     {
       contract: "ContractB",
       fn: "transfer",
-      children: [
-        { contract: "ContractC", fn: "update_balance" },
-      ],
+      children: [{ contract: "ContractC", fn: "update_balance" }],
     },
     { contract: "ContractB", fn: "emit_event" },
   ],
 };
 
-type Tab = "overview" | "source" | "simulate" | "flow" | "roles" | "networks" | "graph" | "state-diff";
+type Tab =
+  | "overview"
+  | "source"
+  | "simulate"
+  | "flow"
+  | "roles"
+  | "networks"
+  | "graph"
+  | "state-diff";
 
 export default function ContractPage() {
   const { id = "" } = useParams();
@@ -89,7 +97,9 @@ export default function ContractPage() {
   });
 
   const downloadAbi = () => {
-    api.downloadAbi(id).catch(err => console.error("Download ABI failed:", err));
+    api
+      .downloadAbi(id)
+      .catch((err) => console.error("Download ABI failed:", err));
   };
 
   // A contract is considered "unverified" when the server has no registered
@@ -102,7 +112,14 @@ export default function ContractPage() {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         <div className="card">
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 16,
+            }}
+          >
             <span
               style={{
                 display: "inline-block",
@@ -114,11 +131,20 @@ export default function ContractPage() {
               }}
             />
             <h2 style={{ fontSize: 16 }}>Unverified Contract</h2>
-            <code style={{ fontSize: 12, color: "var(--muted)", wordBreak: "break-all" }}>{id}</code>
+            <code
+              style={{
+                fontSize: 12,
+                color: "var(--muted)",
+                wordBreak: "break-all",
+              }}
+            >
+              {id}
+            </code>
           </div>
           <p style={{ color: "var(--muted)", fontSize: 13, marginBottom: 16 }}>
-            This contract has no registered ABI. Upload a local spec file to inspect
-            its transaction logs — the file stays in your browser session only.
+            This contract has no registered ABI. Upload a local spec file to
+            inspect its transaction logs — the file stays in your browser
+            session only.
           </p>
           <AbiUploadZone
             onLoad={loadAbi}
@@ -143,14 +169,14 @@ export default function ContractPage() {
   }
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: "overview",    label: "Overview" },
-    { key: "source",      label: "Source Code" },
-    { key: "simulate",    label: "Simulate" },
-    { key: "flow",        label: "Invocation Flow" },
-    { key: "roles",       label: "Privileged Roles" },
-    { key: "networks",    label: "Networks" },
-    { key: "graph",       label: "Address Graph" },
-    { key: "state-diff",  label: "State Timeline" },
+    { key: "overview", label: "Overview" },
+    { key: "source", label: "Source Code" },
+    { key: "simulate", label: "Simulate" },
+    { key: "flow", label: "Invocation Flow" },
+    { key: "roles", label: "Privileged Roles" },
+    { key: "networks", label: "Networks" },
+    { key: "graph", label: "Address Graph" },
+    { key: "state-diff", label: "State Timeline" },
   ];
 
   return (
@@ -171,11 +197,27 @@ export default function ContractPage() {
 
       {/* Header */}
       <div className="card">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}
+        >
           <div>
             <h2 style={{ marginBottom: 8 }}>{meta.name}</h2>
-            <p style={{ color: "var(--muted)", marginBottom: 12 }}>{meta.description}</p>
-            <code style={{ fontSize: 12, color: "var(--muted)", wordBreak: "break-all" }}>{id}</code>
+            <p style={{ color: "var(--muted)", marginBottom: 12 }}>
+              {meta.description}
+            </p>
+            <code
+              style={{
+                fontSize: 12,
+                color: "var(--muted)",
+                wordBreak: "break-all",
+              }}
+            >
+              {id}
+            </code>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <Link
@@ -211,10 +253,26 @@ export default function ContractPage() {
         </div>
 
         {meta.dependency_advisory?.outdated && (
-          <div className="card" style={{ borderLeft: "4px solid #f97316", background: "rgba(249, 115, 22, 0.08)", color: "#78350f", marginTop: 12 }}>
+          <div
+            className="card"
+            style={{
+              borderLeft: "4px solid #f97316",
+              background: "rgba(249, 115, 22, 0.08)",
+              color: "#78350f",
+              marginTop: 12,
+            }}
+          >
             <strong>{meta.dependency_advisory.summary}</strong>
-            <div style={{ marginTop: 8, display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
-              {meta.dependency_advisory.packages.map(pkg => (
+            <div
+              style={{
+                marginTop: 8,
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 12,
+                alignItems: "center",
+              }}
+            >
+              {meta.dependency_advisory.packages.map((pkg) => (
                 <div key={pkg.name} style={{ minWidth: 180 }}>
                   <div style={{ fontSize: 13 }}>
                     <span style={{ fontWeight: 700 }}>{pkg.name}</span>
@@ -222,7 +280,12 @@ export default function ContractPage() {
                       {pkg.currentVersion} → {pkg.latestVersion}
                     </span>
                   </div>
-                  <a href={pkg.upgradeUrl} target="_blank" rel="noreferrer" style={{ color: "#b45309", fontSize: 13 }}>
+                  <a
+                    href={pkg.upgradeUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: "#b45309", fontSize: 13 }}
+                  >
                     View upgrade guide
                   </a>
                 </div>
@@ -233,15 +296,25 @@ export default function ContractPage() {
       </div>
 
       {/* Tab bar */}
-      <div style={{ display: "flex", gap: 4, borderBottom: "1px solid var(--border)", paddingBottom: 0 }}>
-        {tabs.map(t => (
+      <div
+        style={{
+          display: "flex",
+          gap: 4,
+          borderBottom: "1px solid var(--border)",
+          paddingBottom: 0,
+        }}
+      >
+        {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             style={{
               background: "none",
               color: tab === t.key ? "var(--accent)" : "var(--muted)",
-              borderBottom: tab === t.key ? "2px solid var(--accent)" : "2px solid transparent",
+              borderBottom:
+                tab === t.key
+                  ? "2px solid var(--accent)"
+                  : "2px solid transparent",
               borderRadius: 0,
               padding: "8px 16px",
               fontWeight: tab === t.key ? 700 : 400,
@@ -259,7 +332,14 @@ export default function ContractPage() {
               the user wants to override descriptions with a local file */}
           {isUnverified && (
             <div className="card">
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 12,
+                }}
+              >
                 <span
                   style={{
                     display: "inline-block",
@@ -343,7 +423,15 @@ export default function ContractPage() {
               padding: "10px 16px",
             }}
           >
-            <summary style={{ cursor: "pointer", fontSize: 13, color: "var(--muted)", userSelect: "none", listStyle: "none" }}>
+            <summary
+              style={{
+                cursor: "pointer",
+                fontSize: 13,
+                color: "var(--muted)",
+                userSelect: "none",
+                listStyle: "none",
+              }}
+            >
               ▶ Compute WASM deploy hash locally
             </summary>
             <div style={{ marginTop: 12 }}>
@@ -358,25 +446,38 @@ export default function ContractPage() {
             <div className="card">
               <h3 style={{ marginBottom: 8, fontSize: 14 }}>Functions</h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {meta.functions.map(f => (
-                  <div key={f.name} className="card" style={{ padding: "8px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {meta.functions.map((f) => (
+                  <div
+                    key={f.name}
+                    className="card"
+                    style={{ padding: "8px 12px" }}
+                  >
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+                    >
                       <span className="badge">{f.name}</span>
-                      <span style={{ color: "var(--muted)", flex: 1 }}>{f.description}</span>
+                      <span style={{ color: "var(--muted)", flex: 1 }}>
+                        {f.description}
+                      </span>
                       {/* Issue #120: SDK snippet copy button */}
                       <button
-                        onClick={() => setSnippetFn(snippetFn === f.name ? null : f.name)}
+                        onClick={() =>
+                          setSnippetFn(snippetFn === f.name ? null : f.name)
+                        }
                         style={{
                           padding: "3px 10px",
                           fontSize: 12,
-                          background: snippetFn === f.name ? "var(--accent, #7c3aed)" : "var(--bg2, #1e1e2e)",
+                          background:
+                            snippetFn === f.name
+                              ? "var(--accent, #7c3aed)"
+                              : "var(--bg2, #1e1e2e)",
                           color: snippetFn === f.name ? "#fff" : "var(--muted)",
                           border: "1px solid var(--border, #333)",
                           borderRadius: 4,
                           cursor: "pointer",
                         }}
                       >
-                        {"</>"}  SDK
+                        {"</>"} SDK
                       </button>
                     </div>
                     {snippetFn === f.name && (
@@ -388,7 +489,13 @@ export default function ContractPage() {
             </div>
           )}
 
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <h3 style={{ margin: 0 }}>Recent Events</h3>
             <ExportButton target="events" params={{ contract: id }} />
           </div>
@@ -412,19 +519,23 @@ export default function ContractPage() {
             contractId={id}
             wasmHash={(meta as any).wasm_hash ?? undefined}
           />
-          {meta.source_files && meta.source_files.length > 0
-            ? <SourceFileTree files={meta.source_files} />
-            : <RustCodeViewer
-                source={meta.source ?? DEMO_SOURCE}
-                filename={meta.source_file ?? `${id.slice(0, 8)}.rs`}
-              />
-          }
+          {meta.source_files && meta.source_files.length > 0 ? (
+            <SourceFileTree files={meta.source_files} />
+          ) : (
+            <RustCodeViewer
+              source={meta.source ?? DEMO_SOURCE}
+              filename={meta.source_file ?? `${id.slice(0, 8)}.rs`}
+            />
+          )}
         </div>
       )}
 
       {/* Tab: Simulate — Issue #46 */}
       {tab === "simulate" && (
-        <div className="card" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div
+          className="card"
+          style={{ display: "flex", flexDirection: "column", gap: 16 }}
+        >
           <h3 style={{ fontSize: 14 }}>Simulate Contract Call</h3>
           <p style={{ color: "var(--muted)", fontSize: 13 }}>
             Preview execution results without spending real fees.
@@ -432,15 +543,20 @@ export default function ContractPage() {
           {meta.functions.length > 0 && (
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <label style={{ color: "var(--muted)" }}>Function:</label>
-              <select value={selectedFn} onChange={e => setSelectedFn(e.target.value)}>
+              <select
+                value={selectedFn}
+                onChange={(e) => setSelectedFn(e.target.value)}
+              >
                 <option value="">— select —</option>
-                {meta.functions.map(f => <option key={f.name} value={f.name}>{f.name}</option>)}
+                {meta.functions.map((f) => (
+                  <option key={f.name} value={f.name}>
+                    {f.name}
+                  </option>
+                ))}
               </select>
             </div>
           )}
-          {selectedFn && (
-            <SimulateButton contractId={id} fnName={selectedFn} />
-          )}
+          {selectedFn && <SimulateButton contractId={id} fnName={selectedFn} />}
           {!selectedFn && meta.functions.length === 0 && (
             <SimulateButton contractId={id} fnName="transfer" />
           )}
@@ -449,7 +565,9 @@ export default function ContractPage() {
 
       {/* Tab: Invocation Flow — Issue #47 */}
       {tab === "flow" && (
-        <InvocationFlowChart root={(meta as any).invocation_tree ?? DEMO_TREE} />
+        <InvocationFlowChart
+          root={(meta as any).invocation_tree ?? DEMO_TREE}
+        />
       )}
 
       {/* Tab: Privileged Roles */}

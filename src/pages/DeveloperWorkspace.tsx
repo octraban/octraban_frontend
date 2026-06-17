@@ -45,9 +45,9 @@ export default function DeveloperWorkspace() {
   if (!meta) return <p>Contract not found.</p>;
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: "source",    label: "📄 Source Code" },
+    { key: "source", label: "📄 Source Code" },
     { key: "functions", label: "⚙ Functions" },
-    { key: "history",   label: "📋 Tx History" },
+    { key: "history", label: "📋 Tx History" },
   ];
 
   return (
@@ -55,20 +55,39 @@ export default function DeveloperWorkspace() {
       {/* Header */}
       <div className="card">
         <h2 style={{ marginBottom: 4 }}>Developer Workspace</h2>
-        <p style={{ color: "var(--muted)", fontSize: 13, marginBottom: 4 }}>{meta.name}</p>
-        <code style={{ fontSize: 11, color: "var(--muted)", wordBreak: "break-all" }}>{id}</code>
+        <p style={{ color: "var(--muted)", fontSize: 13, marginBottom: 4 }}>
+          {meta.name}
+        </p>
+        <code
+          style={{
+            fontSize: 11,
+            color: "var(--muted)",
+            wordBreak: "break-all",
+          }}
+        >
+          {id}
+        </code>
       </div>
 
       {/* Tab bar */}
-      <div style={{ display: "flex", gap: 4, borderBottom: "1px solid var(--border)" }}>
-        {tabs.map(t => (
+      <div
+        style={{
+          display: "flex",
+          gap: 4,
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
+        {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             style={{
               background: "none",
               color: tab === t.key ? "var(--accent)" : "var(--muted)",
-              borderBottom: tab === t.key ? "2px solid var(--accent)" : "2px solid transparent",
+              borderBottom:
+                tab === t.key
+                  ? "2px solid var(--accent)"
+                  : "2px solid transparent",
               borderRadius: 0,
               padding: "8px 16px",
               fontWeight: tab === t.key ? 700 : 400,
@@ -81,45 +100,57 @@ export default function DeveloperWorkspace() {
       </div>
 
       {/* Tab: Source Code */}
-      {tab === "source" && (
-        meta.source_files && meta.source_files.length > 0
-          ? <SourceFileTree files={meta.source_files} />
-          : <RustCodeViewer
-              source={meta.source ?? DEMO_SOURCE}
-              filename={meta.source_file ?? `${id.slice(0, 8)}.rs`}
-            />
-      )}
+      {tab === "source" &&
+        (meta.source_files && meta.source_files.length > 0 ? (
+          <SourceFileTree files={meta.source_files} />
+        ) : (
+          <RustCodeViewer
+            source={meta.source ?? DEMO_SOURCE}
+            filename={meta.source_file ?? `${id.slice(0, 8)}.rs`}
+          />
+        ))}
 
       {/* Tab: Functions */}
       {tab === "functions" && (
         <div className="card">
-          {meta.functions.length === 0
-            ? <p style={{ color: "var(--muted)" }}>No functions registered for this contract.</p>
-            : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {meta.functions.map(f => (
-                  <div
-                    key={f.name}
-                    className="card"
-                    style={{ padding: "12px 16px", display: "flex", alignItems: "flex-start", gap: 12 }}
-                  >
-                    <span className="badge" style={{ flexShrink: 0 }}>{f.name}</span>
-                    <span style={{ color: "var(--muted)", fontSize: 13 }}>{f.description || "No description."}</span>
-                  </div>
-                ))}
-              </div>
-            )
-          }
+          {meta.functions.length === 0 ? (
+            <p style={{ color: "var(--muted)" }}>
+              No functions registered for this contract.
+            </p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {meta.functions.map((f) => (
+                <div
+                  key={f.name}
+                  className="card"
+                  style={{
+                    padding: "12px 16px",
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                  }}
+                >
+                  <span className="badge" style={{ flexShrink: 0 }}>
+                    {f.name}
+                  </span>
+                  <span style={{ color: "var(--muted)", fontSize: 13 }}>
+                    {f.description || "No description."}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* Tab: Transaction History */}
       {tab === "history" && (
         <div className="card">
-          {evLoading
-            ? <p style={{ color: "var(--muted)" }}>Loading…</p>
-            : <EventTable events={events} />
-          }
+          {evLoading ? (
+            <p style={{ color: "var(--muted)" }}>Loading…</p>
+          ) : (
+            <EventTable events={events} />
+          )}
         </div>
       )}
     </div>

@@ -46,7 +46,13 @@ export interface FactoryDeploymentTree {
 export interface ZkHostCall {
   fn_name: string;
   curve: "BN254" | "BLS12-381";
-  kind: "msm" | "pairing" | "scalar_field" | "map_to_curve" | "hash_to_curve" | "other";
+  kind:
+    | "msm"
+    | "pairing"
+    | "scalar_field"
+    | "map_to_curve"
+    | "hash_to_curve"
+    | "other";
   cpu_native: number;
   cpu_legacy: number;
 }
@@ -61,7 +67,14 @@ export interface ZkCostDelta {
 export interface HeuristicParam {
   index: number;
   raw: string;
-  type: "Address" | "ContractId" | "Amount" | "Hash" | "Symbol" | "Boolean" | "Unknown";
+  type:
+    | "Address"
+    | "ContractId"
+    | "Amount"
+    | "Hash"
+    | "Symbol"
+    | "Boolean"
+    | "Unknown";
   value: string;
   confidence: "likely" | "possible";
 }
@@ -258,7 +271,7 @@ export interface ContractTTL {
   contract_id: string;
   current_ledger: number;
   instance: { live_until_ledger: number | null };
-  code:     { live_until_ledger: number | null };
+  code: { live_until_ledger: number | null };
 }
 
 export interface CircuitBreakerStatus {
@@ -286,9 +299,18 @@ export interface NetworkComparisonResult {
   hasVersionMismatch: boolean;
 }
 
-export interface GraphNode { id: string; label: string; type: string; }
+export interface GraphNode {
+  id: string;
+  label: string;
+  type: string;
+}
 
-export interface GraphEdge { source: string; target: string; label?: string; amount?: string; }
+export interface GraphEdge {
+  source: string;
+  target: string;
+  label?: string;
+  amount?: string;
+}
 
 export interface AddressGraphData {
   nodes: GraphNode[];
@@ -296,38 +318,54 @@ export interface AddressGraphData {
 }
 
 export const api = {
-  events: (params: { contract?: string; fn?: string; page?: number; type?: string }) => {
+  events: (params: {
+    contract?: string;
+    fn?: string;
+    page?: number;
+    type?: string;
+  }) => {
     const q = new URLSearchParams();
     if (params.contract) q.set("contract", params.contract);
-    if (params.fn)       q.set("fn", params.fn);
-    if (params.page)     q.set("page", String(params.page));
-    if (params.type)     q.set("type", params.type);
+    if (params.fn) q.set("fn", params.fn);
+    if (params.page) q.set("page", String(params.page));
+    if (params.type) q.set("type", params.type);
     return get<DecodedEvent[]>(`/events?${q}`);
   },
-  event:    (seq: number)     => get<DecodedEvent>(`/events/${seq}`),
-  zkCosts:  (seq: number)     => get<{ calls: ZkHostCall[]; delta: ZkCostDelta | null }>(`/events/${seq}/zk-costs`),
-  contract:        (id: string) => get<ContractMeta>(`/contracts/${id}`),
-  burnAlerts:      (contract: string) => get<BurnAlert[]>(`/burn-alerts?contract=${contract}`),
-  migrationStatus: (id: string) => get<MigrationStatus>(`/contracts/${id}/migration-status`),
-  wallet:   (address: string) => get<DecodedEvent[]>(`/wallet/${address}`),
-  roles:    (id: string)      => get<PrivilegedRole[]>(`/contracts/${id}/roles`),
-  networkComparison: (id: string) => get<NetworkComparisonResult>(`/contracts/${id}/network-comparison`),
-  addressGraph:      (id: string) => get<AddressGraphData>(`/contracts/${id}/address-graph`),
+  event: (seq: number) => get<DecodedEvent>(`/events/${seq}`),
+  zkCosts: (seq: number) =>
+    get<{ calls: ZkHostCall[]; delta: ZkCostDelta | null }>(
+      `/events/${seq}/zk-costs`,
+    ),
+  contract: (id: string) => get<ContractMeta>(`/contracts/${id}`),
+  burnAlerts: (contract: string) =>
+    get<BurnAlert[]>(`/burn-alerts?contract=${contract}`),
+  migrationStatus: (id: string) =>
+    get<MigrationStatus>(`/contracts/${id}/migration-status`),
+  wallet: (address: string) => get<DecodedEvent[]>(`/wallet/${address}`),
+  roles: (id: string) => get<PrivilegedRole[]>(`/contracts/${id}/roles`),
+  networkComparison: (id: string) =>
+    get<NetworkComparisonResult>(`/contracts/${id}/network-comparison`),
+  addressGraph: (id: string) =>
+    get<AddressGraphData>(`/contracts/${id}/address-graph`),
 
   // Issue #117: sub-invocations for a transaction
-  subInvocations: (txHash: string) => get<SubInvocation[]>(`/transactions/${txHash}/sub-invocations`),
+  subInvocations: (txHash: string) =>
+    get<SubInvocation[]>(`/transactions/${txHash}/sub-invocations`),
   // Events where contract appears directly OR as sub-invocation
   eventsDeep: (contractId: string, page = 1) =>
     get<DecodedEvent[]>(`/v1/contracts/${contractId}/events-deep?page=${page}`),
 
   // Issue #118: transaction status (polling fallback; SSE via useTxStatus hook)
-  txStatus: (txHash: string) => get<TxStatusResponse>(`/transactions/${txHash}/status`),
+  txStatus: (txHash: string) =>
+    get<TxStatusResponse>(`/transactions/${txHash}/status`),
 
   // Issue #86: Circuit breaker status
-  circuitBreakerStatus: (id: string) => get<CircuitBreakerStatus>(`/contracts/${id}/circuit-breaker`),
+  circuitBreakerStatus: (id: string) =>
+    get<CircuitBreakerStatus>(`/contracts/${id}/circuit-breaker`),
 
   // Issue #81: RWA token metadata
-  rwaMetadata: (id: string) => get<RwaMetadata>(`/contracts/${id}/rwa-metadata`),
+  rwaMetadata: (id: string) =>
+    get<RwaMetadata>(`/contracts/${id}/rwa-metadata`),
 
   downloadAbi: async (id: string) => {
     const res = await fetch(`${BASE}/contracts/${id}/abi`);
@@ -346,14 +384,27 @@ export const api = {
   // Issue #135: multi-sig source verification
   sourceVerifications: (id: string, wasmHash?: string) => {
     const q = wasmHash ? `?wasm_hash=${encodeURIComponent(wasmHash)}` : "";
-    return get<SourceVerification[]>(`/contracts/${id}/source-verifications${q}`);
+    return get<SourceVerification[]>(
+      `/contracts/${id}/source-verifications${q}`,
+    );
   },
-  submitSourceVerification: (id: string, body: { wasm_hash: string; signer: string; signature: string; compiler_hash: string }) =>
+  submitSourceVerification: (
+    id: string,
+    body: {
+      wasm_hash: string;
+      signer: string;
+      signature: string;
+      compiler_hash: string;
+    },
+  ) =>
     fetch(`${BASE}/contracts/${id}/source-verifications`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-    }).then(r => { if (!r.ok) throw new Error(`API ${r.status}`); return r.json(); }),
+    }).then((r) => {
+      if (!r.ok) throw new Error(`API ${r.status}`);
+      return r.json();
+    }),
 
   // Issue #165: live TTL status (instance + code expiration ledgers)
   contractTTL: (id: string) => get<ContractTTL>(`/contracts/${id}/ttl`),
@@ -365,11 +416,22 @@ export const api = {
   },
 
   // Issue #142: global contract dependency graph
-  contractGraph: (limit = 500) => get<ContractGraphData>(`/contract-graph?limit=${limit}`),
+  contractGraph: (limit = 500) =>
+    get<ContractGraphData>(`/contract-graph?limit=${limit}`),
 
   // Issue #172: CAP-0077 quorum freeze status
-  quorumFreeze: (id: string) => get<{ is_frozen: boolean; ledger: number; tx_hash: string; frozen_ids: string[] }>(`/contracts/${id}/quorum-freeze`),
+  quorumFreeze: (id: string) =>
+    get<{
+      is_frozen: boolean;
+      ledger: number;
+      tx_hash: string;
+      frozen_ids: string[];
+    }>(`/contracts/${id}/quorum-freeze`),
 
   // Full contract spec (functions + custom types)
-  specFull: (id: string) => get<{ functions: { name: string; outputs?: string[] }[]; types: SpecType[] }>(`/contracts/${id}/spec-full`),
+  specFull: (id: string) =>
+    get<{
+      functions: { name: string; outputs?: string[] }[];
+      types: SpecType[];
+    }>(`/contracts/${id}/spec-full`),
 };

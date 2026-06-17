@@ -18,9 +18,16 @@ interface Props {
   wasmHash?: string;
 }
 
-export default function SourceVerificationBadge({ contractId, wasmHash }: Props) {
+export default function SourceVerificationBadge({
+  contractId,
+  wasmHash,
+}: Props) {
   const qc = useQueryClient();
-  const [form, setForm] = useState({ signer: "", signature: "", compiler_hash: "" });
+  const [form, setForm] = useState({
+    signer: "",
+    signature: "",
+    compiler_hash: "",
+  });
   const [showForm, setShowForm] = useState(false);
 
   const { data: verifications = [] } = useQuery({
@@ -30,8 +37,12 @@ export default function SourceVerificationBadge({ contractId, wasmHash }: Props)
   });
 
   const mutation = useMutation({
-    mutationFn: (body: { wasm_hash: string; signer: string; signature: string; compiler_hash: string }) =>
-      api.submitSourceVerification(contractId, body),
+    mutationFn: (body: {
+      wasm_hash: string;
+      signer: string;
+      signature: string;
+      compiler_hash: string;
+    }) => api.submitSourceVerification(contractId, body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["source-verifications", contractId] });
       setForm({ signer: "", signature: "", compiler_hash: "" });
@@ -42,8 +53,12 @@ export default function SourceVerificationBadge({ contractId, wasmHash }: Props)
   const count = verifications.length;
   const isVerified = count >= MIN_VERIFIED;
 
-  const badgeColor = isVerified ? "var(--green, #22c55e)" : count > 0 ? "var(--yellow, #eab308)" : "var(--muted)";
-  const badgeIcon  = isVerified ? "✔" : count > 0 ? "⚠" : "✗";
+  const badgeColor = isVerified
+    ? "var(--green, #22c55e)"
+    : count > 0
+      ? "var(--yellow, #eab308)"
+      : "var(--muted)";
+  const badgeIcon = isVerified ? "✔" : count > 0 ? "⚠" : "✗";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +81,9 @@ export default function SourceVerificationBadge({ contractId, wasmHash }: Props)
           width: "fit-content",
         }}
       >
-        <span style={{ color: badgeColor, fontWeight: 700, fontSize: 14 }}>{badgeIcon}</span>
+        <span style={{ color: badgeColor, fontWeight: 700, fontSize: 14 }}>
+          {badgeIcon}
+        </span>
         <span style={{ color: badgeColor, fontSize: 13, fontWeight: 600 }}>
           {isVerified
             ? `Source Verified by ${count} Independent Developer Signature${count !== 1 ? "s" : ""}`
@@ -83,15 +100,34 @@ export default function SourceVerificationBadge({ contractId, wasmHash }: Props)
             <div
               key={v.signer}
               className="card"
-              style={{ padding: "8px 12px", display: "flex", gap: 12, alignItems: "flex-start" }}
+              style={{
+                padding: "8px 12px",
+                display: "flex",
+                gap: 12,
+                alignItems: "flex-start",
+              }}
             >
-              <span style={{ color: "var(--green, #22c55e)", fontSize: 13 }}>✔</span>
+              <span style={{ color: "var(--green, #22c55e)", fontSize: 13 }}>
+                ✔
+              </span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 12, color: "var(--muted)", fontFamily: "monospace", wordBreak: "break-all" }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "var(--muted)",
+                    fontFamily: "monospace",
+                    wordBreak: "break-all",
+                  }}
+                >
                   {v.signer}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
-                  compiler hash: <code style={{ fontSize: 11 }}>{v.compiler_hash.slice(0, 16)}…</code>
+                <div
+                  style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}
+                >
+                  compiler hash:{" "}
+                  <code style={{ fontSize: 11 }}>
+                    {v.compiler_hash.slice(0, 16)}…
+                  </code>
                   {" · "}
                   {new Date(v.submitted_at).toLocaleDateString()}
                 </div>
@@ -103,7 +139,7 @@ export default function SourceVerificationBadge({ contractId, wasmHash }: Props)
 
       {/* Submit form toggle */}
       <button
-        onClick={() => setShowForm(s => !s)}
+        onClick={() => setShowForm((s) => !s)}
         style={{
           alignSelf: "flex-start",
           padding: "5px 12px",
@@ -131,23 +167,47 @@ export default function SourceVerificationBadge({ contractId, wasmHash }: Props)
             borderRadius: 8,
           }}
         >
-          <h4 style={{ fontSize: 13, margin: 0 }}>Submit Source Verification</h4>
+          <h4 style={{ fontSize: 13, margin: 0 }}>
+            Submit Source Verification
+          </h4>
           {!wasmHash && (
             <p style={{ color: "var(--yellow)", fontSize: 12 }}>
               No WASM hash available for this contract yet.
             </p>
           )}
           {[
-            { field: "signer",        label: "Your Address / Public Key", placeholder: "G…" },
-            { field: "signature",     label: "Cryptographic Signature",   placeholder: "base64 signature…" },
-            { field: "compiler_hash", label: "Compiler Hash",             placeholder: "sha256 of compiled output…" },
+            {
+              field: "signer",
+              label: "Your Address / Public Key",
+              placeholder: "G…",
+            },
+            {
+              field: "signature",
+              label: "Cryptographic Signature",
+              placeholder: "base64 signature…",
+            },
+            {
+              field: "compiler_hash",
+              label: "Compiler Hash",
+              placeholder: "sha256 of compiled output…",
+            },
           ].map(({ field, label, placeholder }) => (
-            <label key={field} style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 12 }}>
+            <label
+              key={field}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+                fontSize: 12,
+              }}
+            >
               <span style={{ color: "var(--muted)" }}>{label}</span>
               <input
                 required
                 value={(form as Record<string, string>)[field]}
-                onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, [field]: e.target.value }))
+                }
                 placeholder={placeholder}
                 style={{
                   padding: "6px 10px",

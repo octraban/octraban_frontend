@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { SandboxFile } from '../services/webcontainer';
-import { exportAsZip, downloadZip, copySandboxUrl } from '../services/export';
-import '../styles/ActionBar.css';
+import React, { useState } from "react";
+import { SandboxFile } from "../services/webcontainer";
+import { exportAsZip, downloadZip, copySandboxUrl } from "../services/export";
+import "../styles/ActionBar.css";
 
 interface ActionBarProps {
   files: Map<string, SandboxFile>;
@@ -13,8 +13,8 @@ const ActionBar: React.FC<ActionBarProps> = ({ files, sandboxId }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   const handleExport = async () => {
-    const blob = await exportAsZip(files, 'soroban-sandbox');
-    downloadZip(blob, 'soroban-sandbox.zip');
+    const blob = await exportAsZip(files, "soroban-sandbox");
+    downloadZip(blob, "soroban-sandbox.zip");
   };
 
   const handleShare = () => {
@@ -28,12 +28,20 @@ const ActionBar: React.FC<ActionBarProps> = ({ files, sandboxId }) => {
   return (
     <div className="action-bar">
       <div className="action-group">
-        <button className="action-btn" onClick={handleExport} title="Export as ZIP">
+        <button
+          className="action-btn"
+          onClick={handleExport}
+          title="Export as ZIP"
+        >
           📦 Export
         </button>
         {sandboxId && (
-          <button className="action-btn" onClick={handleShare} title="Copy shareable URL">
-            {copied ? '✓ Copied' : '🔗 Share'}
+          <button
+            className="action-btn"
+            onClick={handleShare}
+            title="Copy shareable URL"
+          >
+            {copied ? "✓ Copied" : "🔗 Share"}
           </button>
         )}
       </div>

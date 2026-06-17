@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface FileExplorerProps {
   files: Array<{ path: string; content: string; language: string }>;
@@ -6,17 +6,21 @@ interface FileExplorerProps {
   onSelectFile: (path: string) => void;
 }
 
-const FileExplorer: React.FC<FileExplorerProps> = ({ files, selectedFile, onSelectFile }) => {
+const FileExplorer: React.FC<FileExplorerProps> = ({
+  files,
+  selectedFile,
+  onSelectFile,
+}) => {
   const groupedFiles = files.reduce(
     (acc, file) => {
-      const parts = file.path.split('/');
+      const parts = file.path.split("/");
       const filename = parts[parts.length - 1];
-      const dir = parts.slice(0, -1).join('/') || '/';
+      const dir = parts.slice(0, -1).join("/") || "/";
       if (!acc[dir]) acc[dir] = [];
       acc[dir].push({ ...file, filename });
       return acc;
     },
-    {} as Record<string, any[]>
+    {} as Record<string, any[]>,
   );
 
   return (
@@ -28,7 +32,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ files, selectedFile, onSele
           {dirFiles.map((file) => (
             <div
               key={file.path}
-              className={`explorer-file ${selectedFile === file.path ? 'selected' : ''}`}
+              className={`explorer-file ${selectedFile === file.path ? "selected" : ""}`}
               onClick={() => onSelectFile(file.path)}
             >
               {file.filename}

@@ -23,7 +23,10 @@ const severityBgColors = {
   info: "#dbeafe",
 };
 
-export default function ErrorExplainer({ error, onClose }: ErrorExplainerProps) {
+export default function ErrorExplainer({
+  error,
+  onClose,
+}: ErrorExplainerProps) {
   const parsed = translateError(error);
   const severity = getErrorSeverity(parsed.code);
 

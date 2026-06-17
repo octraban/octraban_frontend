@@ -25,14 +25,17 @@ function short(id: string | null | undefined) {
 
 function DeploymentMethodBadge({ method }: { method?: string }) {
   if (!method || method === "unknown") return null;
-  
+
   const colors: Record<string, { bg: string; text: string }> = {
     wasm_hash: { bg: "rgba(88,166,255,0.15)", text: "#58a6ff" },
     stellar_asset: { bg: "rgba(163,113,247,0.15)", text: "#a371f7" },
   };
-  
-  const color = colors[method] ?? { bg: "rgba(139,148,158,0.15)", text: "#8b949e" };
-  
+
+  const color = colors[method] ?? {
+    bg: "rgba(139,148,158,0.15)",
+    text: "#8b949e",
+  };
+
   return (
     <span
       style={{
@@ -45,9 +48,17 @@ function DeploymentMethodBadge({ method }: { method?: string }) {
         fontWeight: 600,
         letterSpacing: 0.3,
       }}
-      title={method === "wasm_hash" ? "Deployed from pre-uploaded WASM hash" : "Stellar Asset Contract"}
+      title={
+        method === "wasm_hash"
+          ? "Deployed from pre-uploaded WASM hash"
+          : "Stellar Asset Contract"
+      }
     >
-      {method === "wasm_hash" ? "WASM" : method === "stellar_asset" ? "SAC" : method.toUpperCase()}
+      {method === "wasm_hash"
+        ? "WASM"
+        : method === "stellar_asset"
+          ? "SAC"
+          : method.toUpperCase()}
     </span>
   );
 }
@@ -66,7 +77,14 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
       aria-label="Factory Deployment Trace"
     >
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 16,
+        }}
+      >
         <span
           style={{
             background: "#d2a8ff",
@@ -81,7 +99,8 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
           ⬢ FACTORY DEPLOYMENT TRACE
         </span>
         <span style={{ color: "var(--muted)", fontSize: 13 }}>
-          {contracts.length} contract{contracts.length !== 1 ? "s" : ""} deployed in single transaction
+          {contracts.length} contract{contracts.length !== 1 ? "s" : ""}{" "}
+          deployed in single transaction
         </span>
       </div>
 
@@ -100,7 +119,9 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
             fontSize: 13,
           }}
         >
-          <span style={{ color: "#d2a8ff", fontWeight: 700, fontSize: 14 }}>⬡ Factory Contract</span>
+          <span style={{ color: "#d2a8ff", fontWeight: 700, fontSize: 14 }}>
+            ⬡ Factory Contract
+          </span>
           {factoryContractId ? (
             <Link
               to={`/contract/${factoryContractId}`}
@@ -119,7 +140,14 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
         </div>
 
         {/* Deployed sub-contracts */}
-        <div style={{ marginLeft: 32, display: "flex", flexDirection: "column", gap: 6 }}>
+        <div
+          style={{
+            marginLeft: 32,
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+          }}
+        >
           {contracts.map((c, i) => (
             <div
               key={i}
@@ -143,10 +171,12 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
               }}
             >
               <span style={{ color: "var(--muted)", fontSize: 14 }}>└─</span>
-              <span style={{ color: "var(--text)", fontWeight: 600, minWidth: 80 }}>
+              <span
+                style={{ color: "var(--text)", fontWeight: 600, minWidth: 80 }}
+              >
                 Contract #{c.index + 1}
               </span>
-              
+
               <Link
                 to={`/contract/${c.contractId}`}
                 style={{
@@ -158,9 +188,9 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
               >
                 {short(c.contractId)}
               </Link>
-              
+
               <DeploymentMethodBadge method={c.deploymentMethod} />
-              
+
               {c.wasmHash && (
                 <span
                   style={{
@@ -178,7 +208,7 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
           ))}
         </div>
       </div>
-      
+
       {/* Footer note */}
       <div
         style={{
@@ -191,8 +221,9 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
           fontStyle: "italic",
         }}
       >
-        💡 This transaction executed a factory pattern, programmatically deploying multiple contracts
-        from a single parent contract. Click any contract ID to view its profile.
+        💡 This transaction executed a factory pattern, programmatically
+        deploying multiple contracts from a single parent contract. Click any
+        contract ID to view its profile.
       </div>
     </div>
   );

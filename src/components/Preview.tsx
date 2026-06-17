@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import DependencyVisualizer from './DependencyVisualizer';
+import React, { useState } from "react";
+import DependencyVisualizer from "./DependencyVisualizer";
 
 interface PreviewProps {
   packageJsonContent?: string;
 }
 
-const Preview: React.FC<PreviewProps> = ({ packageJsonContent = '' }) => {
+const Preview: React.FC<PreviewProps> = ({ packageJsonContent = "" }) => {
   const [showDeps, setShowDeps] = useState(false);
 
   return (
@@ -22,7 +22,10 @@ const Preview: React.FC<PreviewProps> = ({ packageJsonContent = '' }) => {
       </div>
       <div className="preview-content">
         {showDeps ? (
-          <DependencyVisualizer packageJsonContent={packageJsonContent} isVisible={showDeps} />
+          <DependencyVisualizer
+            packageJsonContent={packageJsonContent}
+            isVisible={showDeps}
+          />
         ) : (
           <>
             <div className="contract-events">

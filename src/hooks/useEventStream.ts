@@ -14,7 +14,9 @@ export function useEventStream(onEvent: (ev: DecodedEvent) => void) {
       try {
         const payload = JSON.parse(msg.data);
         if (payload.type === "event") onEvent(payload.data as DecodedEvent);
-      } catch { /* ignore malformed frames */ }
+      } catch {
+        /* ignore malformed frames */
+      }
     };
 
     ws.onerror = (err) => console.error("[ws] error", err);
