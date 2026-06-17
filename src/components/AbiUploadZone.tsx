@@ -81,7 +81,6 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
       const file = e.dataTransfer.files[0];
       if (file) readFile(file);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onLoad]
   );
 
@@ -92,7 +91,6 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
       // Reset so the same file can be re-uploaded
       e.target.value = "";
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onLoad]
   );
 

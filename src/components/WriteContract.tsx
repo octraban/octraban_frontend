@@ -38,23 +38,6 @@ interface Props {
 
 const NETWORK_PASSPHRASE = Networks.TESTNET;
 
-// ── Primitive types that use a plain text/number input ────────────────────────
-
-const PRIMITIVE_TYPES = new Set([
-  "bool", "u32", "i32", "u64", "i64", "u128", "i128", "u256", "i256",
-  "string", "symbol", "bytes", "address", "val", "void",
-  "timepoint", "duration", "error",
-]);
-
-function isPrimitive(type: string, typeIndex: TypeIndex): boolean {
-  const t = type.toLowerCase();
-  if (PRIMITIVE_TYPES.has(t)) return true;
-  if (t.startsWith("option<") || t.startsWith("vec<") || t.startsWith("map<") ||
-      t.startsWith("bytesn<") || t.startsWith("result<") || t.startsWith("(")) return true;
-  // If the type is in the typeIndex it's a custom struct/enum/union
-  return !typeIndex.has(type);
-}
-
 // ── ScVal serialisation ───────────────────────────────────────────────────────
 
 /**

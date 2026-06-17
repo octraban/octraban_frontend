@@ -65,7 +65,6 @@ export default function ContractDependencyGraph3D() {
       graphRef.current?._destructor?.();
       graphRef.current = null;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial]);
 
   // Live WebSocket updates

@@ -6,23 +6,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api";
 
-const NETWORKS = ["mainnet", "testnet", "futurenet"] as const;
-type Network = typeof NETWORKS[number];
-
-interface NetworkStatus {
-  network: Network;
-  deployed: boolean;
-  wasmHash?: string;
-  balance?: string;
-  error?: string;
-}
-
-interface NetworkComparisonResult {
-  contractId: string;
-  statuses: NetworkStatus[];
-  hasVersionMismatch: boolean;
-}
-
 function StatusBadge({ deployed, error }: { deployed: boolean; error?: string }) {
   if (error) return <span style={{ color: "#ef4444", fontWeight: 600 }}>Error</span>;
   return deployed

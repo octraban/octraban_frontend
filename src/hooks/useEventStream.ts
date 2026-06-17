@@ -20,6 +20,5 @@ export function useEventStream(onEvent: (ev: DecodedEvent) => void) {
     ws.onerror = (err) => console.error("[ws] error", err);
 
     return () => ws.close();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

@@ -41,7 +41,8 @@ function highlight(raw: string): string {
   }
 
   // Restore placeholders
-  result = result.replace(/\x00(\d+)\x00/g, (_, i) => placeholders[Number(i)]);
+  // eslint-disable-next-line no-control-regex
+  result = result.replace(/\x00(\d+)\x00/gu, (_, i) => placeholders[Number(i)]);
   return result;
 }
 

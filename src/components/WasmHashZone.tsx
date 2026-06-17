@@ -29,7 +29,6 @@ export default function WasmHashZone() {
     setDragging(false);
     const file = e.dataTransfer.files[0];
     if (file) computeHash(file);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

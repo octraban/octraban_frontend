@@ -4,7 +4,6 @@ import {
   StrKey,
   TransactionBuilder,
   Networks,
-  BASE_FEE,
   Contract,
   Account,
 } from "@stellar/stellar-sdk";

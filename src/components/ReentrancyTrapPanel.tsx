@@ -30,7 +30,6 @@ interface Props {
 }
 
 const REENTRANCY_ICON = "⚠";
-const DEPTH_ICON = "⚠";
 
 export default function ReentrancyTrapPanel({ result }: Props) {
   const [expanded, setExpanded] = useState(false);

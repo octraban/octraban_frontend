@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api";
-import type { BurnAlert } from "../api";
 import EventTable from "../components/EventTable";
 import RustCodeViewer from "../components/RustCodeViewer";
 import MigrationBanner from "../components/MigrationBanner";
@@ -80,12 +79,6 @@ export default function ContractPage() {
   const { data: events = [], isLoading: evLoading } = useQuery({
     queryKey: ["events", id],
     queryFn: () => api.events({ contract: id }),
-    enabled: !!id,
-  });
-
-  const { data: burnAlerts = [] } = useQuery({
-    queryKey: ["burn-alerts", id],
-    queryFn: () => api.burnAlerts(id),
     enabled: !!id,
   });
 

@@ -3,7 +3,7 @@ import { SandboxFile } from './webcontainer';
 
 export async function exportAsZip(
   files: Map<string, SandboxFile>,
-  projectName: string = 'soroban-sandbox'
+  _projectName: string = 'soroban-sandbox'
 ): Promise<Blob> {
   const zip = new JSZip();
 

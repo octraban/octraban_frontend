@@ -13,37 +13,10 @@
  * WriteContract component can pass to nativeToScVal / toScVal.
  */
 
-import { useState } from "react";
 import type { SpecType } from "../api";
 import type { TypeIndex } from "./StructuredValue";
 
 // ── Primitive type helpers ────────────────────────────────────────────────────
-
-const PRIMITIVE_TYPES = new Set([
-  "bool", "u32", "i32", "u64", "i64", "u128", "i128", "u256", "i256",
-  "string", "symbol", "bytes", "address", "val", "void",
-  "timepoint", "duration", "error",
-]);
-
-function isPrimitive(type: string): boolean {
-  const t = type.toLowerCase();
-  return (
-    PRIMITIVE_TYPES.has(t) ||
-    t.startsWith("option<") ||
-    t.startsWith("vec<") ||
-    t.startsWith("map<") ||
-    t.startsWith("bytesn<") ||
-    t.startsWith("result<") ||
-    t.startsWith("(")
-  );
-}
-
-function primitiveInputType(type: string): string {
-  const t = type.toLowerCase();
-  if (t === "bool") return "checkbox";
-  if (t.includes("int") || ["u32","i32","u64","i64","u128","i128","u256","i256"].includes(t)) return "number";
-  return "text";
-}
 
 // ── Main component ────────────────────────────────────────────────────────────
 

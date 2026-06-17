@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Editor from '../components/Editor';
 import FileExplorer from '../components/FileExplorer';
 import Terminal from '../components/Terminal';
 import { loadSandbox } from '../services/sandbox-api';
