@@ -11,6 +11,7 @@ const XdrInspector = lazy(() => import("./pages/XdrInspector"));
 const RpcMetricsDashboard = lazy(() => import("./pages/RpcMetricsDashboard"));
 const GraphPage = lazy(() => import("./pages/GraphPage"));
 const SandboxPage = lazy(() => import("./pages/Sandbox"));
+const SharedSandbox = lazy(() => import("./pages/SharedSandbox"));
 const DeveloperWorkspace = lazy(() => import("./pages/DeveloperWorkspace"));
 const SetupPage = lazy(() => import("./pages/SetupPage"));
 
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="/rpc-metrics" element={<RpcMetricsDashboard />} />
             <Route path="/graph" element={<GraphPage />} />
             <Route path="/sandbox" element={<SandboxPage />} />
+            <Route path="/sandbox/:id" element={<SharedSandbox />} />
             <Route path="/setup" element={<SetupPage />} />
           </Routes>
         </Suspense>
