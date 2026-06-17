@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SandboxFile } from '../services/webcontainer';
-import { exportAsZip, downloadZip, generateSandboxId, copySandboxUrl } from '../services/export';
+import { exportAsZip, downloadZip, copySandboxUrl } from '../services/export';
 import '../styles/ActionBar.css';
 
 interface ActionBarProps {

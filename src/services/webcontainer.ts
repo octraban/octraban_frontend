@@ -95,14 +95,12 @@ export async function mountFiles(
     const parts = file.path.split('/').filter(Boolean);
     let current = tree;
 
-    for (let i = 0; i < parts.length - i; i++) {
+    for (let i = 0; i < parts.length - 1; i++) {
       const part = parts[i];
       if (!current[part]) {
         current[part] = { directory: {} };
       }
-      if (i < parts.length - 1) {
-        current = (current[part].directory as FileSystemTree) || {};
-      }
+      current = (current[part].directory as FileSystemTree) || {};
     }
 
     const lastPart = parts[parts.length - 1];
@@ -123,7 +121,7 @@ export async function runCommand(
   let exitCode = 0;
 
   process.output.pipeTo(
-    new WritableStream({
+    new WritableStream<string>({
       write(chunk) {
         onOutput(chunk);
       },

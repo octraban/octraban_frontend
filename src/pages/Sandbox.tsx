@@ -10,7 +10,7 @@ import { initWebContainer, mountFiles, runCommand, SandboxFile } from '../servic
 import { getTemplate } from '../services/templates';
 import { generateSandboxId } from '../services/export';
 import { saveSandbox } from '../services/sandbox-api';
-import { createAutoSaver, loadSession, clearSession } from '../services/session';
+import { createAutoSaver } from '../services/session';
 import { WebContainer } from '@webcontainer/api';
 
 const Sandbox: React.FC = () => {
