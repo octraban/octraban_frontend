@@ -9,6 +9,8 @@ import TemplateSelector from '../components/TemplateSelector';
 import { initWebContainer, mountFiles, runCommand, SandboxFile } from '../services/webcontainer';
 import { getTemplate } from '../services/templates';
 import { generateSandboxId } from '../services/export';
+import { saveSandbox } from '../services/sandbox-api';
+import { createAutoSaver, loadSession, clearSession } from '../services/session';
 import { WebContainer } from '@webcontainer/api';
 
 const Sandbox: React.FC = () => {
@@ -18,11 +20,14 @@ const Sandbox: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(true);
   const [sandboxId] = useState(generateSandboxId());
+  const [templateId, setTemplateId] = useState<string>('');
   const webcontainerRef = useRef<WebContainer | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
+  const autoSaverRef = useRef<(() => void) | null>(null);
 
   const initializeSandbox = async (templateId: string) => {
     setIsInitializing(true);
+    setTemplateId(templateId);
     try {
       const container = await initWebContainer();
       webcontainerRef.current = container;
@@ -35,9 +40,18 @@ const Sandbox: React.FC = () => {
       setSelectedFile(Object.keys(template.files)[0]);
 
       await mountFiles(container, templateMap);
+      
+      // Start auto-saver
+      if (autoSaverRef.current) autoSaverRef.current();
+      autoSaverRef.current = createAutoSaver(sandboxId, templateId, templateMap, Object.keys(template.files)[0]);
+
+      // Persist to backend
+      await saveSandbox(sandboxId, templateId, templateMap);
+
       setTerminalOutput(['> Sandbox initialized with ' + template.name]);
       setShowTemplateSelector(false);
     } catch (error) {
+      console.error('Initialization error:', error);
       setTerminalOutput([
         '✗ Failed to initialize WebContainer',
         'Note: WebContainer requires COOP/COEP headers. Running in demo mode.',
@@ -57,9 +71,19 @@ const Sandbox: React.FC = () => {
   const handleFileChange = (content: string) => {
     if (selectedFile) {
       const updatedFile = { ...files.get(selectedFile)!, content };
-      setFiles(new Map(files).set(selectedFile, updatedFile));
+      const newFiles = new Map(files).set(selectedFile, updatedFile);
+      setFiles(newFiles);
     }
   };
+
+  // Auto-persist files when they change
+  useEffect(() => {
+    if (files.size > 0 && templateId && sandboxId) {
+      saveSandbox(sandboxId, templateId, files).catch((error) => {
+        console.warn('Failed to auto-save:', error);
+      });
+    }
+  }, [files, templateId, sandboxId]);
 
   const handleRun = async () => {
     if (!webcontainerRef.current) {
