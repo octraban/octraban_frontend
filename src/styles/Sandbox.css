@@ -117,12 +117,24 @@
 }
 
 .preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 8px 15px;
   font-weight: 600;
   font-size: 12px;
   text-transform: uppercase;
   color: #bebebe;
   border-bottom: 1px solid #3e3e42;
+}
+
+.preview-toggle {
+  background: transparent;
+  border: none;
+  color: #bebebe;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
 }
 
 .preview-content {

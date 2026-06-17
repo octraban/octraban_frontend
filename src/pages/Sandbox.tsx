@@ -154,7 +154,7 @@ const Sandbox: React.FC = () => {
         </div>
 
         <div className="right-panel">
-          <Preview />
+          <Preview packageJsonContent={files.get('package.json')?.content || ''} />
           <Terminal output={terminalOutput} />
         </div>
       </div>
