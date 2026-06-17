@@ -4,7 +4,9 @@ import Editor from '../components/Editor';
 import FileExplorer from '../components/FileExplorer';
 import Terminal from '../components/Terminal';
 import Preview from '../components/Preview';
-import { initWebContainer, mountFiles, runCommand, NODE_SDK_TEMPLATE, SandboxFile } from '../services/webcontainer';
+import TemplateSelector from '../components/TemplateSelector';
+import { initWebContainer, mountFiles, runCommand, SandboxFile } from '../services/webcontainer';
+import { getTemplate } from '../services/templates';
 import { WebContainer } from '@webcontainer/api';
 
 const Sandbox: React.FC = () => {
@@ -12,36 +14,36 @@ const Sandbox: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(true);
   const webcontainerRef = useRef<WebContainer | null>(null);
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(false);
 
-  // Initialize WebContainer and template on mount
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        const container = await initWebContainer();
-        webcontainerRef.current = container;
+  const initializeSandbox = async (templateId: string) => {
+    setIsInitializing(true);
+    try {
+      const container = await initWebContainer();
+      webcontainerRef.current = container;
 
-        // Load Node.js template
-        const templateMap = new Map(Object.entries(NODE_SDK_TEMPLATE));
-        setFiles(templateMap);
-        setSelectedFile('src/index.js');
+      const template = getTemplate(templateId);
+      if (!template) throw new Error('Template not found');
 
-        // Mount files to container
-        await mountFiles(container, templateMap);
-        setTerminalOutput(['> Sandbox initialized']);
-      } catch (error) {
-        setTerminalOutput([
-          '✗ Failed to initialize WebContainer',
-          'Note: WebContainer requires COOP/COEP headers. Running in demo mode.',
-        ]);
-      } finally {
-        setIsInitializing(false);
-      }
-    };
+      const templateMap = new Map(Object.entries(template.files));
+      setFiles(templateMap);
+      setSelectedFile(Object.keys(template.files)[0]);
 
-    initialize();
-  }, []);
+      await mountFiles(container, templateMap);
+      setTerminalOutput(['> Sandbox initialized with ' + template.name]);
+      setShowTemplateSelector(false);
+    } catch (error) {
+      setTerminalOutput([
+        '✗ Failed to initialize WebContainer',
+        'Note: WebContainer requires COOP/COEP headers. Running in demo mode.',
+      ]);
+      setShowTemplateSelector(false);
+    } finally {
+      setIsInitializing(false);
+    }
+  };
 
   const currentFile = selectedFile ? files.get(selectedFile) : null;
 
@@ -66,12 +68,10 @@ const Sandbox: React.FC = () => {
     setTerminalOutput((prev) => [...prev, '$ npm start', '']);
 
     try {
-      // First install dependencies
       await runCommand(webcontainerRef.current, 'npm install', (line) => {
         setTerminalOutput((prev) => [...prev, line]);
       });
 
-      // Then run the script
       await runCommand(webcontainerRef.current, 'npm start', (line) => {
         setTerminalOutput((prev) => [...prev, line]);
       });
@@ -81,6 +81,17 @@ const Sandbox: React.FC = () => {
       setIsRunning(false);
     }
   };
+
+  if (showTemplateSelector) {
+    return (
+      <div className="sandbox-container">
+        <div className="sandbox-header">
+          <h1>Soroban Sandbox</h1>
+        </div>
+        <TemplateSelector onSelect={initializeSandbox} />
+      </div>
+    );
+  }
 
   if (isInitializing) {
     return (
