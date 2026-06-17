@@ -4,9 +4,11 @@ import Editor from '../components/Editor';
 import FileExplorer from '../components/FileExplorer';
 import Terminal from '../components/Terminal';
 import Preview from '../components/Preview';
+import ActionBar from '../components/ActionBar';
 import TemplateSelector from '../components/TemplateSelector';
 import { initWebContainer, mountFiles, runCommand, SandboxFile } from '../services/webcontainer';
 import { getTemplate } from '../services/templates';
+import { generateSandboxId } from '../services/export';
 import { WebContainer } from '@webcontainer/api';
 
 const Sandbox: React.FC = () => {
@@ -15,6 +17,7 @@ const Sandbox: React.FC = () => {
   const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(true);
+  const [sandboxId] = useState(generateSandboxId());
   const webcontainerRef = useRef<WebContainer | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
 
@@ -112,6 +115,8 @@ const Sandbox: React.FC = () => {
           {isRunning ? 'Running...' : 'Run'}
         </button>
       </div>
+
+      <ActionBar files={files} sandboxId={sandboxId} />
 
       <div className="sandbox-layout">
         <FileExplorer files={Array.from(files.values())} selectedFile={selectedFile} onSelectFile={handleFileSelect} />
