@@ -10,7 +10,7 @@ const EventPage = lazy(() => import("./pages/EventPage"));
 const XdrInspector = lazy(() => import("./pages/XdrInspector"));
 const RpcMetricsDashboard = lazy(() => import("./pages/RpcMetricsDashboard"));
 const GraphPage = lazy(() => import("./pages/GraphPage"));
-const SandboxPage = lazy(() => import("./pages/SandboxPage"));
+const SandboxPage = lazy(() => import("./pages/Sandbox"));
 const DeveloperWorkspace = lazy(() => import("./pages/DeveloperWorkspace"));
 const SetupPage = lazy(() => import("./pages/SetupPage"));
 
