@@ -18,6 +18,13 @@ import type { TypeIndex } from "./StructuredValue";
 
 // ── Primitive type helpers ────────────────────────────────────────────────────
 
+function primitiveInputType(type: string): string {
+  const t = type.toLowerCase();
+  if (t === "bool") return "checkbox";
+  if (t.includes("int") || ["u32","i32","u64","i64","u128","i128","u256","i256"].includes(t)) return "number";
+  return "text";
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 interface StructuredInputProps {
