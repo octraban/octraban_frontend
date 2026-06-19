@@ -247,6 +247,64 @@ export interface SubInvocation {
   ledger: number;
 }
 
+// Issue #210: Extended sub-invocation with optional analytics fields
+export interface SubInvocationExtended extends SubInvocation {
+  gas_cost?: number;
+  parent_invocation_id?: number | null;
+  is_reentrant?: boolean;
+  contract_type?: "token" | "dex" | "lending" | "nft" | "other";
+  duration_ms?: number;
+}
+
+// Issue #210: Search/filter parameters for sub-invocations
+export interface SubInvocationFilter {
+  contract?: string;
+  depth_min?: number;
+  depth_max?: number;
+  gas_min?: number;
+  gas_max?: number;
+  function?: string;
+  date_from?: string;
+  date_to?: string;
+  arg_query?: string;
+  has_reentrancy?: boolean;
+  tx_hash?: string;
+  ledger_min?: number;
+  ledger_max?: number;
+}
+
+// Issue #210: Call-path analytical metrics (6 metrics)
+export interface SubInvocationCallMetrics {
+  longest_chain: SubInvocationExtended[];
+  most_called: { contract_id: string; count: number }[];
+  reentrancy_paths: SubInvocationExtended[][];
+  critical_path: SubInvocationExtended[];
+  dependency_map: Record<string, string[]>;
+  clusters: string[][];
+}
+
+// Issue #210: Analytics dashboard data
+export interface SubInvocationAnalytics {
+  total_invocations: number;
+  unique_contracts: number;
+  max_depth: number;
+  avg_depth: number;
+  top_contracts: { contract_id: string; call_count: number }[];
+  depth_distribution: { depth: number; count: number }[];
+  reentrancy_count: number;
+  volume_by_timeframe: { timeframe: string; count: number }[];
+}
+
+// Issue #210: Cross-transaction diff result
+export interface TransactionTreeDiff {
+  tx_a: string;
+  tx_b: string;
+  only_in_a: SubInvocationExtended[];
+  only_in_b: SubInvocationExtended[];
+  common: SubInvocationExtended[];
+  gas_diff: number;
+}
+
 // Issue #118: transaction status
 export interface TxStatusResponse {
   tx_hash: string;
@@ -499,4 +557,44 @@ export const api = {
       null,
       2,
     ),
+
+  // Issue #210: Sub-invocation search with 8+ filter types
+  searchSubInvocations: (filter: SubInvocationFilter) => {
+    const q = new URLSearchParams();
+    if (filter.contract) q.set("contract", filter.contract);
+    if (filter.depth_min != null) q.set("depth_min", String(filter.depth_min));
+    if (filter.depth_max != null) q.set("depth_max", String(filter.depth_max));
+    if (filter.gas_min != null) q.set("gas_min", String(filter.gas_min));
+    if (filter.gas_max != null) q.set("gas_max", String(filter.gas_max));
+    if (filter.function) q.set("function", filter.function);
+    if (filter.date_from) q.set("date_from", filter.date_from);
+    if (filter.date_to) q.set("date_to", filter.date_to);
+    if (filter.arg_query) q.set("arg_query", filter.arg_query);
+    if (filter.has_reentrancy != null) q.set("has_reentrancy", String(filter.has_reentrancy));
+    if (filter.tx_hash) q.set("tx_hash", filter.tx_hash);
+    if (filter.ledger_min != null) q.set("ledger_min", String(filter.ledger_min));
+    if (filter.ledger_max != null) q.set("ledger_max", String(filter.ledger_max));
+    return get<SubInvocationExtended[]>(`/sub-invocations/search?${q}`);
+  },
+
+  // Issue #210: Global analytics for sub-invocations
+  subInvocationAnalytics: () => get<SubInvocationAnalytics>(`/sub-invocations/analytics`),
+
+  // Issue #210: Call-path metrics for a single transaction (6 analytical metrics)
+  callPathMetrics: (txHash: string) =>
+    get<SubInvocationCallMetrics>(`/transactions/${txHash}/call-path-metrics`),
+
+  // Issue #210: Cross-transaction tree diff
+  compareTransactionTrees: (txA: string, txB: string) =>
+    get<TransactionTreeDiff>(
+      `/transactions/compare?a=${encodeURIComponent(txA)}&b=${encodeURIComponent(txB)}`,
+    ),
+
+  // Issue #210: SSE stream URL builder for live sub-invocation feed
+  subInvocationStreamUrl: (filter?: Pick<SubInvocationFilter, "contract" | "function">) => {
+    const q = new URLSearchParams();
+    if (filter?.contract) q.set("contract", filter.contract);
+    if (filter?.function) q.set("function", filter.function);
+    return `${BASE}/sub-invocations/stream?${q}`;
+  },
 };
