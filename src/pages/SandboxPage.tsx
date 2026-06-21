@@ -1,5 +1,4 @@
 import { useState } from "react";
-import SSEStatusIndicator from "../components/SSEStatusIndicator";
 import { xdr, StrKey, TransactionBuilder, Networks, Contract, Account } from "@stellar/stellar-sdk";
 
 interface ParsedInvocation {
@@ -243,8 +242,6 @@ export default function SandboxPage() {
             {result.latestLedger != null && (
               <span style={{ fontSize: 12, color: "var(--muted)" }}>ledger #{result.latestLedger}</span>
             )}
-              {/** Show SSE status if a tx hash is present in the result */}
-              {(result as any).tx_hash && <SSEStatusIndicator txHash={(result as any).tx_hash} />}
           </div>
 
           {result.error && <p style={{ color: "#f85149", fontSize: 13, marginBottom: 8 }}>{result.error}</p>}

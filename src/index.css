@@ -45,7 +45,7 @@ button {
   border: none;
   border-radius: 7px;
   padding: 6px 14px;
-  font-weight: 603;
+  font-weight: 600;
   cursor: pointer;
   transition: background 200ms ease, color 200ms ease, opacity 200ms ease;
 }

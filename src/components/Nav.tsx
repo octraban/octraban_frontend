@@ -38,9 +38,6 @@ export default function Nav() {
       <Link to="/xdr" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
         XDR Workbench
       </Link>
-      <Link to="/storage-layout" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
-        Storage Layout
-      </Link>
       <Link to="/rpc-metrics" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
         RPC Metrics
       </Link>
