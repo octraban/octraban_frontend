@@ -7,7 +7,6 @@ import {
 } from "@stellar/freighter-api";
 import {
   Contract,
-  Networks,
   TransactionBuilder,
   BASE_FEE,
   nativeToScVal,
@@ -16,6 +15,7 @@ import {
   xdr,
 } from "@stellar/stellar-sdk";
 import { api } from "../api";
+import { useNetwork } from "../contexts/NetworkContext";
 import StructuredInput from "./StructuredInput";
 import { buildTypeIndex, type TypeIndex } from "./StructuredValue";
 
@@ -35,8 +35,6 @@ interface Props {
   functions: AbiFunction[];
   contractId: string;
 }
-
-const NETWORK_PASSPHRASE = Networks.TESTNET;
 
 // ── Primitive types that use a plain text/number input ────────────────────────
 
@@ -135,6 +133,7 @@ function toScVal(value: unknown, type: string, typeIndex: TypeIndex): xdr.ScVal 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function WriteContract({ functions, contractId }: Props) {
+  const { active: activeNetwork } = useNetwork();
   const writeFns = functions.filter(f => f.mutates);
 
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
@@ -196,14 +195,14 @@ export default function WriteContract({ functions, contractId }: Props) {
 
       const tx = new TransactionBuilder(account, {
         fee: BASE_FEE,
-        networkPassphrase: NETWORK_PASSPHRASE,
+        networkPassphrase: activeNetwork.passphrase,
       })
         .addOperation(contract.call(fn.name, ...callArgs))
         .setTimeout(30)
         .build();
 
       const { signedTxXdr } = await signTransaction(tx.toXDR(), {
-        networkPassphrase: NETWORK_PASSPHRASE,
+        networkPassphrase: activeNetwork.passphrase,
       });
 
       const submitRes = await fetch("/api/submit", {
