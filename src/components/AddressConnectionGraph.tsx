@@ -1,5 +1,5 @@
 /**
- * Issue #126 — Interactive Address Connection Graph
+ * Interactive Address Connection Graph
  * Visual map of how a contract interacts with external addresses and other contracts.
  * Uses Cytoscape.js for interactive node-based graph rendering.
  */
@@ -75,13 +75,13 @@ export default function AddressConnectionGraph({ contractId }: Props) {
             selector: "node",
             style: {
               "background-color": "data(type)" as any,
-              "label": "data(label)",
-              "color": "#fff",
+              label: "data(label)",
+              color: "#fff",
               "font-size": 10,
               "text-valign": "bottom",
               "text-margin-y": 4,
-              "width": 36,
-              "height": 36,
+              width: 36,
+              height: 36,
             },
           },
           {
@@ -95,14 +95,14 @@ export default function AddressConnectionGraph({ contractId }: Props) {
           {
             selector: "edge",
             style: {
-              "width": 2,
+              width: 2,
               "line-color": "#4b5563",
               "target-arrow-color": "#4b5563",
               "target-arrow-shape": "triangle",
               "curve-style": "bezier",
-              "label": "data(label)",
+              label: "data(label)",
               "font-size": 9,
-              "color": "#9ca3af",
+              color: "#9ca3af",
               "text-rotation": "autorotate",
             },
           },
@@ -123,20 +123,64 @@ export default function AddressConnectionGraph({ contractId }: Props) {
 
   if (isLoading) return <p style={{ color: "var(--muted)" }}>Loading graph…</p>;
   if (error) return <p style={{ color: "#ef4444" }}>Failed to load address graph.</p>;
-  if (!data || data.nodes.length === 0) return <p style={{ color: "var(--muted)" }}>No connections found for this contract.</p>;
+  if (!data || data.nodes.length === 0)
+    return <p style={{ color: "var(--muted)" }}>No connections found for this contract.</p>;
 
   return (
     <div className="card">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 12,
+        }}
+      >
         <h3 style={{ fontSize: 14, margin: 0 }}>Address Connection Graph</h3>
-        <div style={{ display: "flex", gap: 16, fontSize: 12, color: "var(--muted)" }}>
-          <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", background: "#6366f1", marginRight: 4 }} />Contract</span>
-          <span><span style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", background: "#0ea5e9", marginRight: 4 }} />Wallet</span>
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            fontSize: 12,
+            color: "var(--muted)",
+          }}
+        >
+          <span>
+            <span
+              style={{
+                display: "inline-block",
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: "#6366f1",
+                marginRight: 4,
+              }}
+            />
+            Contract
+          </span>
+          <span>
+            <span
+              style={{
+                display: "inline-block",
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: "#0ea5e9",
+                marginRight: 4,
+              }}
+            />
+            Wallet
+          </span>
         </div>
       </div>
       <div
         ref={containerRef}
-        style={{ width: "100%", height: 420, background: "var(--surface, #0f0f1a)", borderRadius: 8 }}
+        style={{
+          width: "100%",
+          height: 420,
+          background: "var(--surface, #0f0f1a)",
+          borderRadius: 8,
+        }}
       />
       <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>
         Scroll to zoom · Drag to pan · {data.nodes.length} nodes · {data.edges.length} connections

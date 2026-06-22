@@ -1,3 +1,5 @@
+import { BatchCall } from "./types/batch";
+
 const BASE = "/api";
 
 export interface SpecType {
@@ -29,7 +31,7 @@ export interface FeeBumpInfo {
   actual_caller: string | null;
 }
 
-// Issue #177: Factory deployment tracking
+Factory deployment tracking
 export interface FactoryDeploymentContract {
   contractId: string;
   wasmHash: string | null;
@@ -42,7 +44,7 @@ export interface FactoryDeploymentTree {
   contracts: FactoryDeploymentContract[];
 }
 
-// Issue #164: CAP-0080 ZK host function types
+CAP-0080 ZK host function types
 export interface ZkHostCall {
   fn_name: string;
   curve: "BN254" | "BLS12-381";
@@ -74,19 +76,19 @@ export interface DecodedEvent {
   description: string;
   raw_topics: string[];
   tx_hash?: string;
-  // Issue #40: Soroban resource gas costs
+  Soroban resource gas costs
   cpu_instructions?: number;
   mem_bytes?: number;
   fee_charged?: number;
-  // Issue #50: state-bloat risk
+  state-bloat risk
   is_high_bloat_risk?: boolean;
-  // Issue #51: upgrade lineage
+  upgrade lineage
   upgrade_info?: { type: "upgrade"; oldHash: string; newHash: string };
-  // Issue #52: storage tier breakdown
+  storage tier breakdown
   storage_tiers?: StorageTiers;
-  // Issue #74: clawback compliance flag
+  clawback compliance flag
   is_clawback?: boolean;
-  // Issue #75: AMM swap path hops ["10 USDC", "9.1 EURC", "5.2 XLM"]
+  AMM swap path hops ["10 USDC", "9.1 EURC", "5.2 XLM"]
   swap_path?: string[];
   // Protocol 26: TTL extension host function data
   ttl_extension?: {
@@ -95,9 +97,9 @@ export interface DecodedEvent {
     min_extension: number | null;
     max_extension: number | null;
   };
-  // Issue #169: fee-bump chain of custody
+  fee-bump chain of custody
   fee_bump?: FeeBumpInfo | null;
-  // Issue #167: state archival / restoration info (RestoreFootprintOp)
+  state archival / restoration info (RestoreFootprintOp)
   archival_info?: {
     isRestoreOp: boolean;
     revivedKeys: {
@@ -111,13 +113,13 @@ export interface DecodedEvent {
     keyCount: number;
     feePaid: number | null;
   } | null;
-  // Issue #191: CAP-0080 ZK host function telemetry (Protocol 26)
+  CAP-0080 ZK host function telemetry (Protocol 26)
   zk_host_calls?: { calls: ZkHostCall[]; delta: ZkCostDelta | null };
   // Heuristic fallback params: present when no ABI is registered
   heuristic_params?: HeuristicParam[];
   // SAC implicit side-effect (auto-created account or trustline)
   sac_side_effect?: "account_created" | "trustline_opened";
-  // Issue #177: Factory deployment trace
+  Factory deployment trace
   factory_deployment?: FactoryDeploymentTree;
 }
 
@@ -156,6 +158,39 @@ export interface ContractMeta {
   dependency_advisory?: DependencyAdvisory | null;
 }
 
+export type SearchKind = "contract" | "event" | "wallet";
+
+export interface SearchContract {
+  id: string;
+  name: string;
+  description?: string | null;
+  functions?: { name: string; description?: string }[];
+  event_count: number;
+}
+
+export interface SearchWallet {
+  address: string;
+  event_count: number;
+  first_seen_ledger: number | null;
+  last_seen_ledger: number | null;
+  contracts: string[];
+}
+
+export interface SearchSuggestion {
+  kind: SearchKind;
+  label: string;
+  route: string;
+  meta: Record<string, unknown>;
+}
+
+export interface SearchResponse {
+  query: string;
+  contracts: SearchContract[];
+  events: DecodedEvent[];
+  wallets: SearchWallet[];
+  suggestions: SearchSuggestion[];
+}
+
 export interface BurnAlert {
   contractId: string;
   ledger: number;
@@ -164,7 +199,7 @@ export interface BurnAlert {
   flaggedAt: number;
 }
 
-// Issue #38: paginated contract transaction response
+paginated contract transaction response
 export interface ContractTransactionsResponse {
   data: DecodedEvent[];
   pagination: {
@@ -176,7 +211,7 @@ export interface ContractTransactionsResponse {
   };
 }
 
-// Issue #142: contract dependency graph
+contract dependency graph
 export interface GraphNode3D {
   id: string;
   callCount: number;
@@ -213,7 +248,7 @@ export interface PrivilegedRole {
   updated_at: string;
 }
 
-// Issue #135: source verification signature
+source verification signature
 export interface SourceVerification {
   signer: string;
   signature: string;
@@ -222,7 +257,7 @@ export interface SourceVerification {
   submitted_at: string;
 }
 
-// Issue #140: storage state diff entry
+storage state diff entry
 export interface StateDiff {
   ledger: number;
   tx_hash: string | null;
@@ -234,7 +269,7 @@ export interface StateDiff {
   created_at: string;
 }
 
-// Issue #117: sub-invocation record
+sub-invocation record
 export interface SubInvocation {
   id: number;
   parent_tx_hash: string;
@@ -245,7 +280,7 @@ export interface SubInvocation {
   ledger: number;
 }
 
-// Issue #118: transaction status
+transaction status
 export interface TxStatusResponse {
   tx_hash: string;
   status: "pending" | "success" | "failed";
@@ -253,12 +288,12 @@ export interface TxStatusResponse {
   error?: string | null;
 }
 
-// Issue #165: Live TTL status for contract instance and code entries
+Live TTL status for contract instance and code entries
 export interface ContractTTL {
   contract_id: string;
   current_ledger: number;
   instance: { live_until_ledger: number | null };
-  code:     { live_until_ledger: number | null };
+  code: { live_until_ledger: number | null };
 }
 
 export interface CircuitBreakerStatus {
@@ -286,9 +321,18 @@ export interface NetworkComparisonResult {
   hasVersionMismatch: boolean;
 }
 
-export interface GraphNode { id: string; label: string; type: string; }
+export interface GraphNode {
+  id: string;
+  label: string;
+  type: string;
+}
 
-export interface GraphEdge { source: string; target: string; label?: string; amount?: string; }
+export interface GraphEdge {
+  source: string;
+  target: string;
+  label?: string;
+  amount?: string;
+}
 
 export interface AddressGraphData {
   nodes: GraphNode[];
@@ -299,34 +343,40 @@ export const api = {
   events: (params: { contract?: string; fn?: string; page?: number; type?: string }) => {
     const q = new URLSearchParams();
     if (params.contract) q.set("contract", params.contract);
-    if (params.fn)       q.set("fn", params.fn);
-    if (params.page)     q.set("page", String(params.page));
-    if (params.type)     q.set("type", params.type);
+    if (params.fn) q.set("fn", params.fn);
+    if (params.page) q.set("page", String(params.page));
+    if (params.type) q.set("type", params.type);
     return get<DecodedEvent[]>(`/events?${q}`);
   },
-  event:    (seq: number)     => get<DecodedEvent>(`/events/${seq}`),
-  zkCosts:  (seq: number)     => get<{ calls: ZkHostCall[]; delta: ZkCostDelta | null }>(`/events/${seq}/zk-costs`),
-  contract:        (id: string) => get<ContractMeta>(`/contracts/${id}`),
-  burnAlerts:      (contract: string) => get<BurnAlert[]>(`/burn-alerts?contract=${contract}`),
+  event: (seq: number) => get<DecodedEvent>(`/events/${seq}`),
+  search: (q: string, limit = 10) => {
+    const params = new URLSearchParams();
+    params.set("q", q);
+    params.set("limit", String(limit));
+    return get<SearchResponse>(`/search?${params}`);
+  },
+  zkCosts: (seq: number) => get<{ calls: ZkHostCall[]; delta: ZkCostDelta | null }>(`/events/${seq}/zk-costs`),
+  contract: (id: string) => get<ContractMeta>(`/contracts/${id}`),
+  burnAlerts: (contract: string) => get<BurnAlert[]>(`/burn-alerts?contract=${contract}`),
   migrationStatus: (id: string) => get<MigrationStatus>(`/contracts/${id}/migration-status`),
-  wallet:   (address: string) => get<DecodedEvent[]>(`/wallet/${address}`),
-  roles:    (id: string)      => get<PrivilegedRole[]>(`/contracts/${id}/roles`),
+  wallet: (address: string) => get<DecodedEvent[]>(`/wallet/${address}`),
+  roles: (id: string) => get<PrivilegedRole[]>(`/contracts/${id}/roles`),
   networkComparison: (id: string) => get<NetworkComparisonResult>(`/contracts/${id}/network-comparison`),
-  addressGraph:      (id: string) => get<AddressGraphData>(`/contracts/${id}/address-graph`),
+  addressGraph: (id: string) => get<AddressGraphData>(`/contracts/${id}/address-graph`),
 
-  // Issue #117: sub-invocations for a transaction
+  sub-invocations for a transaction
   subInvocations: (txHash: string) => get<SubInvocation[]>(`/transactions/${txHash}/sub-invocations`),
   // Events where contract appears directly OR as sub-invocation
   eventsDeep: (contractId: string, page = 1) =>
     get<DecodedEvent[]>(`/v1/contracts/${contractId}/events-deep?page=${page}`),
 
-  // Issue #118: transaction status (polling fallback; SSE via useTxStatus hook)
+  transaction status (polling fallback; SSE via useTxStatus hook)
   txStatus: (txHash: string) => get<TxStatusResponse>(`/transactions/${txHash}/status`),
 
-  // Issue #86: Circuit breaker status
+  Circuit breaker status
   circuitBreakerStatus: (id: string) => get<CircuitBreakerStatus>(`/contracts/${id}/circuit-breaker`),
 
-  // Issue #81: RWA token metadata
+  RWA token metadata
   rwaMetadata: (id: string) => get<RwaMetadata>(`/contracts/${id}/rwa-metadata`),
 
   downloadAbi: async (id: string) => {
@@ -343,33 +393,149 @@ export const api = {
     URL.revokeObjectURL(url);
   },
 
-  // Issue #135: multi-sig source verification
+  multi-sig source verification
   sourceVerifications: (id: string, wasmHash?: string) => {
     const q = wasmHash ? `?wasm_hash=${encodeURIComponent(wasmHash)}` : "";
     return get<SourceVerification[]>(`/contracts/${id}/source-verifications${q}`);
   },
-  submitSourceVerification: (id: string, body: { wasm_hash: string; signer: string; signature: string; compiler_hash: string }) =>
+  submitSourceVerification: (
+    id: string,
+    body: {
+      wasm_hash: string;
+      signer: string;
+      signature: string;
+      compiler_hash: string;
+    },
+  ) =>
     fetch(`${BASE}/contracts/${id}/source-verifications`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-    }).then(r => { if (!r.ok) throw new Error(`API ${r.status}`); return r.json(); }),
+    }).then((r) => {
+      if (!r.ok) throw new Error(`API ${r.status}`);
+      return r.json();
+    }),
 
-  // Issue #165: live TTL status (instance + code expiration ledgers)
+  live TTL status (instance + code expiration ledgers)
   contractTTL: (id: string) => get<ContractTTL>(`/contracts/${id}/ttl`),
 
-  // Issue #140: state-diff timeline
+  state-diff timeline
   stateDiffs: (id: string, key?: string) => {
     const q = key ? `?key=${encodeURIComponent(key)}` : "";
     return get<StateDiff[]>(`/contracts/${id}/state-diffs${q}`);
   },
 
-  // Issue #142: global contract dependency graph
+  global contract dependency graph
   contractGraph: (limit = 500) => get<ContractGraphData>(`/contract-graph?limit=${limit}`),
 
-  // Issue #172: CAP-0077 quorum freeze status
-  quorumFreeze: (id: string) => get<{ is_frozen: boolean; ledger: number; tx_hash: string; frozen_ids: string[] }>(`/contracts/${id}/quorum-freeze`),
+  CAP-0077 quorum freeze status
+  quorumFreeze: (id: string) =>
+    get<{
+      is_frozen: boolean;
+      ledger: number;
+      tx_hash: string;
+      frozen_ids: string[];
+    }>(`/contracts/${id}/quorum-freeze`),
 
   // Full contract spec (functions + custom types)
-  specFull: (id: string) => get<{ functions: { name: string; outputs?: string[] }[]; types: SpecType[] }>(`/contracts/${id}/spec-full`),
+  specFull: (id: string) =>
+    get<{
+      functions: { name: string; outputs?: string[] }[];
+      types: SpecType[];
+    }>(`/contracts/${id}/spec-full`),
+
+  Batch Multi-Call endpoints
+  batchSimulate: (calls: BatchCall[], sourceAccount?: string) =>
+    fetch(`${BASE}/batch/simulate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ calls, sourceAccount }),
+    }).then((r) => r.json()),
+  batchEstimateGas: (calls: BatchCall[], sourceAccount?: string) =>
+    fetch(`${BASE}/batch/estimate-gas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ calls, sourceAccount }),
+    }).then((r) => r.json()),
+  batchOptimize: (calls: BatchCall[], sourceAccount?: string) =>
+    fetch(`${BASE}/batch/optimize`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ calls, sourceAccount }),
+    }).then((r) => r.json()),
+  batchValidate: (calls: BatchCall[], sourceAccount?: string) =>
+    fetch(`${BASE}/batch/validate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ calls, sourceAccount }),
+    }).then((r) => r.json()),
+
+  // Batch types export
+  exportBatchAsHardhat: (calls: BatchCall[]) => {
+    const lines = [
+      "// Generated Hardhat script for Soroban batch calls",
+      "const { Server, Contract, TransactionBuilder, Networks, nativeToScVal } = require('@stellar/stellar-sdk');",
+      "",
+      "async function main() {",
+      "  const server = new Server(process.env.SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org');",
+      "  const source = process.env.SOROBAN_SOURCE || 'GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN';",
+      "  const account = await server.getAccount(source);",
+      "",
+      ...calls.flatMap((call, i) => [
+        `  const op${i + 1} = new Contract('${call.contractId}').call(`,
+        `    '${call.functionName}'${call.args.length ? "," : ""}`,
+        ...(call.args.length
+          ? call.args.map(
+              (arg) =>
+                `    nativeToScVal(${JSON.stringify(arg.value)}${arg.type ? `, { type: '${arg.type}' }` : ""}),`,
+            )
+          : []),
+        "  );",
+        "",
+      ]),
+      "  const tx = new TransactionBuilder(account, {",
+      "    fee: '100',",
+      "    networkPassphrase: Networks.TESTNET,",
+      "  })",
+      ...calls.map((_, i) => `    .addOperation(op${i + 1})`),
+      "      .setTimeout(30)",
+      "      .build();",
+      "",
+      "  const simulation = await server.simulateTransaction(tx);",
+      "  console.log(simulation);",
+      "}",
+      "",
+      "main().catch(console.error);",
+    ];
+    return lines.join("\n");
+  },
+  exportBatchAsCurl: (calls: BatchCall[], sourceAccount?: string) =>
+    JSON.stringify(
+      {
+        calls,
+        sourceAccount,
+      },
+      null,
+      2,
+    ),
+  exportBatchAsGraphQL: () =>
+    [
+      "mutation SimulateBatch($calls: [BatchCallInput!]!, $sourceAccount: String) {",
+      "  simulateBatch(calls: $calls, sourceAccount: $sourceAccount) {",
+      "    success",
+      "    results { callId success returnValue error }",
+      "    totalGas { cpuInsns memBytes fee }",
+      "  }",
+      "}",
+    ].join("\n"),
+  exportBatchAsJson: (calls: BatchCall[], sourceAccount?: string) =>
+    JSON.stringify(
+      {
+        calls,
+        sourceAccount,
+        generatedAt: new Date().toISOString(),
+      },
+      null,
+      2,
+    ),
 };

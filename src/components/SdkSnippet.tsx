@@ -1,5 +1,5 @@
 /**
- * Issue #120 — SDK Snippet Copy Button.
+ * SDK Snippet Copy Button.
  *
  * Generates ready-to-use code snippets for a contract function in
  * JavaScript, Python, and Rust, pre-populated with the contract ID
@@ -18,7 +18,7 @@ interface Props {
 }
 
 function buildArgList(args: { name: string; type?: string }[] = []): string {
-  return args.map(a => a.name).join(", ");
+  return args.map((a) => a.name).join(", ");
 }
 
 function jsSnippet(contractId: string, fnName: string, rpcUrl: string, passphrase: string, args: Props["args"] = []): string {
@@ -67,9 +67,7 @@ print(response.status)`;
 }
 
 function rustSnippet(contractId: string, fnName: string, args: Props["args"] = []): string {
-  const argList = args.length
-    ? args.map(a => `    // ${a.name}: ${a.type ?? "ScVal"}`).join("\n") + "\n"
-    : "";
+  const argList = args.length ? args.map((a) => `    // ${a.name}: ${a.type ?? "ScVal"}`).join("\n") + "\n" : "";
   return `use soroban_sdk::{contract, contractimpl, Address, Env};
 // Client generated from contract spec:
 // stellar contract bindings rust --contract-id ${contractId} --output-dir ./bindings
@@ -85,8 +83,8 @@ ${argList}    let client = Client::new(env, contract_id);
 
 const LANGS: { key: Lang; label: string }[] = [
   { key: "javascript", label: "JavaScript" },
-  { key: "python",     label: "Python" },
-  { key: "rust",       label: "Rust" },
+  { key: "python", label: "Python" },
+  { key: "rust", label: "Rust" },
 ];
 
 export default function SdkSnippet({ contractId, fnName, args = [] }: Props) {
@@ -112,9 +110,16 @@ export default function SdkSnippet({ contractId, fnName, args = [] }: Props) {
   return (
     <div style={{ marginTop: 8 }}>
       {/* Language tabs + copy button */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 6,
+        }}
+      >
         <div style={{ display: "flex", gap: 4 }}>
-          {LANGS.map(l => (
+          {LANGS.map((l) => (
             <button
               key={l.key}
               onClick={() => setLang(l.key)}
@@ -150,17 +155,19 @@ export default function SdkSnippet({ contractId, fnName, args = [] }: Props) {
       </div>
 
       {/* Code block */}
-      <pre style={{
-        background: "var(--bg2, #1e1e2e)",
-        border: "1px solid var(--border, #333)",
-        borderRadius: 6,
-        padding: "12px 14px",
-        fontSize: 12,
-        overflowX: "auto",
-        margin: 0,
-        color: "var(--fg, #e2e8f0)",
-        lineHeight: 1.6,
-      }}>
+      <pre
+        style={{
+          background: "var(--bg2, #1e1e2e)",
+          border: "1px solid var(--border, #333)",
+          borderRadius: 6,
+          padding: "12px 14px",
+          fontSize: 12,
+          overflowX: "auto",
+          margin: 0,
+          color: "var(--fg, #e2e8f0)",
+          lineHeight: 1.6,
+        }}
+      >
         <code>{snippet}</code>
       </pre>
     </div>

@@ -1,12 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-
-// In Docker, the indexer API lives at the hostname "indexer".
-// Override via VITE_API_URL env var to match the container network.
-const apiTarget = process.env.VITE_API_URL || "http://localhost:3001";
+import monacoEditorPluginPkg from "vite-plugin-monaco-editor";
+const monacoEditorPlugin = monacoEditorPluginPkg.default || monacoEditorPluginPkg;
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    monacoEditorPlugin({
+      languageWorkers: ["editorWorkerService", "typescript", "json", "css", "html"],
+    }),
+  ],
+  build: {
+    target: "esnext",
+  },
   server: { proxy: { "/api": "http://localhost:3001" } },
   test: { environment: "jsdom", globals: true, setupFiles: [] },
 });

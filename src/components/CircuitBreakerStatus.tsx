@@ -13,11 +13,7 @@ export default function CircuitBreakerStatus({ contractId }: CircuitBreakerStatu
   });
 
   if (isLoading) {
-    return (
-      <div style={{ color: "var(--muted)", fontSize: 13 }}>
-        Loading status…
-      </div>
-    );
+    return <div style={{ color: "var(--muted)", fontSize: 13 }}>Loading status…</div>;
   }
 
   if (!status?.has_circuit_breaker) {
@@ -46,9 +42,7 @@ export default function CircuitBreakerStatus({ contractId }: CircuitBreakerStatu
     >
       <span style={{ fontSize: 20 }}>{icon}</span>
       <div>
-        <div style={{ color: textColor, fontWeight: 700, fontSize: 14 }}>
-          {statusText}
-        </div>
+        <div style={{ color: textColor, fontWeight: 700, fontSize: 14 }}>{statusText}</div>
         {status.pause_status_ledger && (
           <div style={{ color: "var(--muted)", fontSize: 12, marginTop: 4 }}>
             Last status change at ledger {status.pause_status_ledger}

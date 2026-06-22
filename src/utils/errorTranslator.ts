@@ -1,6 +1,6 @@
 /**
  * Error Code to Human-Friendly Message Mapper
- * Issue #49: Human-Friendly Error State Explainer UI
+ * Human-Friendly Error State Explainer UI
  */
 
 const ERROR_DICTIONARY: Record<string, string> = {
@@ -13,8 +13,8 @@ const ERROR_DICTIONARY: Record<string, string> = {
   "108": "Execution Failed: Assertion Failed",
   "109": "Execution Failed: Runtime Panic",
   "110": "Execution Failed: Invalid Operation",
-  // Issue #134: protocol-level block compute exhaustion
-  "tx_resource_limit_exceeded": "Transaction Dropped: Block Compute Capacity Maxed Out",
+  protocol-level block compute exhaustion
+  tx_resource_limit_exceeded: "Transaction Dropped: Block Compute Capacity Maxed Out",
 };
 
 export interface ParsedError {
@@ -25,7 +25,7 @@ export interface ParsedError {
 }
 
 export function translateError(error: string): ParsedError {
-  // Issue #134: check for protocol-level resource limit result code first
+  check for protocol-level resource limit result code first
   if (
     error === "tx_resource_limit_exceeded" ||
     error === "txResourceLimitExceeded" ||
@@ -41,7 +41,7 @@ export function translateError(error: string): ParsedError {
 
   // Try to extract error code
   const codeMatch = error.match(/Error\((\w+),\s*(\d+)\)/);
-  
+
   if (codeMatch) {
     const [, category, code] = codeMatch;
     const message = ERROR_DICTIONARY[code] || `Execution Failed: Unknown Error (${code})`;
@@ -59,7 +59,7 @@ export function translateError(error: string): ParsedError {
 export function getErrorSeverity(code: string): "critical" | "warning" | "info" {
   const criticalCodes = ["102", "105", "107"];
   const warningCodes = ["103", "104", "108", "109"];
-  
+
   if (criticalCodes.includes(code)) return "critical";
   if (warningCodes.includes(code)) return "warning";
   return "info";

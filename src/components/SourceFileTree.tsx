@@ -26,11 +26,22 @@ function buildTree(files: SourceFile[]): TreeNode {
       const isLast = i === parts.length - 1;
 
       if (isLast) {
-        node.children.push({ name, fullPath: file.path, isDir: false, children: [], content: file.content });
+        node.children.push({
+          name,
+          fullPath: file.path,
+          isDir: false,
+          children: [],
+          content: file.content,
+        });
       } else {
-        let dir = node.children.find(c => c.name === name && c.isDir);
+        let dir = node.children.find((c) => c.name === name && c.isDir);
         if (!dir) {
-          dir = { name, fullPath: parts.slice(0, i + 1).join("/"), isDir: true, children: [] };
+          dir = {
+            name,
+            fullPath: parts.slice(0, i + 1).join("/"),
+            isDir: true,
+            children: [],
+          };
           node.children.push(dir);
         }
         node = dir;
@@ -87,16 +98,30 @@ function NodeRow({ node, depth, selected, onSelect, expanded, onToggle }: NodeRo
           userSelect: "none",
         }}
       >
-        <span style={{ color: "var(--muted)", fontSize: 11, width: 12, textAlign: "center", flexShrink: 0 }}>
+        <span
+          style={{
+            color: "var(--muted)",
+            fontSize: 11,
+            width: 12,
+            textAlign: "center",
+            flexShrink: 0,
+          }}
+        >
           {node.isDir ? (isExpanded ? "▾" : "▸") : ""}
         </span>
-        <span style={{ color: node.isDir ? "var(--yellow)" : "var(--muted)", fontSize: 13 }}>
+        <span
+          style={{
+            color: node.isDir ? "var(--yellow)" : "var(--muted)",
+            fontSize: 13,
+          }}
+        >
           {node.isDir ? "📁" : fileIcon(node.name)}
         </span>
         <span>{node.name}</span>
       </div>
-      {node.isDir && isExpanded &&
-        sortNodes(node.children).map(child => (
+      {node.isDir &&
+        isExpanded &&
+        sortNodes(node.children).map((child) => (
           <NodeRow
             key={child.fullPath}
             node={child}
@@ -106,8 +131,7 @@ function NodeRow({ node, depth, selected, onSelect, expanded, onToggle }: NodeRo
             expanded={expanded}
             onToggle={onToggle}
           />
-        ))
-      }
+        ))}
     </>
   );
 }
@@ -135,32 +159,54 @@ export default function SourceFileTree({ files }: Props) {
 
   const [expanded, setExpanded] = useState<Set<string>>(initialDirs);
   const [selected, setSelected] = useState<SourceFile | null>(
-    files.find(f => f.path.endsWith("lib.rs")) ?? files[0] ?? null
+    files.find((f) => f.path.endsWith("lib.rs")) ?? files[0] ?? null,
   );
 
   const toggle = (path: string) => {
-    setExpanded(prev => {
+    setExpanded((prev) => {
       const next = new Set(prev);
-      next.has(path) ? next.delete(path) : next.add(path);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
       return next;
     });
   };
 
   return (
-    <div style={{ display: "flex", gap: 0, border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: 0,
+        border: "1px solid var(--border)",
+        borderRadius: 8,
+        overflow: "hidden",
+      }}
+    >
       {/* Navigator panel */}
-      <div style={{
-        width: 220,
-        flexShrink: 0,
-        background: "var(--bg)",
-        borderRight: "1px solid var(--border)",
-        overflowY: "auto",
-        padding: "8px 4px",
-      }}>
-        <div style={{ fontSize: 11, color: "var(--muted)", padding: "0 8px 6px", textTransform: "uppercase", letterSpacing: 1 }}>
+      <div
+        style={{
+          width: 220,
+          flexShrink: 0,
+          background: "var(--bg)",
+          borderRight: "1px solid var(--border)",
+          overflowY: "auto",
+          padding: "8px 4px",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            color: "var(--muted)",
+            padding: "0 8px 6px",
+            textTransform: "uppercase",
+            letterSpacing: 1,
+          }}
+        >
           Source Files
         </div>
-        {sortNodes(tree.children).map(node => (
+        {sortNodes(tree.children).map((node) => (
           <NodeRow
             key={node.fullPath}
             node={node}
@@ -175,14 +221,11 @@ export default function SourceFileTree({ files }: Props) {
 
       {/* Viewer panel */}
       <div style={{ flex: 1, overflow: "hidden" }}>
-        {selected
-          ? <RustCodeViewer source={selected.content} filename={selected.path} />
-          : (
-            <div style={{ padding: 24, color: "var(--muted)", fontSize: 13 }}>
-              Select a file to view its source.
-            </div>
-          )
-        }
+        {selected ? (
+          <RustCodeViewer source={selected.content} filename={selected.path} />
+        ) : (
+          <div style={{ padding: 24, color: "var(--muted)", fontSize: 13 }}>Select a file to view its source.</div>
+        )}
       </div>
     </div>
   );

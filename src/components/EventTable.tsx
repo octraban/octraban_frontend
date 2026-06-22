@@ -26,10 +26,14 @@ function LinkedDescription({ text }: { text: string }) {
       parts.push(
         <Link key={match.index} to={route} title={addr}>
           {truncateAddress(addr)}
-        </Link>
+        </Link>,
       );
     } else {
-      parts.push(<span key={match.index} title={addr}>{truncateAddress(addr)}</span>);
+      parts.push(
+        <span key={match.index} title={addr}>
+          {truncateAddress(addr)}
+        </span>,
+      );
     }
     last = match.index + match[0].length;
   }
@@ -41,9 +45,7 @@ function LinkedDescription({ text }: { text: string }) {
 function parseSwapPath(description: string): string[] | null {
   const arrowParts = description.split(/\s*→\s*/);
   if (arrowParts.length >= 2) {
-    const hops = arrowParts
-      .map(p => p.match(/([\d,.]+)\s+([A-Z]{2,10})/)?.[0])
-      .filter(Boolean) as string[];
+    const hops = arrowParts.map((p) => p.match(/([\d,.]+)\s+([A-Z]{2,10})/)?.[0]).filter(Boolean) as string[];
     if (hops.length >= 2) return hops;
   }
   const m = description.match(/([\d,.]+)\s+([A-Z]{2,10}).*?(?:for|to)\s+([\d,.]+)\s+([A-Z]{2,10})/i);
@@ -137,17 +139,13 @@ function TTLExtensionBadge({ ext }: { ext: NonNullable<DecodedEvent["ttl_extensi
       {ext.min_extension != null && (
         <span style={{ color: "var(--muted)" }}>Requested: +{ext.min_extension} Ledgers</span>
       )}
-      {ext.max_extension != null && (
-        <span style={{ color: "var(--muted)" }}>Clamp: {ext.max_extension}</span>
-      )}
-      {ext.extend_to != null && (
-        <span style={{ color: "var(--muted)" }}>→ {ext.extend_to}</span>
-      )}
+      {ext.max_extension != null && <span style={{ color: "var(--muted)" }}>Clamp: {ext.max_extension}</span>}
+      {ext.extend_to != null && <span style={{ color: "var(--muted)" }}>→ {ext.extend_to}</span>}
     </span>
   );
 }
 
-/** Issue #177: Inline badge for factory deployment events. */
+/** Inline badge for factory deployment events. */
 function FactoryDeploymentBadge({ deployment }: { deployment: NonNullable<DecodedEvent["factory_deployment"]> }) {
   return (
     <span
@@ -180,7 +178,12 @@ export default function EventTable({ events }: Props) {
     <div style={{ overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
-          <tr style={{ borderBottom: "1px solid var(--border)", color: "var(--muted)" }}>
+          <tr
+            style={{
+              borderBottom: "1px solid var(--border)",
+              color: "var(--muted)",
+            }}
+          >
             <th style={th}>Seq</th>
             <th style={th}>Ledger</th>
             <th style={th}>Function</th>
@@ -188,7 +191,7 @@ export default function EventTable({ events }: Props) {
           </tr>
         </thead>
         <tbody>
-          {events.map(ev => (
+          {events.map((ev) => (
             <tr key={ev.seq} style={{ borderBottom: "1px solid var(--border)" }}>
               <td style={td}>
                 <Link to={`/event/${ev.seq}`}>#{ev.seq}</Link>
@@ -197,7 +200,15 @@ export default function EventTable({ events }: Props) {
               <td style={td}>
                 <FunctionBadge fn={ev.function} />
               </td>
-              <td style={{ ...td, maxWidth: 480, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <td
+                style={{
+                  ...td,
+                  maxWidth: 480,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {ev.is_clawback && (
                   <span className="badge clawback" style={{ marginRight: 6 }} title="Mandatory authority intervention">
                     ⚠ COMPLIANCE: CLAWBACK
@@ -225,18 +236,27 @@ export default function EventTable({ events }: Props) {
                 {ev.factory_deployment && <FactoryDeploymentBadge deployment={ev.factory_deployment} />}
                 {ev.sac_side_effect && <SacSideEffectBadge kind={ev.sac_side_effect} />}
                 <LinkedDescription text={ev.description} />
-                {ev.function === "transfer" && (() => {
-                  const t = parseTransfer(ev.description);
-                  return t ? <FiatValue amount={t.amount} symbol={t.symbol} /> : null;
-                })()}
-                {ev.function === "swap" && (() => {
-                  const path = ev.swap_path ?? parseSwapPath(ev.description);
-                  return path ? (
-                    <span style={{ marginLeft: 6, color: "var(--accent)", fontSize: 12, whiteSpace: "nowrap" }}>
-                      {path.join(" → ")}
-                    </span>
-                  ) : null;
-                })()}
+                {ev.function === "transfer" &&
+                  (() => {
+                    const t = parseTransfer(ev.description);
+                    return t ? <FiatValue amount={t.amount} symbol={t.symbol} /> : null;
+                  })()}
+                {ev.function === "swap" &&
+                  (() => {
+                    const path = ev.swap_path ?? parseSwapPath(ev.description);
+                    return path ? (
+                      <span
+                        style={{
+                          marginLeft: 6,
+                          color: "var(--accent)",
+                          fontSize: 12,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {path.join(" → ")}
+                      </span>
+                    ) : null;
+                  })()}
               </td>
             </tr>
           ))}
@@ -246,5 +266,9 @@ export default function EventTable({ events }: Props) {
   );
 }
 
-const th: React.CSSProperties = { textAlign: "left", padding: "8px 12px", fontWeight: 500 };
+const th: React.CSSProperties = {
+  textAlign: "left",
+  padding: "8px 12px",
+  fontWeight: 500,
+};
 const td: React.CSSProperties = { padding: "10px 12px" };

@@ -12,14 +12,18 @@ const api = {
   events: (params: { contract?: string; fn?: string; page?: number; type?: string }) => {
     const q = new URLSearchParams();
     if (params.contract) q.set("contract", params.contract);
-    if (params.fn)       q.set("fn", params.fn);
-    if (params.page)     q.set("page", String(params.page));
-    if (params.type)     q.set("type", params.type);
+    if (params.fn) q.set("fn", params.fn);
+    if (params.page) q.set("page", String(params.page));
+    if (params.type) q.set("type", params.type);
     return get<Array<{ seq: number }>>(`/events?${q}`);
   },
-  event:    (seq: number)     => get<{ seq: number }>(`/events/${seq}`),
-  contract: (id: string)      => get<{ id: string; name: string }>(`/contracts/${id}`),
-  wallet:   (address: string) => get<Array<{ seq: number }>>(`/wallet/${address}`),
+  event: (seq: number) => get<{ seq: number }>(`/events/${seq}`),
+  contract: (id: string) => get<{ id: string; name: string }>(`/contracts/${id}`),
+  wallet: (address: string) => get<Array<{ seq: number }>>(`/wallet/${address}`),
+  search: (q: string, limit = 10) =>
+    get<{ contracts: unknown[]; events: unknown[]; wallets: unknown[]; suggestions: unknown[] }>(
+      `/search?q=${encodeURIComponent(q)}&limit=${limit}`,
+    ),
   burnAlerts: (contract: string) => get<Array<{ contractId: string }>>(`/burn-alerts?contract=${contract}`),
   migrationStatus: (id: string) => get<{ pending: boolean }>(`/contracts/${id}/migration-status`),
   roles: (id: string) => get<Array<{ role: string; address: string }>>(`/contracts/${id}/roles`),
@@ -28,9 +32,11 @@ const api = {
     const q = key ? `?key=${encodeURIComponent(key)}` : "";
     return get<Array<{ ledger: number }>>(`/contracts/${id}/state-diffs${q}`);
   },
-  contractGraph: (limit = 500) => get<{ nodes: Array<{ id: string }>; links: Array<{ source: string; target: string }> }>(`/contract-graph?limit=${limit}`),
+  contractGraph: (limit = 500) =>
+    get<{ nodes: Array<{ id: string }>; links: Array<{ source: string; target: string }> }>(`/contract-graph?limit=${limit}`),
   quorumFreeze: (id: string) => get<{ is_frozen: boolean }>(`/contracts/${id}/quorum-freeze`),
-  specFull: (id: string) => get<{ functions: Array<{ name: string }>; types: Array<{ name: string }> }>(`/contracts/${id}/spec-full`),
+  specFull: (id: string) =>
+    get<{ functions: Array<{ name: string }>; types: Array<{ name: string }> }>(`/contracts/${id}/spec-full`),
   downloadAbi: async (id: string) => {
     const res = await fetch(`${BASE}/contracts/${id}/abi`);
     if (!res.ok) throw new Error(`API ${res.status}: /contracts/${id}/abi`);
@@ -45,12 +51,37 @@ const api = {
     URL.revokeObjectURL(url);
   },
   subInvocations: (txHash: string) => get<Array<{ id: number; parent_tx_hash: string }>>(`/transactions/${txHash}/sub-invocations`),
-  circuitBreakerStatus: (id: string) => get<{ has_circuit_breaker: boolean; is_paused: boolean }>(`/contracts/${id}/circuit-breaker`),
+  circuitBreakerStatus: (id: string) =>
+    get<{ has_circuit_breaker: boolean; is_paused: boolean }>(`/contracts/${id}/circuit-breaker`),
   rwaMetadata: (id: string) => get<{ is_rwa: boolean }>(`/contracts/${id}/rwa-metadata`),
   sourceVerifications: (id: string, wasmHash?: string) => {
     const q = wasmHash ? `?wasm_hash=${encodeURIComponent(wasmHash)}` : "";
     return get<Array<{ signer: string }>>(`/contracts/${id}/source-verifications${q}`);
   },
+  batchSimulate: (calls: Array<{ id: string; contractId: string; functionName: string; args: unknown[] }>, sourceAccount?: string) =>
+    fetch(`${BASE}/batch/simulate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ calls, sourceAccount }),
+    }).then((r) => r.json()),
+  batchEstimateGas: (calls: Array<{ id: string; contractId: string; functionName: string; args: unknown[] }>, sourceAccount?: string) =>
+    fetch(`${BASE}/batch/estimate-gas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ calls, sourceAccount }),
+    }).then((r) => r.json()),
+  batchOptimize: (calls: Array<{ id: string; contractId: string; functionName: string; args: unknown[] }>, sourceAccount?: string) =>
+    fetch(`${BASE}/batch/optimize`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ calls, sourceAccount }),
+    }).then((r) => r.json()),
+  batchValidate: (calls: Array<{ id: string; contractId: string; functionName: string; args: unknown[] }>, sourceAccount?: string) =>
+    fetch(`${BASE}/batch/validate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ calls, sourceAccount }),
+    }).then((r) => r.json()),
 };
 
 describe("api utility", () => {
@@ -120,6 +151,15 @@ describe("api utility", () => {
     mockFetch([{ seq: 1 }, { seq: 2 }]);
     const result = await api.wallet("GABCDEF");
     expect(result).toHaveLength(2);
+  });
+
+  it("search builds encoded query string", async () => {
+    mockFetch({ contracts: [], events: [], wallets: [], suggestions: [] });
+    const result = await api.search("USDC transfer", 25);
+    expect(result.contracts).toEqual([]);
+    const [url] = (fetch as any).mock.calls[0];
+    expect(url).toContain("q=USDC%20transfer");
+    expect(url).toContain("limit=25");
   });
 
   it("subInvocations fetches by tx hash", async () => {
@@ -309,5 +349,53 @@ describe("api types validation", () => {
     const status = { pending: false, upgradedAtLedger: null, migratedAtLedger: null };
     expect(status.pending).toBe(false);
     expect(status.upgradedAtLedger).toBeNull();
+  });
+});
+
+describe("batch API", () => {
+  beforeEach(() => {
+    global.fetch = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function mockFetch(data: unknown) {
+    (global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => data,
+    });
+  }
+
+  it("batchSimulate sends POST request with calls", async () => {
+    mockFetch({ success: true, results: [], totalGas: { cpuInsns: 100, memBytes: 50, fee: 1000 } });
+    const calls = [{ id: "1", contractId: "C1", functionName: "transfer", args: [] }];
+    const result = await api.batchSimulate(calls, "GABC");
+    expect(result.success).toBe(true);
+    const [url, init] = (fetch as any).mock.calls[0];
+    expect(url).toContain("/batch/simulate");
+    expect((init as any).method).toBe("POST");
+  });
+
+  it("batchEstimateGas returns gas estimates", async () => {
+    mockFetch({ estimates: [{ callId: "1", cpuInsns: 100, memBytes: 50, fee: 1000 }], totalGas: { cpuInsns: 100, memBytes: 50, fee: 1000 } });
+    const calls = [{ id: "1", contractId: "C1", functionName: "transfer", args: [] }];
+    const result = await api.batchEstimateGas(calls);
+    expect(result.estimates).toHaveLength(1);
+  });
+
+  it("batchOptimize returns optimized order", async () => {
+    mockFetch({ optimizedOrder: ["1", "2"] });
+    const calls = [{ id: "1", contractId: "C1", functionName: "transfer", args: [] }];
+    const result = await api.batchOptimize(calls);
+    expect(result.optimizedOrder).toContain("1");
+  });
+
+  it("batchValidate returns validation result", async () => {
+    mockFetch({ valid: true, errors: [], conflicts: [] });
+    const calls = [{ id: "1", contractId: "C1", functionName: "transfer", args: [] }];
+    const result = await api.batchValidate(calls);
+    expect(result.valid).toBe(true);
   });
 });

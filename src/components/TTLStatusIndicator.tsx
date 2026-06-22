@@ -1,6 +1,6 @@
 /**
  * Contract TTL Status Indicator Component
- * Issue #50: Contract TTL Status Tracker
+ * Contract TTL Status Tracker
  */
 
 import React from "react";
@@ -39,7 +39,14 @@ export default function TTLStatusIndicator({ liveUntilLedger, currentLedger }: T
         border: `1px solid ${statusColors[status]}`,
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "8px",
+        }}
+      >
         <div
           style={{
             width: "12px",
@@ -48,21 +55,33 @@ export default function TTLStatusIndicator({ liveUntilLedger, currentLedger }: T
             backgroundColor: statusColors[status],
           }}
         />
-        <h4 style={{ margin: 0, fontSize: "14px", fontWeight: "600", color: statusColors[status] }}>
+        <h4
+          style={{
+            margin: 0,
+            fontSize: "14px",
+            fontWeight: "600",
+            color: statusColors[status],
+          }}
+        >
           TTL Status: {status.charAt(0).toUpperCase() + status.slice(1)}
         </h4>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "12px" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "12px",
+          fontSize: "12px",
+        }}
+      >
         <div>
           <span style={{ color: "#666" }}>Remaining Time:</span>
           <p style={{ margin: "4px 0 0 0", fontWeight: "600", fontSize: "14px" }}>{timeRemaining}</p>
         </div>
         <div>
           <span style={{ color: "#666" }}>Expires at Ledger:</span>
-          <p style={{ margin: "4px 0 0 0", fontWeight: "600", fontSize: "14px" }}>
-            {liveUntilLedger.toLocaleString()}
-          </p>
+          <p style={{ margin: "4px 0 0 0", fontWeight: "600", fontSize: "14px" }}>{liveUntilLedger.toLocaleString()}</p>
         </div>
       </div>
 

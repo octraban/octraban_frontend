@@ -1,5 +1,5 @@
 /**
- * Issue #140 — Visual State-Diff Timeline for Smart Contracts
+ * Visual State-Diff Timeline for Smart Contracts
  *
  * Renders an interactive timeline slider that lets users scrub through
  * historical ContractDataEntry mutations block-by-block.
@@ -44,7 +44,7 @@ export default function StateDiffTimeline({ contractId }: Props) {
   }, [diffs]);
 
   const uniqueKeys = useMemo(() => {
-    const s = new Set(diffs.map(d => d.key));
+    const s = new Set(diffs.map((d) => d.key));
     return Array.from(s).sort();
   }, [diffs]);
 
@@ -59,11 +59,9 @@ export default function StateDiffTimeline({ contractId }: Props) {
   }
 
   const maxIndex = ledgerGroups.length - 1;
-  const current  = ledgerGroups[sliderIndex];
+  const current = ledgerGroups[sliderIndex];
 
-  const visibleEntries = filterKey
-    ? current.entries.filter(e => e.key === filterKey)
-    : current.entries;
+  const visibleEntries = filterKey ? current.entries.filter((e) => e.key === filterKey) : current.entries;
 
   // Cumulative state up to current ledger for context
   const cumulativeState = useMemo(() => {
@@ -80,10 +78,14 @@ export default function StateDiffTimeline({ contractId }: Props) {
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {/* Slider control */}
       <div className="card" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 13, fontWeight: 600 }}>
-            Block {current.ledger.toLocaleString()}
-          </span>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span style={{ fontSize: 13, fontWeight: 600 }}>Block {current.ledger.toLocaleString()}</span>
           <span style={{ fontSize: 12, color: "var(--muted)" }}>
             {sliderIndex + 1} / {ledgerGroups.length} snapshots
           </span>
@@ -94,7 +96,7 @@ export default function StateDiffTimeline({ contractId }: Props) {
           min={0}
           max={maxIndex}
           value={sliderIndex}
-          onChange={e => setSliderIndex(Number(e.target.value))}
+          onChange={(e) => setSliderIndex(Number(e.target.value))}
           style={{ width: "100%", accentColor: "var(--accent)" }}
           aria-label="Timeline slider — scrub through block history"
         />
@@ -109,11 +111,7 @@ export default function StateDiffTimeline({ contractId }: Props) {
               style={{
                 flex: 1,
                 height: Math.min(6, 2 + g.entries.length),
-                background: i === sliderIndex
-                  ? "var(--accent)"
-                  : i < sliderIndex
-                    ? "var(--muted)"
-                    : "var(--border)",
+                background: i === sliderIndex ? "var(--accent)" : i < sliderIndex ? "var(--muted)" : "var(--border)",
                 borderRadius: 2,
                 cursor: "pointer",
                 transition: "background 0.15s",
@@ -125,7 +123,14 @@ export default function StateDiffTimeline({ contractId }: Props) {
 
       {/* Key filter */}
       {uniqueKeys.length > 1 && (
-        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
           <span style={{ fontSize: 12, color: "var(--muted)" }}>Filter key:</span>
           <button
             onClick={() => setFilterKey("")}
@@ -141,7 +146,7 @@ export default function StateDiffTimeline({ contractId }: Props) {
           >
             All
           </button>
-          {uniqueKeys.map(k => (
+          {uniqueKeys.map((k) => (
             <button
               key={k}
               onClick={() => setFilterKey(k === filterKey ? "" : k)}
@@ -171,7 +176,14 @@ export default function StateDiffTimeline({ contractId }: Props) {
         <h4 style={{ fontSize: 13, margin: 0, marginBottom: 4 }}>
           Changes at ledger {current.ledger.toLocaleString()}
           {current.entries[0]?.tx_hash && (
-            <span style={{ fontSize: 11, color: "var(--muted)", marginLeft: 8, fontWeight: 400 }}>
+            <span
+              style={{
+                fontSize: 11,
+                color: "var(--muted)",
+                marginLeft: 8,
+                fontWeight: 400,
+              }}
+            >
               tx: {current.entries[0].tx_hash.slice(0, 12)}…
             </span>
           )}
@@ -206,16 +218,37 @@ export default function StateDiffTimeline({ contractId }: Props) {
               >
                 {d.change_type}
               </span>
-              <div style={{ gridColumn: "2 / -1", fontFamily: "monospace", color: "var(--fg)", wordBreak: "break-all" }}>
+              <div
+                style={{
+                  gridColumn: "2 / -1",
+                  fontFamily: "monospace",
+                  color: "var(--fg)",
+                  wordBreak: "break-all",
+                }}
+              >
                 {d.key}
               </div>
               {d.change_type !== "created" && d.old_value !== null && (
-                <div style={{ gridColumn: "2", color: "var(--red, #ef4444)", fontFamily: "monospace", wordBreak: "break-all" }}>
+                <div
+                  style={{
+                    gridColumn: "2",
+                    color: "var(--red, #ef4444)",
+                    fontFamily: "monospace",
+                    wordBreak: "break-all",
+                  }}
+                >
                   − {d.old_value}
                 </div>
               )}
               {d.change_type !== "removed" && d.new_value !== null && (
-                <div style={{ gridColumn: d.change_type === "created" ? "2 / -1" : "3", color: "var(--green, #22c55e)", fontFamily: "monospace", wordBreak: "break-all" }}>
+                <div
+                  style={{
+                    gridColumn: d.change_type === "created" ? "2 / -1" : "3",
+                    color: "var(--green, #22c55e)",
+                    fontFamily: "monospace",
+                    wordBreak: "break-all",
+                  }}
+                >
                   + {d.new_value}
                 </div>
               )}
@@ -225,14 +258,51 @@ export default function StateDiffTimeline({ contractId }: Props) {
       </div>
 
       {/* Cumulative state snapshot */}
-      <details style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px" }}>
-        <summary style={{ cursor: "pointer", fontSize: 12, color: "var(--muted)", userSelect: "none" }}>
+      <details
+        style={{
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          borderRadius: 8,
+          padding: "10px 16px",
+        }}
+      >
+        <summary
+          style={{
+            cursor: "pointer",
+            fontSize: 12,
+            color: "var(--muted)",
+            userSelect: "none",
+          }}
+        >
           Cumulative state at ledger {current.ledger.toLocaleString()} ({Object.keys(cumulativeState).length} keys)
         </summary>
-        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 4 }}>
+        <div
+          style={{
+            marginTop: 10,
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
           {Object.entries(cumulativeState).map(([k, v]) => (
-            <div key={k} style={{ display: "flex", gap: 8, fontSize: 11, fontFamily: "monospace" }}>
-              <span style={{ color: "var(--muted)", minWidth: 120, wordBreak: "break-all" }}>{k}</span>
+            <div
+              key={k}
+              style={{
+                display: "flex",
+                gap: 8,
+                fontSize: 11,
+                fontFamily: "monospace",
+              }}
+            >
+              <span
+                style={{
+                  color: "var(--muted)",
+                  minWidth: 120,
+                  wordBreak: "break-all",
+                }}
+              >
+                {k}
+              </span>
               <span style={{ color: "var(--fg)", wordBreak: "break-all" }}>{v ?? "(removed)"}</span>
             </div>
           ))}

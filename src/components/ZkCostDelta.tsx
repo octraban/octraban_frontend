@@ -1,5 +1,5 @@
 /**
- * Issue #164 — ZkCostDelta
+ * ZkCostDelta
  * Shows CAP-0080 ZK host function calls and the CPU cost savings
  * (native Protocol 26 vs legacy Wasm-side micro-allocations).
  */
@@ -15,19 +15,22 @@ export default function ZkCostDelta({ calls, delta }: Props) {
 
   return (
     <div className="card" style={{ marginTop: 12 }}>
-      <h4 style={{ marginBottom: 10, fontSize: 13 }}>
-        ⚡ ZK Host Functions (CAP-0080 / Protocol 26)
-      </h4>
+      <h4 style={{ marginBottom: 10, fontSize: 13 }}>⚡ ZK Host Functions (CAP-0080 / Protocol 26)</h4>
 
       {/* Aggregate savings banner */}
       {delta && (
-        <div style={{
-          display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 14,
-          padding: "10px 14px",
-          background: "var(--surface, #1a1a2e)",
-          borderRadius: 8,
-          borderLeft: "3px solid #22c55e",
-        }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            flexWrap: "wrap",
+            marginBottom: 14,
+            padding: "10px 14px",
+            background: "var(--surface, #1a1a2e)",
+            borderRadius: 8,
+            borderLeft: "3px solid #22c55e",
+          }}
+        >
           <Stat label="Native CPU" value={delta.total_native.toLocaleString()} unit="ops" />
           <Stat label="Legacy Wasm CPU" value={delta.total_legacy.toLocaleString()} unit="ops" />
           <Stat
@@ -65,8 +68,12 @@ export default function ZkCostDelta({ calls, delta }: Props) {
                 </Td>
                 <Td>{c.kind.replace(/_/g, " ")}</Td>
                 <Td align="right">{c.cpu_native.toLocaleString()}</Td>
-                <Td align="right" muted>{c.cpu_legacy.toLocaleString()}</Td>
-                <Td align="right" green>{saved.toLocaleString()} ({pct}%)</Td>
+                <Td align="right" muted>
+                  {c.cpu_legacy.toLocaleString()}
+                </Td>
+                <Td align="right" green>
+                  {saved.toLocaleString()} ({pct}%)
+                </Td>
               </tr>
             );
           })}
@@ -79,8 +86,23 @@ export default function ZkCostDelta({ calls, delta }: Props) {
 function Stat({ label, value, unit, highlight }: { label: string; value: string; unit: string; highlight?: boolean }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <span style={{ fontSize: 10, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
-      <span style={{ fontWeight: highlight ? 700 : 600, fontSize: 15, color: highlight ? "#22c55e" : undefined }}>
+      <span
+        style={{
+          fontSize: 10,
+          color: "var(--muted)",
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontWeight: highlight ? 700 : 600,
+          fontSize: 15,
+          color: highlight ? "#22c55e" : undefined,
+        }}
+      >
         {value}
       </span>
       <span style={{ fontSize: 10, color: "var(--muted)" }}>{unit}</span>
@@ -90,20 +112,40 @@ function Stat({ label, value, unit, highlight }: { label: string; value: string;
 
 function Th({ children, align }: { children: React.ReactNode; align?: "right" }) {
   return (
-    <th style={{ padding: "4px 8px", fontWeight: 500, textAlign: align ?? "left" }}>{children}</th>
+    <th
+      style={{
+        padding: "4px 8px",
+        fontWeight: 500,
+        textAlign: align ?? "left",
+      }}
+    >
+      {children}
+    </th>
   );
 }
 
-function Td({ children, mono, muted, green, align }: {
-  children: React.ReactNode; mono?: boolean; muted?: boolean; green?: boolean; align?: "right";
+function Td({
+  children,
+  mono,
+  muted,
+  green,
+  align,
+}: {
+  children: React.ReactNode;
+  mono?: boolean;
+  muted?: boolean;
+  green?: boolean;
+  align?: "right";
 }) {
   return (
-    <td style={{
-      padding: "5px 8px",
-      fontFamily: mono ? "monospace" : undefined,
-      color: muted ? "var(--muted)" : green ? "#22c55e" : undefined,
-      textAlign: align ?? "left",
-    }}>
+    <td
+      style={{
+        padding: "5px 8px",
+        fontFamily: mono ? "monospace" : undefined,
+        color: muted ? "var(--muted)" : green ? "#22c55e" : undefined,
+        textAlign: align ?? "left",
+      }}
+    >
       {children}
     </td>
   );

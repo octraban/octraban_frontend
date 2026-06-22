@@ -1,5 +1,5 @@
 /**
- * TTLProgressBar — Issue #165
+ * TTLProgressBar —
  * Renders a labelled progress bar for a single TTL entry (instance or code).
  * Shows remaining ledgers, estimated time, and expiration ledger number.
  */
@@ -20,10 +20,10 @@ function formatRemaining(ledgers: number): string {
 }
 
 function statusColor(pct: number): string {
-  if (pct <= 0) return "#6b7280";   // expired — grey
-  if (pct < 10) return "#ef4444";   // critical — red
-  if (pct < 25) return "#f59e0b";   // warning — amber
-  return "#10b981";                  // healthy — green
+  if (pct <= 0) return "#6b7280"; // expired — grey
+  if (pct < 10) return "#ef4444"; // critical — red
+  if (pct < 25) return "#f59e0b"; // warning — amber
+  return "#10b981"; // healthy — green
 }
 
 interface BarProps {
@@ -36,7 +36,15 @@ function Bar({ label, liveUntilLedger, currentLedger }: BarProps) {
   if (liveUntilLedger === null) {
     return (
       <div style={{ marginBottom: 12 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: 12,
+            color: "var(--muted)",
+            marginBottom: 4,
+          }}
+        >
           <span>{label}</span>
           <span>unavailable</span>
         </div>
@@ -54,16 +62,26 @@ function Bar({ label, liveUntilLedger, currentLedger }: BarProps) {
 
   return (
     <div style={{ marginBottom: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: 12,
+          marginBottom: 4,
+        }}
+      >
         <span style={{ color: "var(--muted)" }}>{label}</span>
         <span style={{ color, fontWeight: 600 }}>
-          {isExpired
-            ? "Expired"
-            : `${remaining.toLocaleString()} ledgers · ${formatRemaining(remaining)}`}
+          {isExpired ? "Expired" : `${remaining.toLocaleString()} ledgers · ${formatRemaining(remaining)}`}
         </span>
       </div>
       <div
-        style={{ height: 6, background: "var(--border, #2a2a3e)", borderRadius: 3, overflow: "hidden" }}
+        style={{
+          height: 6,
+          background: "var(--border, #2a2a3e)",
+          borderRadius: 3,
+          overflow: "hidden",
+        }}
         role="progressbar"
         aria-valuenow={Math.round(pct)}
         aria-valuemin={0}
@@ -103,12 +121,16 @@ export default function TTLProgressBar({ contractId }: TTLProgressBarProps) {
   if (isError || !data) return null;
 
   return (
-    <div
-      className="card"
-      style={{ padding: "14px 16px" }}
-      aria-label="Contract TTL status"
-    >
-      <h3 style={{ fontSize: 13, marginBottom: 12, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+    <div className="card" style={{ padding: "14px 16px" }} aria-label="Contract TTL status">
+      <h3
+        style={{
+          fontSize: 13,
+          marginBottom: 12,
+          color: "var(--muted)",
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+        }}
+      >
         TTL / Expiration
       </h3>
       <Bar label="Instance" liveUntilLedger={data.instance.live_until_ledger} currentLedger={data.current_ledger} />

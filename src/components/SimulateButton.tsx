@@ -1,4 +1,4 @@
-// Issue #46 — Contract execution simulation estimator button
+Contract execution simulation estimator button
 import { useState } from "react";
 
 interface SimResult {
@@ -26,7 +26,11 @@ export default function SimulateButton({ contractId, fnName, args = "[]" }: Prop
       const res = await fetch("/api/simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contractId, fn: fnName, args: JSON.parse(argsInput) }),
+        body: JSON.stringify({
+          contractId,
+          fn: fnName,
+          args: JSON.parse(argsInput),
+        }),
       });
       const data = await res.json();
       setResult(data);
@@ -39,10 +43,17 @@ export default function SimulateButton({ contractId, fnName, args = "[]" }: Prop
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
         <input
           value={argsInput}
-          onChange={e => setArgsInput(e.target.value)}
+          onChange={(e) => setArgsInput(e.target.value)}
           placeholder='Args JSON, e.g. ["GABC...", 100]'
           style={{ flex: 1, minWidth: 200 }}
         />
@@ -52,28 +63,47 @@ export default function SimulateButton({ contractId, fnName, args = "[]" }: Prop
       </div>
 
       {result && (
-        <div className="card" style={{
-          borderColor: result.success ? "var(--green)" : "#f85149",
-          padding: "12px 16px",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: result.cost ? 10 : 0 }}>
-            <span style={{
-              fontWeight: 700,
-              color: result.success ? "var(--green)" : "#f85149",
-            }}>
+        <div
+          className="card"
+          style={{
+            borderColor: result.success ? "var(--green)" : "#f85149",
+            padding: "12px 16px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              marginBottom: result.cost ? 10 : 0,
+            }}
+          >
+            <span
+              style={{
+                fontWeight: 700,
+                color: result.success ? "var(--green)" : "#f85149",
+              }}
+            >
               {result.success ? "✓ Would succeed" : "✗ Would revert"}
             </span>
-            {result.returnValue && (
-              <code style={{ color: "var(--muted)", fontSize: 12 }}>→ {result.returnValue}</code>
-            )}
+            {result.returnValue && <code style={{ color: "var(--muted)", fontSize: 12 }}>→ {result.returnValue}</code>}
           </div>
-          {result.error && (
-            <p style={{ color: "#f85149", fontSize: 12, marginTop: 4 }}>{result.error}</p>
-          )}
+          {result.error && <p style={{ color: "#f85149", fontSize: 12, marginTop: 4 }}>{result.error}</p>}
           {result.cost && (
-            <div style={{ display: "flex", gap: 16, fontSize: 12, color: "var(--muted)" }}>
-              <span>CPU: <strong style={{ color: "var(--text)" }}>{result.cost.cpuInsns}</strong> insns</span>
-              <span>Mem: <strong style={{ color: "var(--text)" }}>{result.cost.memBytes}</strong> bytes</span>
+            <div
+              style={{
+                display: "flex",
+                gap: 16,
+                fontSize: 12,
+                color: "var(--muted)",
+              }}
+            >
+              <span>
+                CPU: <strong style={{ color: "var(--text)" }}>{result.cost.cpuInsns}</strong> insns
+              </span>
+              <span>
+                Mem: <strong style={{ color: "var(--text)" }}>{result.cost.memBytes}</strong> bytes
+              </span>
             </div>
           )}
         </div>

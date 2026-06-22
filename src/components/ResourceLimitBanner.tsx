@@ -1,5 +1,5 @@
 /**
- * Issue #134 — Resource Limit Exceeded Banner
+ * Resource Limit Exceeded Banner
  *
  * Displays an explicit error layout when a transaction was dropped because
  * the block's total compute capacity was maxed out.
@@ -36,12 +36,18 @@ export default function ResourceLimitBanner({ payload }: ResourceLimitBannerProp
           Transaction Dropped: Block Compute Capacity Maxed Out
         </div>
         <div style={{ fontSize: "0.875em", opacity: 0.85 }}>
-          This transaction was rejected because the block&apos;s total resource budget
-          was exhausted (<code>tx_resource_limit_exceeded</code>). Try resubmitting
-          in the next ledger when capacity resets.
+          This transaction was rejected because the block&apos;s total resource budget was exhausted (
+          <code>tx_resource_limit_exceeded</code>). Try resubmitting in the next ledger when capacity resets.
         </div>
         {payload.tx_hash && (
-          <div style={{ fontSize: "0.8em", marginTop: "6px", opacity: 0.6, fontFamily: "monospace" }}>
+          <div
+            style={{
+              fontSize: "0.8em",
+              marginTop: "6px",
+              opacity: 0.6,
+              fontFamily: "monospace",
+            }}
+          >
             tx: {payload.tx_hash}
           </div>
         )}

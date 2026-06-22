@@ -54,7 +54,7 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
             ? "Invalid JSON — check the file for syntax errors."
             : err instanceof Error
               ? err.message
-              : "Unknown error reading file."
+              : "Unknown error reading file.",
         );
       }
     };
@@ -81,8 +81,7 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
       const file = e.dataTransfer.files[0];
       if (file) readFile(file);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onLoad]
+    [onLoad],
   );
 
   const onInputChange = useCallback(
@@ -92,8 +91,7 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
       // Reset so the same file can be re-uploaded
       e.target.value = "";
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onLoad]
+    [onLoad],
   );
 
   const error = readError ?? parseError;
@@ -118,9 +116,7 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
           {/* Icon + title row */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 16 }}>📄</span>
-            <span style={{ fontWeight: 600, color: "var(--green)", fontSize: 13 }}>
-              Local ABI loaded
-            </span>
+            <span style={{ fontWeight: 600, color: "var(--green)", fontSize: 13 }}>Local ABI loaded</span>
             <span
               style={{
                 fontSize: 11,
@@ -136,7 +132,15 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
           </div>
 
           {/* File info */}
-          <div style={{ fontSize: 12, color: "var(--muted)", display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--muted)",
+              display: "flex",
+              gap: 16,
+              flexWrap: "wrap",
+            }}
+          >
             <span>
               <span style={{ color: "var(--text)" }}>File:</span> {localAbi.fileName}
             </span>
@@ -146,24 +150,21 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
               </span>
             )}
             <span>
-              <span style={{ color: "var(--text)" }}>Functions:</span>{" "}
-              {localAbi.functions.length}
+              <span style={{ color: "var(--text)" }}>Functions:</span> {localAbi.functions.length}
             </span>
             {localAbi.types && localAbi.types.length > 0 && (
               <span>
-                <span style={{ color: "var(--text)" }}>Types:</span>{" "}
-                {localAbi.types.length}
+                <span style={{ color: "var(--text)" }}>Types:</span> {localAbi.types.length}
               </span>
             )}
             <span>
-              <span style={{ color: "var(--text)" }}>Loaded:</span>{" "}
-              {new Date(localAbi.loadedAt).toLocaleTimeString()}
+              <span style={{ color: "var(--text)" }}>Loaded:</span> {new Date(localAbi.loadedAt).toLocaleTimeString()}
             </span>
           </div>
 
           {/* Function list */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
-            {localAbi.functions.map(f => (
+            {localAbi.functions.map((f) => (
               <span key={f.name} className="badge" style={{ fontSize: 11 }}>
                 {f.name}
               </span>
@@ -200,13 +201,7 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
         </div>
 
         {/* Hidden file input for Replace */}
-        <input
-          ref={inputRef}
-          type="file"
-          accept=".json"
-          style={{ display: "none" }}
-          onChange={onInputChange}
-        />
+        <input ref={inputRef} type="file" accept=".json" style={{ display: "none" }} onChange={onInputChange} />
       </div>
     );
   }
@@ -223,7 +218,7 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         onClick={() => inputRef.current?.click()}
-        onKeyDown={e => (e.key === "Enter" || e.key === " ") && inputRef.current?.click()}
+        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && inputRef.current?.click()}
         style={{
           border: `2px dashed ${dragging ? "var(--accent)" : "var(--border)"}`,
           borderRadius: 8,
@@ -282,7 +277,14 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
         >
           <div>
             <strong style={{ color: "var(--text)" }}>Registry format</strong>
-            <pre style={{ margin: "4px 0 0", fontSize: 11, color: "var(--muted)", overflowX: "auto" }}>{`{
+            <pre
+              style={{
+                margin: "4px 0 0",
+                fontSize: 11,
+                color: "var(--muted)",
+                overflowX: "auto",
+              }}
+            >{`{
   "contractId": "C...",
   "name": "My Contract",
   "functions": [
@@ -292,7 +294,14 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
           </div>
           <div>
             <strong style={{ color: "var(--text)" }}>Full-spec format</strong>
-            <pre style={{ margin: "4px 0 0", fontSize: 11, color: "var(--muted)", overflowX: "auto" }}>{`{
+            <pre
+              style={{
+                margin: "4px 0 0",
+                fontSize: 11,
+                color: "var(--muted)",
+                overflowX: "auto",
+              }}
+            >{`{
   "functions": [
     { "name": "transfer", "inputs": [{"name":"from","type":"Address"}] }
   ],
@@ -301,7 +310,14 @@ export default function AbiUploadZone({ onLoad, onClear, localAbi, parseError }:
           </div>
           <div>
             <strong style={{ color: "var(--text)" }}>Flat array</strong>
-            <pre style={{ margin: "4px 0 0", fontSize: 11, color: "var(--muted)", overflowX: "auto" }}>{`[{ "name": "transfer", "params": [...] }]`}</pre>
+            <pre
+              style={{
+                margin: "4px 0 0",
+                fontSize: 11,
+                color: "var(--muted)",
+                overflowX: "auto",
+              }}
+            >{`[{ "name": "transfer", "params": [...] }]`}</pre>
           </div>
         </div>
       </details>

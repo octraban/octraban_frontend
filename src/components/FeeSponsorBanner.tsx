@@ -10,7 +10,12 @@ function short(addr: string) {
 }
 
 export default function FeeSponsorBanner({ feeBump }: Props) {
-  const tiers: { role: string; label: string; address: string; color: string }[] = [
+  const tiers: {
+    role: string;
+    label: string;
+    address: string;
+    color: string;
+  }[] = [
     {
       role: "Sponsor",
       label: "Paid the fee",
@@ -41,7 +46,14 @@ export default function FeeSponsorBanner({ feeBump }: Props) {
       style={{ marginTop: 12, borderLeft: "3px solid var(--accent)" }}
       aria-label="Fee-bump chain of custody"
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 12,
+        }}
+      >
         <span
           style={{
             fontSize: 11,
@@ -80,17 +92,7 @@ export default function FeeSponsorBanner({ feeBump }: Props) {
   );
 }
 
-function TierRow({
-  role,
-  label,
-  address,
-  color,
-}: {
-  role: string;
-  label: string;
-  address: string;
-  color: string;
-}) {
+function TierRow({ role, label, address, color }: { role: string; label: string; address: string; color: string }) {
   return (
     <div
       style={{
@@ -119,7 +121,12 @@ function TierRow({
 
       {/* Address */}
       <code
-        style={{ fontSize: 13, fontFamily: "monospace", color, wordBreak: "break-all" }}
+        style={{
+          fontSize: 13,
+          fontFamily: "monospace",
+          color,
+          wordBreak: "break-all",
+        }}
         title={address}
       >
         {short(address)}

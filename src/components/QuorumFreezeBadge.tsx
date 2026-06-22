@@ -48,26 +48,35 @@ export default function QuorumFreezeBadge({ contractId }: Props) {
       </div>
 
       <p style={{ fontSize: 12, color: "var(--muted)", margin: 0 }}>
-        This contract has been collectively frozen by network validators during a security incident.
-        All invocations targeting this contract will be rejected with a quarantine error.
+        This contract has been collectively frozen by network validators during a security incident. All invocations
+        targeting this contract will be rejected with a quarantine error.
       </p>
 
       {data.ledger && (
         <div style={{ fontSize: 11, color: "var(--muted)" }}>
           Freeze enacted at ledger <strong style={{ color: "var(--text)" }}>{data.ledger}</strong>
           {data.tx_hash && (
-            <span> · tx <code style={{ fontSize: 11 }}>{data.tx_hash.slice(0, 12)}…</code></span>
+            <span>
+              {" "}
+              · tx <code style={{ fontSize: 11 }}>{data.tx_hash.slice(0, 12)}…</code>
+            </span>
           )}
         </div>
       )}
 
       {data.frozen_ids.length > 1 && (
         <details style={{ fontSize: 11, color: "var(--muted)" }}>
-          <summary style={{ cursor: "pointer" }}>
-            {data.frozen_ids.length} frozen keys in this event
-          </summary>
-          <ul style={{ margin: "6px 0 0", paddingLeft: 16, display: "flex", flexDirection: "column", gap: 2 }}>
-            {data.frozen_ids.map(id => (
+          <summary style={{ cursor: "pointer" }}>{data.frozen_ids.length} frozen keys in this event</summary>
+          <ul
+            style={{
+              margin: "6px 0 0",
+              paddingLeft: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}
+          >
+            {data.frozen_ids.map((id) => (
               <li key={id}>
                 <code style={{ fontSize: 11, color: "#ef4444" }}>{id}</code>
               </li>

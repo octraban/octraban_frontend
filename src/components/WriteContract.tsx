@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  isConnected,
-  getAddress,
-  signTransaction,
-} from "@stellar/freighter-api";
+import { isConnected, getAddress, signTransaction } from "@stellar/freighter-api";
 import {
   Contract,
   TransactionBuilder,
@@ -68,7 +64,7 @@ function toScVal(value: unknown, type: string, typeIndex: TypeIndex): xdr.ScVal 
     const obj = (value ?? {}) as Record<string, unknown>;
 
     // Named struct → ScvMap
-    const entries = fields.map(field => {
+    const entries = fields.map((field) => {
       const fieldVal = toScVal(obj[field.name] ?? "", field.type, typeIndex);
       return new xdr.ScMapEntry({
         key: xdr.ScVal.scvSymbol(field.name),
@@ -88,7 +84,7 @@ function toScVal(value: unknown, type: string, typeIndex: TypeIndex): xdr.ScVal 
   if (typeDef?.kind === "union") {
     const unionVal = (value ?? {}) as { variant?: string; data?: unknown };
     const tag = unionVal.variant ?? typeDef.cases?.[0]?.name ?? "";
-    const matchedCase = typeDef.cases?.find(c => c.name === tag);
+    const matchedCase = typeDef.cases?.find((c) => c.name === tag);
     const payloadTypes = matchedCase?.types ?? [];
 
     const tagScVal = xdr.ScVal.scvSymbol(tag);
@@ -105,9 +101,7 @@ function toScVal(value: unknown, type: string, typeIndex: TypeIndex): xdr.ScVal 
 
     // Multi-payload tuple variant
     const dataArr = Array.isArray(unionVal.data) ? (unionVal.data as unknown[]) : [];
-    const payloadScVals = payloadTypes.map((pt, i) =>
-      toScVal(dataArr[i] ?? "", pt, typeIndex)
-    );
+    const payloadScVals = payloadTypes.map((pt, i) => toScVal(dataArr[i] ?? "", pt, typeIndex));
     return xdr.ScVal.scvVec([tagScVal, ...payloadScVals]);
   }
 
@@ -140,7 +134,10 @@ export default function WriteContract({ functions, contractId }: Props) {
   const [selected, setSelected] = useState<string>(writeFns[0]?.name ?? "");
   // args holds either a string (primitive) or a structured value (complex type)
   const [args, setArgs] = useState<Record<string, unknown>>({});
-  const [status, setStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [status, setStatus] = useState<{
+    type: "success" | "error";
+    msg: string;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Fetch the full spec (functions + custom types) for this contract
@@ -151,17 +148,18 @@ export default function WriteContract({ functions, contractId }: Props) {
     retry: false,
   });
 
-  const typeIndex: TypeIndex = fullSpec?.types
-    ? buildTypeIndex(fullSpec.types)
-    : new Map();
+  const typeIndex: TypeIndex = fullSpec?.types ? buildTypeIndex(fullSpec.types) : new Map();
 
-  const fn = writeFns.find(f => f.name === selected);
+  const fn = writeFns.find((f) => f.name === selected);
 
   async function connectWallet() {
     try {
       const connected = await isConnected();
       if (!connected) {
-        setStatus({ type: "error", msg: "Freighter extension not found. Please install it." });
+        setStatus({
+          type: "error",
+          msg: "Freighter extension not found. Please install it.",
+        });
         return;
       }
       const { address } = await getAddress();
@@ -189,9 +187,7 @@ export default function WriteContract({ functions, contractId }: Props) {
       const account = new Account(accData.id, accData.sequence);
 
       const contract = new Contract(contractId);
-      const callArgs = (fn.params ?? []).map(p =>
-        toScVal(args[p.name] ?? "", p.type, typeIndex)
-      );
+      const callArgs = (fn.params ?? []).map((p) => toScVal(args[p.name] ?? "", p.type, typeIndex));
 
       const tx = new TransactionBuilder(account, {
         fee: BASE_FEE,
@@ -213,7 +209,10 @@ export default function WriteContract({ functions, contractId }: Props) {
       const data = await submitRes.json();
       if (!submitRes.ok) throw new Error(data.error ?? "Submission failed");
 
-      setStatus({ type: "success", msg: `Transaction submitted! Hash: ${data.hash}` });
+      setStatus({
+        type: "success",
+        msg: `Transaction submitted! Hash: ${data.hash}`,
+      });
     } catch (e: any) {
       setStatus({ type: "error", msg: e.message });
     } finally {
@@ -237,15 +236,17 @@ export default function WriteContract({ functions, contractId }: Props) {
         </p>
       )}
 
-      <select value={selected} onChange={e => handleSelect(e.target.value)} style={{ width: "100%" }}>
-        {writeFns.map(f => (
-          <option key={f.name} value={f.name}>{f.name}</option>
+      <select value={selected} onChange={(e) => handleSelect(e.target.value)} style={{ width: "100%" }}>
+        {writeFns.map((f) => (
+          <option key={f.name} value={f.name}>
+            {f.name}
+          </option>
         ))}
       </select>
 
       {fn?.params && fn.params.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {fn.params.map(p => {
+          {fn.params.map((p) => {
             const isComplex = typeIndex.has(p.type);
             return (
               <div key={p.name} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -260,17 +261,15 @@ export default function WriteContract({ functions, contractId }: Props) {
                         p.type.toLowerCase() === "address"
                           ? "text"
                           : p.type.toLowerCase().includes("int") ||
-                            ["u32","i32","u64","i64","u128","i128"].includes(p.type.toLowerCase())
-                          ? "number"
-                          : "text"
+                              ["u32", "i32", "u64", "i64", "u128", "i128"].includes(p.type.toLowerCase())
+                            ? "number"
+                            : "text"
                       }
                       placeholder={
-                        p.type.toLowerCase() === "address"
-                          ? `${p.name} (e.g. GABC…)`
-                          : `${p.name} (${p.type})`
+                        p.type.toLowerCase() === "address" ? `${p.name} (e.g. GABC…)` : `${p.name} (${p.type})`
                       }
                       value={args[p.name] != null ? String(args[p.name]) : ""}
-                      onChange={e => setArgs(a => ({ ...a, [p.name]: e.target.value }))}
+                      onChange={(e) => setArgs((a) => ({ ...a, [p.name]: e.target.value }))}
                       style={{ width: "100%" }}
                     />
                   </>
@@ -281,7 +280,7 @@ export default function WriteContract({ functions, contractId }: Props) {
                   <StructuredInput
                     type={p.type}
                     value={args[p.name] ?? null}
-                    onChange={v => setArgs(a => ({ ...a, [p.name]: v }))}
+                    onChange={(v) => setArgs((a) => ({ ...a, [p.name]: v }))}
                     typeIndex={typeIndex}
                     label={p.name}
                   />

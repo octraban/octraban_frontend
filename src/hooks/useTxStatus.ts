@@ -1,5 +1,5 @@
 /**
- * Issue #118 — SSE transaction status hook.
+ * SSE transaction status hook.
  *
  * Opens a Server-Sent Events connection to /api/transactions/:hash/status/stream
  * and returns the live status. Falls back to polling if SSE is unavailable.
@@ -14,7 +14,7 @@ export interface TxStatusPayload {
   status: TxStatus;
   ledger: number | null;
   error: string | null;
-  /** Issue #134: true when the tx was dropped due to block compute capacity being full */
+  /** true when the tx was dropped due to block compute capacity being full */
   is_resource_limit_exceeded?: boolean;
 }
 
@@ -33,14 +33,16 @@ export function useTxStatus(txHash: string | null | undefined) {
         if (data.status === "success" || data.status === "failed") {
           es.close();
         }
-      } catch { /* ignore parse errors */ }
+      } catch {
+        /* ignore parse errors */
+      }
     };
 
     es.onerror = () => {
       es.close();
       // Fallback: single poll
       fetch(`/api/transactions/${txHash}/status`)
-        .then(r => r.json())
+        .then((r) => r.json())
         .then(setPayload)
         .catch(() => {});
     };

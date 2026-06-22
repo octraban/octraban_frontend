@@ -1,14 +1,10 @@
 /**
  * SDK Snippet Generator Component
- * Issue #51: Client SDK Snippet Generator Utility
+ * Client SDK Snippet Generator Utility
  */
 
 import React, { useState } from "react";
-import {
-  generateJavaScriptSnippet,
-  generateRustSnippet,
-  generateTypeScriptSnippet,
-} from "../utils/snippetGenerator";
+import { generateJavaScriptSnippet, generateRustSnippet, generateTypeScriptSnippet } from "../utils/snippetGenerator";
 
 interface SDKSnippetGeneratorProps {
   contractId: string;
@@ -18,11 +14,7 @@ interface SDKSnippetGeneratorProps {
 
 type Language = "javascript" | "typescript" | "rust";
 
-export default function SDKSnippetGenerator({
-  contractId,
-  functionName,
-  functionParams,
-}: SDKSnippetGeneratorProps) {
+export default function SDKSnippetGenerator({ contractId, functionName, functionParams }: SDKSnippetGeneratorProps) {
   const [language, setLanguage] = useState<Language>("javascript");
   const [copied, setCopied] = useState(false);
 
@@ -49,7 +41,13 @@ export default function SDKSnippetGenerator({
   };
 
   return (
-    <div style={{ borderRadius: "8px", border: "1px solid #e5e7eb", overflow: "hidden" }}>
+    <div
+      style={{
+        borderRadius: "8px",
+        border: "1px solid #e5e7eb",
+        overflow: "hidden",
+      }}
+    >
       <div
         style={{
           padding: "12px 16px",

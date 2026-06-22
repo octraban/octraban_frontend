@@ -16,14 +16,25 @@ export default function FiatValue({ amount, symbol }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    fiatLabel(amount, symbol).then(l => { if (!cancelled) setLabel(l); });
-    return () => { cancelled = true; };
+    fiatLabel(amount, symbol).then((l) => {
+      if (!cancelled) setLabel(l);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [amount, symbol]);
 
   if (!label) return null;
 
   return (
-    <span style={{ fontSize: 11, color: "var(--muted)", display: "block", marginTop: 2 }}>
+    <span
+      style={{
+        fontSize: 11,
+        color: "var(--muted)",
+        display: "block",
+        marginTop: 2,
+      }}
+    >
       {label}
     </span>
   );

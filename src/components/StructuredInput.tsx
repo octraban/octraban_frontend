@@ -13,35 +13,15 @@
  * WriteContract component can pass to nativeToScVal / toScVal.
  */
 
-import { useState } from "react";
 import type { SpecType } from "../api";
 import type { TypeIndex } from "./StructuredValue";
 
 // ── Primitive type helpers ────────────────────────────────────────────────────
 
-const PRIMITIVE_TYPES = new Set([
-  "bool", "u32", "i32", "u64", "i64", "u128", "i128", "u256", "i256",
-  "string", "symbol", "bytes", "address", "val", "void",
-  "timepoint", "duration", "error",
-]);
-
-function isPrimitive(type: string): boolean {
-  const t = type.toLowerCase();
-  return (
-    PRIMITIVE_TYPES.has(t) ||
-    t.startsWith("option<") ||
-    t.startsWith("vec<") ||
-    t.startsWith("map<") ||
-    t.startsWith("bytesn<") ||
-    t.startsWith("result<") ||
-    t.startsWith("(")
-  );
-}
-
 function primitiveInputType(type: string): string {
   const t = type.toLowerCase();
   if (t === "bool") return "checkbox";
-  if (t.includes("int") || ["u32","i32","u64","i64","u128","i128","u256","i256"].includes(t)) return "number";
+  if (t.includes("int") || ["u32", "i32", "u64", "i64", "u128", "i128", "u256", "i256"].includes(t)) return "number";
   return "text";
 }
 
@@ -60,13 +40,7 @@ interface StructuredInputProps {
   label?: string;
 }
 
-export default function StructuredInput({
-  type,
-  value,
-  onChange,
-  typeIndex,
-  label,
-}: StructuredInputProps) {
+export default function StructuredInput({ type, value, onChange, typeIndex, label }: StructuredInputProps) {
   const typeDef = typeIndex.get(type);
 
   // ── Struct ────────────────────────────────────────────────────────────────
@@ -84,14 +58,7 @@ export default function StructuredInput({
 
   // ── Enum ──────────────────────────────────────────────────────────────────
   if (typeDef?.kind === "enum" || typeDef?.kind === "error_enum") {
-    return (
-      <EnumInput
-        typeDef={typeDef}
-        value={value as number | null}
-        onChange={onChange}
-        label={label ?? type}
-      />
-    );
+    return <EnumInput typeDef={typeDef} value={value as number | null} onChange={onChange} label={label ?? type} />;
   }
 
   // ── Union ─────────────────────────────────────────────────────────────────
@@ -109,12 +76,7 @@ export default function StructuredInput({
 
   // ── Primitive / unknown type ──────────────────────────────────────────────
   return (
-    <PrimitiveInput
-      type={type}
-      value={value as string | boolean | null}
-      onChange={onChange}
-      label={label ?? type}
-    />
+    <PrimitiveInput type={type} value={value as string | boolean | null} onChange={onChange} label={label ?? type} />
   );
 }
 
@@ -150,16 +112,15 @@ function StructInput({ typeDef, value, onChange, typeIndex, label }: StructInput
           borderLeft: "2px solid var(--border)",
         }}
       >
-        {fields.map(field => (
+        {fields.map((field) => (
           <div key={field.name} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <label style={{ fontSize: 11, color: "var(--muted)" }}>
-              {field.name}{" "}
-              <span style={{ color: "var(--accent)" }}>({field.type})</span>
+              {field.name} <span style={{ color: "var(--accent)" }}>({field.type})</span>
             </label>
             <StructuredInput
               type={field.type}
               value={current[field.name] ?? null}
-              onChange={v => handleFieldChange(field.name, v)}
+              onChange={(v) => handleFieldChange(field.name, v)}
               typeIndex={typeIndex}
             />
           </div>
@@ -187,12 +148,8 @@ function EnumInput({ typeDef, value, onChange, label }: EnumInputProps) {
       <span style={{ fontSize: 11, color: "var(--muted)" }}>
         {label} <span style={{ color: "var(--accent)" }}>({typeDef.name})</span>
       </span>
-      <select
-        value={selected}
-        onChange={e => onChange(Number(e.target.value))}
-        style={{ width: "100%" }}
-      >
-        {cases.map(c => (
+      <select value={selected} onChange={(e) => onChange(Number(e.target.value))} style={{ width: "100%" }}>
+        {cases.map((c) => (
           <option key={c.name} value={c.value ?? 0}>
             {c.name} ({c.value ?? 0})
           </option>
@@ -220,7 +177,7 @@ interface UnionInputProps {
 function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputProps) {
   const cases = typeDef.cases ?? [];
   const selectedVariant = value?.variant ?? cases[0]?.name ?? "";
-  const matchedCase = cases.find(c => c.name === selectedVariant);
+  const matchedCase = cases.find((c) => c.name === selectedVariant);
   const payloadTypes = matchedCase?.types ?? [];
 
   function handleVariantChange(variant: string) {
@@ -236,13 +193,11 @@ function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputPr
       <span style={{ fontSize: 11, color: "var(--muted)" }}>
         {label} <span style={{ color: "var(--accent)" }}>({typeDef.name})</span>
       </span>
-      <select
-        value={selectedVariant}
-        onChange={e => handleVariantChange(e.target.value)}
-        style={{ width: "100%" }}
-      >
-        {cases.map(c => (
-          <option key={c.name} value={c.name}>{c.name}</option>
+      <select value={selectedVariant} onChange={(e) => handleVariantChange(e.target.value)} style={{ width: "100%" }}>
+        {cases.map((c) => (
+          <option key={c.name} value={c.name}>
+            {c.name}
+          </option>
         ))}
       </select>
 
@@ -280,7 +235,7 @@ function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputPr
                   <StructuredInput
                     type={pt}
                     value={dataArr[i] ?? null}
-                    onChange={v => {
+                    onChange={(v) => {
                       const next = [...dataArr];
                       next[i] = v;
                       handleDataChange(next);
@@ -315,7 +270,7 @@ function PrimitiveInput({ type, value, onChange, label }: PrimitiveInputProps) {
         <input
           type="checkbox"
           checked={value === true || value === "true"}
-          onChange={e => onChange(e.target.checked)}
+          onChange={(e) => onChange(e.target.checked)}
         />
         <span style={{ fontSize: 12, color: "var(--muted)" }}>{label}</span>
       </div>
@@ -327,7 +282,7 @@ function PrimitiveInput({ type, value, onChange, label }: PrimitiveInputProps) {
       type={inputKind}
       placeholder={`${label} (${type})`}
       value={value == null ? "" : String(value)}
-      onChange={e => onChange(e.target.value)}
+      onChange={(e) => onChange(e.target.value)}
       style={{ width: "100%" }}
     />
   );

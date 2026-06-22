@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { api, type PrivilegedRole } from "../api";
 
 const ROLE_COLORS: Record<string, string> = {
-  admin:   "#f85149",
+  admin: "#f85149",
   manager: "#d29922",
-  minter:  "#3fb950",
-  pauser:  "#58a6ff",
+  minter: "#3fb950",
+  pauser: "#58a6ff",
 };
 
 function roleColor(role: string) {
@@ -51,29 +51,27 @@ export default function PrivilegedRoles({ contractId }: { contractId: string }) 
           {roles.map((r: PrivilegedRole, i: number) => (
             <tr key={i} style={{ borderTop: "1px solid var(--border)" }}>
               <td style={td}>
-                <span style={{
-                  display: "inline-block",
-                  padding: "2px 8px",
-                  borderRadius: 4,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  background: roleColor(r.role) + "22",
-                  color: roleColor(r.role),
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}>
+                <span
+                  style={{
+                    display: "inline-block",
+                    padding: "2px 8px",
+                    borderRadius: 4,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    background: roleColor(r.role) + "22",
+                    color: roleColor(r.role),
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                  }}
+                >
                   {r.role}
                 </span>
               </td>
               <td style={{ ...td, fontFamily: "monospace" }}>
                 <span title={r.address}>{fmtAddr(r.address)}</span>
               </td>
-              <td style={{ ...td, color: "var(--muted)" }}>
-                {r.ledger ?? "—"}
-              </td>
-              <td style={{ ...td, color: "var(--muted)", fontSize: 12 }}>
-                {new Date(r.updated_at).toLocaleString()}
-              </td>
+              <td style={{ ...td, color: "var(--muted)" }}>{r.ledger ?? "—"}</td>
+              <td style={{ ...td, color: "var(--muted)", fontSize: 12 }}>{new Date(r.updated_at).toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
@@ -83,8 +81,12 @@ export default function PrivilegedRoles({ contractId }: { contractId: string }) 
 }
 
 const th: React.CSSProperties = {
-  textAlign: "left", padding: "6px 8px", fontWeight: 500, fontSize: 11,
+  textAlign: "left",
+  padding: "6px 8px",
+  fontWeight: 500,
+  fontSize: 11,
 };
 const td: React.CSSProperties = {
-  padding: "7px 8px", verticalAlign: "middle",
+  padding: "7px 8px",
+  verticalAlign: "middle",
 };
