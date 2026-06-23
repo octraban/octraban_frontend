@@ -324,6 +324,7 @@ describe("api types validation", () => {
   it("ContractMeta shape is correct", () => {
     const meta = {
       id: "C1",
+      version: 1,
       name: "Token",
       description: "A token",
       functions: [{ name: "transfer", args: [{ name: "to", type: "address" }] }],
@@ -331,6 +332,7 @@ describe("api types validation", () => {
     };
     expect(meta.functions[0].name).toBe("transfer");
     expect(meta.functions[0].args[0].type).toBe("address");
+    expect(meta.version).toBeTypeOf("number");
   });
 
   it("PrivilegedRole shape is correct", () => {

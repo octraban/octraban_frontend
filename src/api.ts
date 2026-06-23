@@ -149,6 +149,7 @@ export interface DependencyAdvisory {
 
 export interface ContractMeta {
   id: string;
+  version: number;
   name: string;
   description: string;
   functions: { name: string; description: string }[];
