@@ -2,7 +2,6 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api";
 import ResourceCosts from "../components/ResourceCosts";
-import SSEStatusIndicator from "../components/SSEStatusIndicator";
 import StorageTierBreakdown from "../components/StorageTierBreakdown";
 import GasLimitAlert from "../components/GasLimitAlert";
 import FeeSponsorBanner from "../components/FeeSponsorBanner";
@@ -71,17 +70,7 @@ export default function EventPage() {
         )}
         <Row label="Ledger" value={ev.ledger.toLocaleString()} />
         <Row label="Contract" value={<Link to={`/contract/${ev.contract_id}`}>{ev.contract_id}</Link>} />
-        {ev.tx_hash && (
-          <Row
-            label="Tx Hash"
-            value={
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontFamily: "monospace" }}>{ev.tx_hash}</span>
-                <SSEStatusIndicator txHash={ev.tx_hash} />
-              </span>
-            }
-          />
-        )}
+        {ev.tx_hash && <Row label="Tx Hash" value={ev.tx_hash} mono />}
         {ev.raw_topics.length > 0 && <Row label="Topics" value={ev.raw_topics.join(", ")} mono />}
       </div>
 
@@ -91,22 +80,22 @@ export default function EventPage() {
       {/* Fee-Bump sponsorship banner */}
       {ev.fee_bump && <FeeSponsorBanner feeBump={ev.fee_bump} />}
 
-      {/* Issue #177 — Factory Deployment Trace */}
+      {/* Factory Deployment Trace */}
       {ev.factory_deployment && <FactoryDeploymentTree deployment={ev.factory_deployment} />}
 
-      {/* Issue #40 — Resource Consumption breakdown */}
+      {/* Resource Consumption breakdown */}
       <ResourceCosts event={ev} />
 
-      {/* Issue #164 — CAP-0080 ZK host function cost delta */}
+      {/* CAP-0080 ZK host function cost delta */}
       {ev.zk_host_calls && <ZkCostDelta calls={ev.zk_host_calls.calls} delta={ev.zk_host_calls.delta} />}
 
-      {/* Issue #125 — Gas-Limit Alert Flag */}
+      {/* Gas-Limit Alert Flag */}
       <GasLimitAlert event={ev} />
 
-      {/* Issue #52 — Storage tier breakdown */}
+      {/* Storage tier breakdown */}
       {ev.storage_tiers && <StorageTierBreakdown tiers={ev.storage_tiers} />}
 
-      {/* Issue #167 — State restoration (RestoreFootprintOp) */}
+      {/* State restoration (RestoreFootprintOp) */}
       {ev.archival_info?.isRestoreOp && <RestoreFootprintPanel restore={ev.archival_info} />}
     </div>
   );

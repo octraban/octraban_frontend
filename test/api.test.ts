@@ -12,14 +12,18 @@ const api = {
   events: (params: { contract?: string; fn?: string; page?: number; type?: string }) => {
     const q = new URLSearchParams();
     if (params.contract) q.set("contract", params.contract);
-    if (params.fn)       q.set("fn", params.fn);
-    if (params.page)     q.set("page", String(params.page));
-    if (params.type)     q.set("type", params.type);
+    if (params.fn) q.set("fn", params.fn);
+    if (params.page) q.set("page", String(params.page));
+    if (params.type) q.set("type", params.type);
     return get<Array<{ seq: number }>>(`/events?${q}`);
   },
-  event:    (seq: number)     => get<{ seq: number }>(`/events/${seq}`),
-  contract: (id: string)      => get<{ id: string; name: string }>(`/contracts/${id}`),
-  wallet:   (address: string) => get<Array<{ seq: number }>>(`/wallet/${address}`),
+  event: (seq: number) => get<{ seq: number }>(`/events/${seq}`),
+  contract: (id: string) => get<{ id: string; name: string }>(`/contracts/${id}`),
+  wallet: (address: string) => get<Array<{ seq: number }>>(`/wallet/${address}`),
+  search: (q: string, limit = 10) =>
+    get<{ contracts: unknown[]; events: unknown[]; wallets: unknown[]; suggestions: unknown[] }>(
+      `/search?q=${encodeURIComponent(q)}&limit=${limit}`,
+    ),
   burnAlerts: (contract: string) => get<Array<{ contractId: string }>>(`/burn-alerts?contract=${contract}`),
   migrationStatus: (id: string) => get<{ pending: boolean }>(`/contracts/${id}/migration-status`),
   roles: (id: string) => get<Array<{ role: string; address: string }>>(`/contracts/${id}/roles`),
@@ -147,6 +151,15 @@ describe("api utility", () => {
     mockFetch([{ seq: 1 }, { seq: 2 }]);
     const result = await api.wallet("GABCDEF");
     expect(result).toHaveLength(2);
+  });
+
+  it("search builds encoded query string", async () => {
+    mockFetch({ contracts: [], events: [], wallets: [], suggestions: [] });
+    const result = await api.search("USDC transfer", 25);
+    expect(result.contracts).toEqual([]);
+    const [url] = (fetch as any).mock.calls[0];
+    expect(url).toContain("q=USDC%20transfer");
+    expect(url).toContain("limit=25");
   });
 
   it("subInvocations fetches by tx hash", async () => {
