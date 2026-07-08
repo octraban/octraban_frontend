@@ -93,7 +93,7 @@ describe("Home — empty events array", () => {
   it("renders the page heading without crashing", async () => {
     renderHome();
     // The heading is synchronously present — no async wait needed.
-    expect(screen.getByText("Soroban Smart Block Explorer")).toBeDefined();
+    expect(screen.getByText("Octraban")).toBeDefined();
   });
 
   it('shows the "No events yet" empty-state message after the query resolves', async () => {
