@@ -17,12 +17,12 @@ export const NODE_SDK_TEMPLATE: Record<string, SandboxFile> = {
   "src/index.js": {
     path: "src/index.js",
     language: "javascript",
-    content: `import { SorobanExplorer } from 'soroban-explorer-sdk';
+    content: `import { Octraban } from 'octraban-sdk';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const explorer = new SorobanExplorer({
+const explorer = new Octraban({
   network: 'testnet',
   rpcUrl: process.env.SOROBAN_RPC_URL,
 });
@@ -51,7 +51,7 @@ await explorer.start();
     path: "package.json",
     language: "json",
     content: `{
-  "name": "soroban-explorer-demo",
+  "name": "octraban-demo",
   "version": "1.0.0",
   "type": "module",
   "main": "src/index.js",
@@ -59,7 +59,7 @@ await explorer.start();
     "start": "node src/index.js"
   },
   "dependencies": {
-    "soroban-explorer-sdk": "0.2.0",
+    "octraban-sdk": "0.2.0",
     "dotenv": "16.4.5"
   }
 }

@@ -31,7 +31,7 @@ export default function Nav() {
       }}
     >
       <Link to="/" style={{ fontWeight: 700, fontSize: 16, whiteSpace: "nowrap" }}>
-        ⬡ Soroban Explorer
+        ⬡ Octraban
       </Link>
       <Link to="/search" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
         Search

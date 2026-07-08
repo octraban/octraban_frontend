@@ -9,17 +9,17 @@ export interface Template {
 export const TEMPLATES: Record<string, Template> = {
   "node-sdk": {
     name: "Node.js SDK",
-    description: "Event listener using Soroban Explorer SDK",
+    description: "Event listener using Octraban SDK",
     files: {
       "src/index.js": {
         path: "src/index.js",
         language: "javascript",
-        content: `import { SorobanExplorer } from 'soroban-explorer-sdk';
+        content: `import { Octraban } from 'octraban-sdk';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const explorer = new SorobanExplorer({
+const explorer = new Octraban({
   network: 'testnet',
   rpcUrl: process.env.SOROBAN_RPC_URL,
 });
@@ -48,7 +48,7 @@ await explorer.start();
         path: "package.json",
         language: "json",
         content: `{
-  "name": "soroban-explorer-demo",
+  "name": "octraban-demo",
   "version": "1.0.0",
   "type": "module",
   "main": "src/index.js",
@@ -56,7 +56,7 @@ await explorer.start();
     "start": "node src/index.js"
   },
   "dependencies": {
-    "soroban-explorer-sdk": "0.2.0",
+    "octraban-sdk": "0.2.0",
     "dotenv": "16.4.5"
   }
 }
@@ -79,7 +79,7 @@ EXPLORER_CONTRACT_ID=CABCD1234567890ABCD1234567890ABCD1234567890ABCD1234567890AB
         path: "src/App.tsx",
         language: "typescript",
         content: `import { useState, useEffect } from 'react';
-import { SorobanExplorer } from 'soroban-explorer-sdk';
+import { Octraban } from 'octraban-sdk';
 import './App.css';
 
 interface Event {
@@ -97,7 +97,7 @@ export default function App() {
   useEffect(() => {
     if (!isListening) return;
 
-    const explorer = new SorobanExplorer({
+    const explorer = new Octraban({
       network: 'testnet',
       rpcUrl: import.meta.env.VITE_SOROBAN_RPC_URL,
     });
@@ -163,7 +163,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         path: "package.json",
         language: "json",
         content: `{
-  "name": "soroban-explorer-react",
+  "name": "octraban-react",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -173,7 +173,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   "dependencies": {
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "soroban-explorer-sdk": "0.2.0"
+    "octraban-sdk": "0.2.0"
   },
   "devDependencies": {
     "@types/react": "18.3.3",
@@ -203,13 +203,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         content: `#!/usr/bin/env python3
 import os
 import asyncio
-from stellar_sdk import SorobanExplorer
+from stellar_sdk import Octraban
 from dotenv import load_dotenv
 
 load_dotenv()
 
 async def main():
-    explorer = SorobanExplorer(
+    explorer = Octraban(
         network='testnet',
         rpc_url=os.getenv('SOROBAN_RPC_URL'),
     )

@@ -60,7 +60,7 @@ export default function Home() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div>
-        <h1 style={{ fontSize: 22, marginBottom: 4 }}>Soroban Smart Block Explorer</h1>
+        <h1 style={{ fontSize: 22, marginBottom: 4 }}>Octraban</h1>
         <p style={{ color: "var(--muted)" }}>Human-readable Soroban contract events on Stellar.</p>
       </div>
 
