@@ -363,6 +363,9 @@ export interface SubInvocationExtended extends SubInvocation {
   mem_bytes?: number;
   fee_charged?: number;
   has_reentrancy?: boolean;
+  gas_cost?: number;
+  is_reentrant?: boolean;
+  contract_type?: "token" | "dex" | "lending" | "nft" | "other";
 }
 
 // Aggregate analytics across all sub-invocations
