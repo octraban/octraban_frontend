@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { logger } from '../utils/logger';
 
 /**
  * Multi-Network Contract Management Dashboard
@@ -7,7 +8,7 @@ import React, { useState, useEffect } from 'react';
  */
 export const ContractDashboard = () => {
   const [network, setNetwork] = useState('testnet');
-  const [contractDetails, setContractDetails] = useState({
+  const [contractDetails, _setContractDetails] = useState({
     status: 'Deployed',
     address: 'CABCD...789',
     version: 'v2.1.0',
@@ -17,22 +18,22 @@ export const ContractDashboard = () => {
 
   const handleTransferAdmin = () => {
     // Calls the transfer_admin function added to the contract
-    console.log("Initiating admin transfer transaction...");
+    logger.debug("Initiating admin transfer transaction...");
   };
 
   const handlePause = () => {
     // Multi-sig pause escalation path
-    console.log("Initiating Level 1 emergency pause (2-of-3 required)...");
+    logger.debug("Initiating Level 1 emergency pause (2-of-3 required)...");
   };
 
   const handleVerify = () => {
     // Invokes deterministic build and ABI signature checks via Stellar Expert
-    console.log("Verifying ABI signature and WASM hash on Stellar Expert...");
+    logger.debug("Verifying ABI signature and WASM hash on Stellar Expert...");
   };
 
   const handleUpgrade = () => {
     // Automates proxy contract implementation swap
-    console.log("Simulating upgrade to next implementation...");
+    logger.debug("Simulating upgrade to next implementation...");
   };
 
   return (

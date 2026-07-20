@@ -38,8 +38,9 @@ describe("SearchPage", () => {
       </QueryClientProvider>
     );
 
-    const resultMessage = await screen.findByText(/No results for .*nonexistent/i);
-    expect(resultMessage).toBeDefined();
+    const resultMessage = await screen.findByTestId("no-results");
+    expect(resultMessage.textContent).toMatch(/no results for.*nonexistent/i);
+    expect(resultMessage.textContent).toMatch(/no results for.*nonexistent/i);
     expect(consoleErrorSpy).not.toHaveBeenCalled();
     expect(fetchMock).toHaveBeenCalledWith("/api/search?q=nonexistent&limit=50");
   });

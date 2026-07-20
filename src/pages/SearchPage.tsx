@@ -168,7 +168,7 @@ function Suggestions({ suggestions }: { suggestions: SearchResponse["suggestions
 function Results({ data, query }: { data: FilteredSearchResults; query: string }) {
   if (!data.contracts.length && !data.events.length && !data.wallets.length) {
     return (
-      <div className="card">
+      <div className="card" data-testid="no-results">
         No results for <code>{query}</code>. Try a token symbol, event function, address, transaction hash, or description text.
       </div>
     );

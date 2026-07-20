@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { SandboxFile } from "./webcontainer";
+import { logger } from "../utils/logger";
 
 export async function exportAsZip(
   files: Map<string, SandboxFile>,
@@ -37,7 +38,7 @@ export function createShareableUrl(sandboxId: string): string {
 export function copySandboxUrl(sandboxId: string): void {
   const url = createShareableUrl(sandboxId);
   navigator.clipboard.writeText(url).then(() => {
-    console.log("Sandbox URL copied to clipboard:", url);
+    logger.debug("Sandbox URL copied to clipboard:", url);
   });
 }
 

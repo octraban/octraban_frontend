@@ -1,4 +1,5 @@
 import { WebContainer } from "@webcontainer/api";
+import { logger } from "../utils/logger";
 
 export interface SandboxFile {
   path: string;
@@ -77,7 +78,7 @@ EXPLORER_CONTRACT_ID=CABCD1234567890ABCD1234567890ABCD1234567890ABCD1234567890AB
 export async function initWebContainer(): Promise<WebContainer> {
   try {
     const container = await WebContainer.boot();
-    console.log("WebContainer initialized");
+    logger.debug("WebContainer initialized");
     return container;
   } catch (error) {
     console.error("Failed to initialize WebContainer:", error);
