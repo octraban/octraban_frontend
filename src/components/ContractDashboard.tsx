@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 /**
  * Multi-Network Contract Management Dashboard
@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
  */
 export const ContractDashboard = () => {
   const [network, setNetwork] = useState('testnet');
-  const [contractDetails, setContractDetails] = useState({
+  const [contractDetails] = useState({
     status: 'Deployed',
     address: 'CABCD...789',
     version: 'v2.1.0',
