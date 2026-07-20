@@ -135,31 +135,6 @@ export default function BatchMultiCall() {
     downloadText(api.exportBatchAsJson(calls, sourceAccount || undefined), "batch.json");
   }, [calls, sourceAccount]);
 
-  const exportAsFoundry = useCallback(() => {
-    const script = `// Generated Foundry-style script for Soroban batch calls
-// Note: Foundry is primarily for EVM; this is a Soroban-compatible script
-
-${calls.map(
-  (call, i) => `// Call ${i + 1}: ${call.functionName}
-// contract.call("${call.functionName}", [${call.args.map((a) => `"${a.value}"`).join(", ")}]);`
-).join("\n")}
-`;
-    downloadText(script, "batch-script.sol");
-  }, [calls]);
-
-  const exportAsCli = useCallback(() => {
-    const script = `#!/bin/bash
-# Generated Soroban CLI commands
-
-${calls.map(
-  (call) => `soroban contract invoke \\
-  --id ${call.contractId} \\
-  --function ${call.functionName}`
-).join("\n\n")}
-`;
-    downloadText(script, "batch-script.sh");
-  }, [calls]);
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <div className="card">
