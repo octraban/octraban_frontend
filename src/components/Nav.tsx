@@ -14,7 +14,8 @@ export default function Nav() {
     const params = new URLSearchParams({ q: v });
     if (v.startsWith("G") && v.length === 56) params.set("kind", "wallet");
     else if (v.startsWith("M") && v.length === 56) params.set("kind", "wallet");
-    else if (v.startsWith("C") && v.length === 56) params.set("kind", "contract");
+    else if (v.startsWith("C") && v.length === 56)
+      params.set("kind", "contract");
     nav(`/search?${params}`);
     setQ("");
   }
@@ -30,31 +31,58 @@ export default function Nav() {
         gap: 16,
       }}
     >
-      <Link to="/" style={{ fontWeight: 700, fontSize: 16, whiteSpace: "nowrap" }}>
+      <Link
+        to="/"
+        style={{ fontWeight: 700, fontSize: 16, whiteSpace: "nowrap" }}
+      >
         ⬡ Octraban
       </Link>
-      <Link to="/search" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
+      <Link
+        to="/search"
+        style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}
+      >
         Search
       </Link>
-      <Link to="/xdr" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
+      <Link
+        to="/xdr"
+        style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}
+      >
         XDR Workbench
       </Link>
-      <Link to="/rpc-metrics" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
+      <Link
+        to="/rpc-metrics"
+        style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}
+      >
         RPC Metrics
       </Link>
-      <Link to="/graph" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
+      <Link
+        to="/graph"
+        style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}
+      >
         Dep Graph
       </Link>
-      <Link to="/sandbox" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
+      <Link
+        to="/sandbox"
+        style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}
+      >
         Sandbox
       </Link>
-      <Link to="/batch" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
+      <Link
+        to="/batch"
+        style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}
+      >
         Batch
       </Link>
-      <Link to="/setup" style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}>
+      <Link
+        to="/setup"
+        style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}
+      >
         Setup
       </Link>
-      <form onSubmit={search} style={{ display: "flex", gap: 8, flex: 1, maxWidth: 600 }}>
+      <form
+        onSubmit={search}
+        style={{ display: "flex", gap: 8, flex: 1, maxWidth: 600 }}
+      >
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}

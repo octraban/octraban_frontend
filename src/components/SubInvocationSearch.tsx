@@ -5,7 +5,11 @@ import { useState, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api";
 import type { SubInvocationExtended, SubInvocationFilter } from "../api";
-import { parseQuery, filterToQuery, matchesArgQuery } from "../utils/subInvocationQuery";
+import {
+  parseQuery,
+  filterToQuery,
+  matchesArgQuery,
+} from "../utils/subInvocationQuery";
 
 const FILTER_HINTS = [
   { prefix: "of:", example: "of:CABC…", desc: "Sub-invocations of contract" },
@@ -13,9 +17,17 @@ const FILTER_HINTS = [
   { prefix: "depth:>", example: "depth:>3", desc: "Minimum call depth" },
   { prefix: "depth:<", example: "depth:<5", desc: "Maximum call depth" },
   { prefix: "gas:>", example: "gas:>50000", desc: "Minimum gas cost" },
-  { prefix: "date:", example: "date:2024-01-01..2024-12-31", desc: "Date range" },
+  {
+    prefix: "date:",
+    example: "date:2024-01-01..2024-12-31",
+    desc: "Date range",
+  },
   { prefix: "arg:", example: "arg:amount>100", desc: "Argument value search" },
-  { prefix: "reentrant:", example: "reentrant:true", desc: "Reentrancy filter" },
+  {
+    prefix: "reentrant:",
+    example: "reentrant:true",
+    desc: "Reentrancy filter",
+  },
   { prefix: "ledger:>", example: "ledger:>1000000", desc: "Minimum ledger" },
   { prefix: "tx:", example: "tx:abc123…", desc: "Transaction hash" },
 ];
@@ -84,7 +96,11 @@ export default function SubInvocationSearch({ onResultsChange }: Props) {
     [submittedQuery],
   );
 
-  const { data: results = [], isLoading, error } = useQuery({
+  const {
+    data: results = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["sub-invocations-search", submittedQuery],
     queryFn: () => api.searchSubInvocations(parsedFilter),
     enabled: !!submittedQuery,
@@ -114,27 +130,69 @@ export default function SubInvocationSearch({ onResultsChange }: Props) {
     setSubmittedQuery(q);
   };
 
-  const chips: { label: string; key: keyof SubInvocationFilter; value: string }[] = [];
-  if (parsedFilter.contract) chips.push({ label: "of", key: "contract", value: short(parsedFilter.contract) });
-  if (parsedFilter.function) chips.push({ label: "fn", key: "function", value: parsedFilter.function });
+  const chips: {
+    label: string;
+    key: keyof SubInvocationFilter;
+    value: string;
+  }[] = [];
+  if (parsedFilter.contract)
+    chips.push({
+      label: "of",
+      key: "contract",
+      value: short(parsedFilter.contract),
+    });
+  if (parsedFilter.function)
+    chips.push({ label: "fn", key: "function", value: parsedFilter.function });
   if (parsedFilter.depth_min != null)
-    chips.push({ label: "depth≥", key: "depth_min", value: String(parsedFilter.depth_min) });
+    chips.push({
+      label: "depth≥",
+      key: "depth_min",
+      value: String(parsedFilter.depth_min),
+    });
   if (parsedFilter.depth_max != null)
-    chips.push({ label: "depth≤", key: "depth_max", value: String(parsedFilter.depth_max) });
+    chips.push({
+      label: "depth≤",
+      key: "depth_max",
+      value: String(parsedFilter.depth_max),
+    });
   if (parsedFilter.gas_min != null)
-    chips.push({ label: "gas≥", key: "gas_min", value: parsedFilter.gas_min.toLocaleString() });
+    chips.push({
+      label: "gas≥",
+      key: "gas_min",
+      value: parsedFilter.gas_min.toLocaleString(),
+    });
   if (parsedFilter.gas_max != null)
-    chips.push({ label: "gas≤", key: "gas_max", value: parsedFilter.gas_max.toLocaleString() });
+    chips.push({
+      label: "gas≤",
+      key: "gas_max",
+      value: parsedFilter.gas_max.toLocaleString(),
+    });
   if (parsedFilter.date_from)
-    chips.push({ label: "from", key: "date_from", value: parsedFilter.date_from });
+    chips.push({
+      label: "from",
+      key: "date_from",
+      value: parsedFilter.date_from,
+    });
   if (parsedFilter.date_to)
     chips.push({ label: "to", key: "date_to", value: parsedFilter.date_to });
   if (parsedFilter.has_reentrancy != null)
-    chips.push({ label: "reentrant", key: "has_reentrancy", value: String(parsedFilter.has_reentrancy) });
+    chips.push({
+      label: "reentrant",
+      key: "has_reentrancy",
+      value: String(parsedFilter.has_reentrancy),
+    });
   if (parsedFilter.ledger_min != null)
-    chips.push({ label: "ledger≥", key: "ledger_min", value: String(parsedFilter.ledger_min) });
+    chips.push({
+      label: "ledger≥",
+      key: "ledger_min",
+      value: String(parsedFilter.ledger_min),
+    });
   if (parsedFilter.tx_hash)
-    chips.push({ label: "tx", key: "tx_hash", value: short(parsedFilter.tx_hash) });
+    chips.push({
+      label: "tx",
+      key: "tx_hash",
+      value: short(parsedFilter.tx_hash),
+    });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -151,7 +209,7 @@ export default function SubInvocationSearch({ onResultsChange }: Props) {
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               onFocus={() => setShowHints(true)}
               onBlur={() => setTimeout(() => setShowHints(false), 150)}
-              placeholder='of:CONTRACT fn:transfer depth:>2 gas:>50000 reentrant:true …'
+              placeholder="of:CONTRACT fn:transfer depth:>2 gas:>50000 reentrant:true …"
               aria-label="Sub-invocation search query"
               style={{
                 width: "100%",
@@ -200,8 +258,14 @@ export default function SubInvocationSearch({ onResultsChange }: Props) {
                       color: "var(--text)",
                     }}
                   >
-                    <code style={{ fontSize: 11, color: "#a5b4fc", flexShrink: 0 }}>{h.example}</code>
-                    <span style={{ fontSize: 11, color: "var(--muted)" }}>{h.desc}</span>
+                    <code
+                      style={{ fontSize: 11, color: "#a5b4fc", flexShrink: 0 }}
+                    >
+                      {h.example}
+                    </code>
+                    <span style={{ fontSize: 11, color: "var(--muted)" }}>
+                      {h.desc}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -227,7 +291,9 @@ export default function SubInvocationSearch({ onResultsChange }: Props) {
 
         {/* Active filter chips */}
         {chips.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+          <div
+            style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}
+          >
             {chips.map((c) => (
               <FilterChip
                 key={c.key}
@@ -287,7 +353,9 @@ export default function SubInvocationSearch({ onResultsChange }: Props) {
             }}
           >
             <span>{filtered.length} results</span>
-            {localArgFilter && <span>Filtered by: &ldquo;{localArgFilter}&rdquo;</span>}
+            {localArgFilter && (
+              <span>Filtered by: &ldquo;{localArgFilter}&rdquo;</span>
+            )}
           </div>
           <table
             style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}
@@ -301,12 +369,22 @@ export default function SubInvocationSearch({ onResultsChange }: Props) {
                   borderBottom: "1px solid var(--border)",
                 }}
               >
-                <th style={{ padding: "6px 12px", textAlign: "left" }}>Contract</th>
-                <th style={{ padding: "6px 12px", textAlign: "left" }}>Function</th>
-                <th style={{ padding: "6px 12px", textAlign: "center" }}>Depth</th>
+                <th style={{ padding: "6px 12px", textAlign: "left" }}>
+                  Contract
+                </th>
+                <th style={{ padding: "6px 12px", textAlign: "left" }}>
+                  Function
+                </th>
+                <th style={{ padding: "6px 12px", textAlign: "center" }}>
+                  Depth
+                </th>
                 <th style={{ padding: "6px 12px", textAlign: "right" }}>Gas</th>
-                <th style={{ padding: "6px 12px", textAlign: "right" }}>Ledger</th>
-                <th style={{ padding: "6px 12px", textAlign: "left" }}>Tx Hash</th>
+                <th style={{ padding: "6px 12px", textAlign: "right" }}>
+                  Ledger
+                </th>
+                <th style={{ padding: "6px 12px", textAlign: "left" }}>
+                  Tx Hash
+                </th>
                 <th style={{ padding: "6px 12px", textAlign: "left" }}>Args</th>
               </tr>
             </thead>
@@ -327,18 +405,26 @@ export default function SubInvocationSearch({ onResultsChange }: Props) {
                     {inv.is_reentrant && (
                       <span
                         title="Reentrancy"
-                        style={{ marginLeft: 4, color: "#ef4444", fontSize: 10 }}
+                        style={{
+                          marginLeft: 4,
+                          color: "#ef4444",
+                          fontSize: 10,
+                        }}
                       >
                         ⚠
                       </span>
                     )}
                   </td>
                   <td style={{ padding: "5px 12px" }}>{inv.function}</td>
-                  <td style={{ padding: "5px 12px", textAlign: "center" }}>{inv.depth}</td>
+                  <td style={{ padding: "5px 12px", textAlign: "center" }}>
+                    {inv.depth}
+                  </td>
                   <td style={{ padding: "5px 12px", textAlign: "right" }}>
                     {inv.gas_cost != null ? inv.gas_cost.toLocaleString() : "—"}
                   </td>
-                  <td style={{ padding: "5px 12px", textAlign: "right" }}>{inv.ledger}</td>
+                  <td style={{ padding: "5px 12px", textAlign: "right" }}>
+                    {inv.ledger}
+                  </td>
                   <td
                     style={{
                       padding: "5px 12px",

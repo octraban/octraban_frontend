@@ -74,7 +74,10 @@ export function useSubInvocationStream({
 
     ws.onmessage = (ev) => {
       try {
-        const frame = JSON.parse(ev.data as string) as { type: string; data: SubInvocationExtended };
+        const frame = JSON.parse(ev.data as string) as {
+          type: string;
+          data: SubInvocationExtended;
+        };
         if (frame.type === "sub_invocation") {
           onInvocationRef.current(frame.data);
         }
@@ -106,5 +109,9 @@ export function useSubInvocationLiveFeed(
   filter?: Pick<SubInvocationFilter, "contract" | "function">,
 ): { connected: boolean } {
   const stableCallback = useCallback(onInvocation, []);
-  return useSubInvocationStream({ filter, onInvocation: stableCallback, mode: "sse" });
+  return useSubInvocationStream({
+    filter,
+    onInvocation: stableCallback,
+    mode: "sse",
+  });
 }

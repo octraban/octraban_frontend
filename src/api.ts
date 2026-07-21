@@ -48,7 +48,13 @@ export interface FactoryDeploymentTree {
 export interface ZkHostCall {
   fn_name: string;
   curve: "BN254" | "BLS12-381";
-  kind: "msm" | "pairing" | "scalar_field" | "map_to_curve" | "hash_to_curve" | "other";
+  kind:
+    | "msm"
+    | "pairing"
+    | "scalar_field"
+    | "map_to_curve"
+    | "hash_to_curve"
+    | "other";
   cpu_native: number;
   cpu_legacy: number;
 }
@@ -63,7 +69,14 @@ export interface ZkCostDelta {
 export interface HeuristicParam {
   index: number;
   raw: string;
-  type: "Address" | "ContractId" | "Amount" | "Hash" | "Symbol" | "Boolean" | "Unknown";
+  type:
+    | "Address"
+    | "ContractId"
+    | "Amount"
+    | "Hash"
+    | "Symbol"
+    | "Boolean"
+    | "Unknown";
   value: string;
   confidence: "likely" | "possible";
 }
@@ -396,7 +409,12 @@ export interface TransactionTreeDiff {
 }
 
 export const api = {
-  events: (params: { contract?: string; fn?: string; page?: number; type?: string }) => {
+  events: (params: {
+    contract?: string;
+    fn?: string;
+    page?: number;
+    type?: string;
+  }) => {
     const q = new URLSearchParams();
     if (params.contract) q.set("contract", params.contract);
     if (params.fn) q.set("fn", params.fn);
@@ -411,29 +429,40 @@ export const api = {
     params.set("limit", String(limit));
     return get<SearchResponse>(`/search?${params}`);
   },
-  zkCosts: (seq: number) => get<{ calls: ZkHostCall[]; delta: ZkCostDelta | null }>(`/events/${seq}/zk-costs`),
+  zkCosts: (seq: number) =>
+    get<{ calls: ZkHostCall[]; delta: ZkCostDelta | null }>(
+      `/events/${seq}/zk-costs`,
+    ),
   contract: (id: string) => get<ContractMeta>(`/contracts/${id}`),
-  burnAlerts: (contract: string) => get<BurnAlert[]>(`/burn-alerts?contract=${contract}`),
-  migrationStatus: (id: string) => get<MigrationStatus>(`/contracts/${id}/migration-status`),
+  burnAlerts: (contract: string) =>
+    get<BurnAlert[]>(`/burn-alerts?contract=${contract}`),
+  migrationStatus: (id: string) =>
+    get<MigrationStatus>(`/contracts/${id}/migration-status`),
   wallet: (address: string) => get<DecodedEvent[]>(`/wallet/${address}`),
   roles: (id: string) => get<PrivilegedRole[]>(`/contracts/${id}/roles`),
-  networkComparison: (id: string) => get<NetworkComparisonResult>(`/contracts/${id}/network-comparison`),
-  addressGraph: (id: string) => get<AddressGraphData>(`/contracts/${id}/address-graph`),
+  networkComparison: (id: string) =>
+    get<NetworkComparisonResult>(`/contracts/${id}/network-comparison`),
+  addressGraph: (id: string) =>
+    get<AddressGraphData>(`/contracts/${id}/address-graph`),
 
   // sub-invocations for a transaction
-  subInvocations: (txHash: string) => get<SubInvocation[]>(`/transactions/${txHash}/sub-invocations`),
+  subInvocations: (txHash: string) =>
+    get<SubInvocation[]>(`/transactions/${txHash}/sub-invocations`),
   // Events where contract appears directly OR as sub-invocation
   eventsDeep: (contractId: string, page = 1) =>
     get<DecodedEvent[]>(`/v1/contracts/${contractId}/events-deep?page=${page}`),
 
   // transaction status (polling fallback; SSE via useTxStatus hook)
-  txStatus: (txHash: string) => get<TxStatusResponse>(`/transactions/${txHash}/status`),
+  txStatus: (txHash: string) =>
+    get<TxStatusResponse>(`/transactions/${txHash}/status`),
 
   // Circuit breaker status
-  circuitBreakerStatus: (id: string) => get<CircuitBreakerStatus>(`/contracts/${id}/circuit-breaker`),
+  circuitBreakerStatus: (id: string) =>
+    get<CircuitBreakerStatus>(`/contracts/${id}/circuit-breaker`),
 
   // RWA token metadata
-  rwaMetadata: (id: string) => get<RwaMetadata>(`/contracts/${id}/rwa-metadata`),
+  rwaMetadata: (id: string) =>
+    get<RwaMetadata>(`/contracts/${id}/rwa-metadata`),
 
   downloadAbi: async (id: string) => {
     const res = await fetch(`${BASE}/contracts/${id}/abi`);
@@ -452,7 +481,9 @@ export const api = {
   // multi-sig source verification
   sourceVerifications: (id: string, wasmHash?: string) => {
     const q = wasmHash ? `?wasm_hash=${encodeURIComponent(wasmHash)}` : "";
-    return get<SourceVerification[]>(`/contracts/${id}/source-verifications${q}`);
+    return get<SourceVerification[]>(
+      `/contracts/${id}/source-verifications${q}`,
+    );
   },
   submitSourceVerification: (
     id: string,
@@ -482,7 +513,8 @@ export const api = {
   },
 
   // global contract dependency graph
-  contractGraph: (limit = 500) => get<ContractGraphData>(`/contract-graph?limit=${limit}`),
+  contractGraph: (limit = 500) =>
+    get<ContractGraphData>(`/contract-graph?limit=${limit}`),
 
   // CAP-0077 quorum freeze status
   quorumFreeze: (id: string) =>
@@ -607,15 +639,19 @@ export const api = {
     if (filter.date_from) q.set("date_from", filter.date_from);
     if (filter.date_to) q.set("date_to", filter.date_to);
     if (filter.arg_query) q.set("arg_query", filter.arg_query);
-    if (filter.has_reentrancy != null) q.set("has_reentrancy", String(filter.has_reentrancy));
+    if (filter.has_reentrancy != null)
+      q.set("has_reentrancy", String(filter.has_reentrancy));
     if (filter.tx_hash) q.set("tx_hash", filter.tx_hash);
-    if (filter.ledger_min != null) q.set("ledger_min", String(filter.ledger_min));
-    if (filter.ledger_max != null) q.set("ledger_max", String(filter.ledger_max));
+    if (filter.ledger_min != null)
+      q.set("ledger_min", String(filter.ledger_min));
+    if (filter.ledger_max != null)
+      q.set("ledger_max", String(filter.ledger_max));
     return get<SubInvocationExtended[]>(`/sub-invocations/search?${q}`);
   },
 
   // Issue #210: Global analytics for sub-invocations
-  subInvocationAnalytics: () => get<SubInvocationAnalytics>(`/sub-invocations/analytics`),
+  subInvocationAnalytics: () =>
+    get<SubInvocationAnalytics>(`/sub-invocations/analytics`),
 
   // Issue #210: Call-path metrics for a single transaction (6 analytical metrics)
   callPathMetrics: (txHash: string) =>
@@ -628,7 +664,9 @@ export const api = {
     ),
 
   // Issue #210: SSE stream URL builder for live sub-invocation feed
-  subInvocationStreamUrl: (filter?: Pick<SubInvocationFilter, "contract" | "function">) => {
+  subInvocationStreamUrl: (
+    filter?: Pick<SubInvocationFilter, "contract" | "function">,
+  ) => {
     const q = new URLSearchParams();
     if (filter?.contract) q.set("contract", filter.contract);
     if (filter?.function) q.set("function", filter.function);

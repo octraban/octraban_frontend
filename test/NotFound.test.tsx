@@ -64,7 +64,9 @@ describe("NotFound — catch-all 404 route", () => {
 
   it("shows 'Page not found' heading", () => {
     renderAt("/bad-path");
-    expect(screen.getByRole("heading", { name: /page not found/i })).toBeDefined();
+    expect(
+      screen.getByRole("heading", { name: /page not found/i }),
+    ).toBeDefined();
   });
 
   it("renders at least one link back to the home page", () => {
@@ -79,7 +81,9 @@ describe("NotFound — catch-all 404 route", () => {
     renderAt("/nonexistent");
     const links = ["Home", "Search", "Graph", "XDR Inspector", "Sandbox"];
     links.forEach((label) => {
-      expect(screen.getByRole("link", { name: new RegExp(label, "i") })).toBeDefined();
+      expect(
+        screen.getByRole("link", { name: new RegExp(label, "i") }),
+      ).toBeDefined();
     });
   });
 

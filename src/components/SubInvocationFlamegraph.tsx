@@ -81,17 +81,31 @@ function buildFlamebars(
   return allBars;
 }
 
-export default function SubInvocationFlamegraph({ invocations, txHash }: Props) {
-  const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
+export default function SubInvocationFlamegraph({
+  invocations,
+  txHash,
+}: Props) {
+  const [tooltip, setTooltip] = useState<{
+    text: string;
+    x: number;
+    y: number;
+  } | null>(null);
   const [selected, setSelected] = useState<SubInvocationExtended | null>(null);
 
   const WIDTH = 800;
   const bars = useMemo(() => buildFlamebars(invocations, WIDTH), [invocations]);
-  const maxDepth = useMemo(() => Math.max(0, ...invocations.map((i) => i.depth)), [invocations]);
+  const maxDepth = useMemo(
+    () => Math.max(0, ...invocations.map((i) => i.depth)),
+    [invocations],
+  );
   const totalHeight = (maxDepth + 1) * (ROW_H + ROW_GAP) + 16;
 
   if (!invocations.length) {
-    return <p style={{ color: "var(--muted)", padding: 12 }}>No invocations to render.</p>;
+    return (
+      <p style={{ color: "var(--muted)", padding: 12 }}>
+        No invocations to render.
+      </p>
+    );
   }
 
   return (
@@ -105,7 +119,14 @@ export default function SubInvocationFlamegraph({ invocations, txHash }: Props) 
         }}
       >
         Flamegraph{txHash ? ` — ${txHash.slice(0, 12)}…` : ""}
-        <span style={{ fontSize: 11, color: "var(--muted)", marginLeft: 8, fontWeight: 400 }}>
+        <span
+          style={{
+            fontSize: 11,
+            color: "var(--muted)",
+            marginLeft: 8,
+            fontWeight: 400,
+          }}
+        >
           Bar width = gas cost · Depth = call depth
         </span>
       </div>
@@ -158,7 +179,12 @@ export default function SubInvocationFlamegraph({ invocations, txHash }: Props) 
                 </text>
               )}
               <clipPath id={`clip-${i}`}>
-                <rect x={bar.x} y={y} width={Math.max(1, bar.width - 2)} height={ROW_H} />
+                <rect
+                  x={bar.x}
+                  y={y}
+                  width={Math.max(1, bar.width - 2)}
+                  height={ROW_H}
+                />
               </clipPath>
             </g>
           );
@@ -180,7 +206,9 @@ export default function SubInvocationFlamegraph({ invocations, txHash }: Props) 
               fontSize={10}
               fontFamily="monospace"
             >
-              {tooltip.text.length > 36 ? tooltip.text.slice(0, 36) + "…" : tooltip.text}
+              {tooltip.text.length > 36
+                ? tooltip.text.slice(0, 36) + "…"
+                : tooltip.text}
             </text>
           </g>
         )}

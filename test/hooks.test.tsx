@@ -2,11 +2,27 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 
 describe("useEventStream", () => {
-  let wsMock: { close: any; send: any; onmessage: any; onerror: any; readyState: number };
+  let wsMock: {
+    close: any;
+    send: any;
+    onmessage: any;
+    onerror: any;
+    readyState: number;
+  };
 
   beforeEach(() => {
-    wsMock = { close: vi.fn(), send: vi.fn(), onmessage: null, onerror: null, readyState: 1 };
-    class MockWebSocket { constructor() { return wsMock; } }
+    wsMock = {
+      close: vi.fn(),
+      send: vi.fn(),
+      onmessage: null,
+      onerror: null,
+      readyState: 1,
+    };
+    class MockWebSocket {
+      constructor() {
+        return wsMock;
+      }
+    }
     (globalThis as any).WebSocket = MockWebSocket as any;
   });
 
@@ -28,21 +44,29 @@ describe("useEventStream", () => {
   it("calls onEvent when receiving an event message", async () => {
     const onEvent = vi.fn();
     await renderHookWithEventStream(onEvent);
-    act(() => { wsMock.onmessage({ data: JSON.stringify({ type: "event", data: { seq: 1 } }) }); });
+    act(() => {
+      wsMock.onmessage({
+        data: JSON.stringify({ type: "event", data: { seq: 1 } }),
+      });
+    });
     expect(onEvent).toHaveBeenCalledWith({ seq: 1 });
   });
 
   it("ignores non-event message types", async () => {
     const onEvent = vi.fn();
     await renderHookWithEventStream(onEvent);
-    act(() => { wsMock.onmessage({ data: JSON.stringify({ type: "connected" }) }); });
+    act(() => {
+      wsMock.onmessage({ data: JSON.stringify({ type: "connected" }) });
+    });
     expect(onEvent).not.toHaveBeenCalled();
   });
 
   it("ignores malformed JSON frames", async () => {
     const onEvent = vi.fn();
     await renderHookWithEventStream(onEvent);
-    act(() => { wsMock.onmessage({ data: "not-json" }); });
+    act(() => {
+      wsMock.onmessage({ data: "not-json" });
+    });
     expect(onEvent).not.toHaveBeenCalled();
   });
 
@@ -63,7 +87,9 @@ describe("useLocalAbi", () => {
   it("parseAbiFile parses flat array format", async () => {
     const mod = await import("../src/hooks/useLocalAbi");
     const { parseAbiFile } = mod;
-    const input: any[] = [{ name: "transfer", params: [{ name: "to", type: "address" }] }];
+    const input: any[] = [
+      { name: "transfer", params: [{ name: "to", type: "address" }] },
+    ];
     const result = parseAbiFile(input, "test.json");
     expect(result.functions).toHaveLength(1);
     expect(result.functions[0].name).toBe("transfer");
@@ -74,7 +100,11 @@ describe("useLocalAbi", () => {
   it("parseAbiFile parses registry format", async () => {
     const mod = await import("../src/hooks/useLocalAbi");
     const { parseAbiFile } = mod;
-    const input = { contractId: "C1", name: "Token", functions: [{ name: "mint" }] };
+    const input = {
+      contractId: "C1",
+      name: "Token",
+      functions: [{ name: "mint" }],
+    };
     const result = parseAbiFile(input, "abi.json");
     expect(result.contractId).toBe("C1");
     expect(result.name).toBe("Token");
@@ -84,7 +114,12 @@ describe("useLocalAbi", () => {
   it("parseAbiFile parses full-spec format", async () => {
     const mod = await import("../src/hooks/useLocalAbi");
     const { parseAbiFile } = mod;
-    const input = { functions: [{ name: "transfer", inputs: [{ name: "to", type: "address" }] }], types: [{ kind: "struct", name: "Data" }] };
+    const input = {
+      functions: [
+        { name: "transfer", inputs: [{ name: "to", type: "address" }] },
+      ],
+      types: [{ kind: "struct", name: "Data" }],
+    };
     const result = parseAbiFile(input, "spec.json");
     expect(result.functions[0].name).toBe("transfer");
     expect(result.types).toHaveLength(1);
@@ -93,13 +128,17 @@ describe("useLocalAbi", () => {
   it("parseAbiFile throws for null input", async () => {
     const mod = await import("../src/hooks/useLocalAbi");
     const { parseAbiFile } = mod;
-    expect(() => parseAbiFile(null, "x.json")).toThrow("must be a JSON object or array");
+    expect(() => parseAbiFile(null, "x.json")).toThrow(
+      "must be a JSON object or array",
+    );
   });
 
   it("parseAbiFile throws for unrecognised format", async () => {
     const mod = await import("../src/hooks/useLocalAbi");
     const { parseAbiFile } = mod;
-    expect(() => parseAbiFile({ unknown: true }, "x.json")).toThrow("Unrecognised");
+    expect(() => parseAbiFile({ unknown: true }, "x.json")).toThrow(
+      "Unrecognised",
+    );
   });
 });
 

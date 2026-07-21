@@ -11,11 +11,17 @@ const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function ViolationHeatmap({ data }: { data: HeatmapCell[] }) {
   if (!data.length) {
-    return <p style={{ color: "#9ca3af", fontSize: 13 }}>No violation data available.</p>;
+    return (
+      <p style={{ color: "#9ca3af", fontSize: 13 }}>
+        No violation data available.
+      </p>
+    );
   }
 
   // Build a lookup map: [day][hour] → violations
-  const grid: number[][] = Array.from({ length: 7 }, () => new Array(24).fill(0));
+  const grid: number[][] = Array.from({ length: 7 }, () =>
+    new Array(24).fill(0),
+  );
   let maxVal = 1;
   for (const cell of data) {
     const v = Number(cell.violations);
