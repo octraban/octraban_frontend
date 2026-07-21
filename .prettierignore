@@ -1,0 +1,11 @@
+# Build outputs
+dist
+build
+
+# Dependencies
+node_modules
+
+# Auto-generated
+*.lock
+pnpm-lock.yaml
+package-lock.json

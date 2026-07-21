@@ -25,8 +25,12 @@ export default class ErrorBoundary extends Component<Props, State> {
         this.props.fallback ?? (
           <div style={{ padding: 32, textAlign: "center" }}>
             <h2>Something went wrong</h2>
-            <pre style={{ color: "red", whiteSpace: "pre-wrap" }}>{this.state.error.message}</pre>
-            <button onClick={() => window.location.reload()}>Reload page</button>
+            <pre style={{ color: "red", whiteSpace: "pre-wrap" }}>
+              {this.state.error.message}
+            </pre>
+            <button onClick={() => window.location.reload()}>
+              Reload page
+            </button>
           </div>
         )
       );

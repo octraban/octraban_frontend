@@ -21,14 +21,19 @@ function InvocationRow({
       : variant === "only-b"
         ? "rgba(34,197,94,0.08)"
         : "transparent";
-  const marker =
-    variant === "only-a" ? "−" : variant === "only-b" ? "+" : "=";
+  const marker = variant === "only-a" ? "−" : variant === "only-b" ? "+" : "=";
   const markerColor =
-    variant === "only-a" ? "#ef4444" : variant === "only-b" ? "#22c55e" : "var(--muted)";
+    variant === "only-a"
+      ? "#ef4444"
+      : variant === "only-b"
+        ? "#22c55e"
+        : "var(--muted)";
 
   return (
     <tr style={{ background: bg, fontSize: 11 }}>
-      <td style={{ padding: "3px 8px", color: markerColor, fontWeight: 700 }}>{marker}</td>
+      <td style={{ padding: "3px 8px", color: markerColor, fontWeight: 700 }}>
+        {marker}
+      </td>
       <td style={{ padding: "3px 8px", fontFamily: "monospace" }}>
         {short(inv.contract_id)}
       </td>
@@ -54,7 +59,8 @@ function diffInvocations(
   a: SubInvocationExtended[],
   b: SubInvocationExtended[],
 ): LocalDiff {
-  const keyOf = (i: SubInvocationExtended) => `${i.contract_id}:${i.function}:${i.depth}`;
+  const keyOf = (i: SubInvocationExtended) =>
+    `${i.contract_id}:${i.function}:${i.depth}`;
   const aKeys = new Set(a.map(keyOf));
   const bKeys = new Set(b.map(keyOf));
 
@@ -78,7 +84,9 @@ function diffInvocations(
 export default function SubInvocationDiff() {
   const [txA, setTxA] = useState("");
   const [txB, setTxB] = useState("");
-  const [submitted, setSubmitted] = useState<{ a: string; b: string } | null>(null);
+  const [submitted, setSubmitted] = useState<{ a: string; b: string } | null>(
+    null,
+  );
 
   const { data: aInvs, isLoading: aLoading } = useQuery({
     queryKey: ["sub-invocations", submitted?.a],
@@ -93,7 +101,12 @@ export default function SubInvocationDiff() {
   });
 
   const diff: LocalDiff | null =
-    aInvs && bInvs ? diffInvocations(aInvs as SubInvocationExtended[], bInvs as SubInvocationExtended[]) : null;
+    aInvs && bInvs
+      ? diffInvocations(
+          aInvs as SubInvocationExtended[],
+          bInvs as SubInvocationExtended[],
+        )
+      : null;
 
   const loading = aLoading || bLoading;
 
@@ -103,9 +116,23 @@ export default function SubInvocationDiff() {
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>
           Compare Transaction Call Trees
         </div>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            flexWrap: "wrap",
+            alignItems: "flex-end",
+          }}
+        >
           <div style={{ flex: 1, minWidth: 200 }}>
-            <label style={{ fontSize: 11, color: "var(--muted)", display: "block", marginBottom: 4 }}>
+            <label
+              style={{
+                fontSize: 11,
+                color: "var(--muted)",
+                display: "block",
+                marginBottom: 4,
+              }}
+            >
               Transaction A
             </label>
             <input
@@ -126,7 +153,14 @@ export default function SubInvocationDiff() {
             />
           </div>
           <div style={{ flex: 1, minWidth: 200 }}>
-            <label style={{ fontSize: 11, color: "var(--muted)", display: "block", marginBottom: 4 }}>
+            <label
+              style={{
+                fontSize: 11,
+                color: "var(--muted)",
+                display: "block",
+                marginBottom: 4,
+              }}
+            >
               Transaction B
             </label>
             <input
@@ -191,7 +225,12 @@ export default function SubInvocationDiff() {
               = {diff.common.length} common
             </span>
             {diff.gas_diff !== 0 && (
-              <span style={{ color: diff.gas_diff > 0 ? "#ef4444" : "#22c55e", marginLeft: "auto" }}>
+              <span
+                style={{
+                  color: diff.gas_diff > 0 ? "#ef4444" : "#22c55e",
+                  marginLeft: "auto",
+                }}
+              >
                 Gas diff: {diff.gas_diff > 0 ? "+" : ""}
                 {diff.gas_diff.toLocaleString()}
               </span>
@@ -202,12 +241,26 @@ export default function SubInvocationDiff() {
           <div className="card" style={{ padding: 0, overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ fontSize: 11, color: "var(--muted)", borderBottom: "1px solid var(--border)" }}>
+                <tr
+                  style={{
+                    fontSize: 11,
+                    color: "var(--muted)",
+                    borderBottom: "1px solid var(--border)",
+                  }}
+                >
                   <th style={{ padding: "6px 8px", textAlign: "left" }}></th>
-                  <th style={{ padding: "6px 8px", textAlign: "left" }}>Contract</th>
-                  <th style={{ padding: "6px 8px", textAlign: "left" }}>Function</th>
-                  <th style={{ padding: "6px 8px", textAlign: "center" }}>Depth</th>
-                  <th style={{ padding: "6px 8px", textAlign: "right" }}>Gas</th>
+                  <th style={{ padding: "6px 8px", textAlign: "left" }}>
+                    Contract
+                  </th>
+                  <th style={{ padding: "6px 8px", textAlign: "left" }}>
+                    Function
+                  </th>
+                  <th style={{ padding: "6px 8px", textAlign: "center" }}>
+                    Depth
+                  </th>
+                  <th style={{ padding: "6px 8px", textAlign: "right" }}>
+                    Gas
+                  </th>
                 </tr>
               </thead>
               <tbody>

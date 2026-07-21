@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export type NetworkKind = "testnet" | "mainnet" | "futurenet" | "custom";
 
@@ -65,23 +73,29 @@ interface NetworkContextValue {
   networks: NetworkConfig[];
   active: NetworkConfig;
   setActiveId: (id: string) => void;
-  addCustomNetwork: (network: Omit<NetworkConfig, "id" | "kind" | "custom">) => NetworkConfig;
+  addCustomNetwork: (
+    network: Omit<NetworkConfig, "id" | "kind" | "custom">,
+  ) => NetworkConfig;
   removeCustomNetwork: (id: string) => void;
 }
 
 const NetworkContext = createContext<NetworkContextValue | null>(null);
 
 export function NetworkProvider({ children }: { children: ReactNode }) {
-  const [customNetworks, setCustomNetworks] = useState<NetworkConfig[]>(loadCustomNetworks);
+  const [customNetworks, setCustomNetworks] =
+    useState<NetworkConfig[]>(loadCustomNetworks);
   const [activeId, setActiveIdState] = useState<string>(
-    () => localStorage.getItem(ACTIVE_KEY) || BUILTIN_NETWORKS[0].id
+    () => localStorage.getItem(ACTIVE_KEY) || BUILTIN_NETWORKS[0].id,
   );
 
-  const networks = useMemo(() => [...BUILTIN_NETWORKS, ...customNetworks], [customNetworks]);
+  const networks = useMemo(
+    () => [...BUILTIN_NETWORKS, ...customNetworks],
+    [customNetworks],
+  );
 
   const active = useMemo(
-    () => networks.find(n => n.id === activeId) ?? BUILTIN_NETWORKS[0],
-    [networks, activeId]
+    () => networks.find((n) => n.id === activeId) ?? BUILTIN_NETWORKS[0],
+    [networks, activeId],
   );
 
   useEffect(() => {
@@ -93,24 +107,43 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(ACTIVE_KEY, id);
   }, []);
 
-  const addCustomNetwork = useCallback((network: Omit<NetworkConfig, "id" | "kind" | "custom">) => {
-    const id = `custom-${Date.now()}`;
-    const full: NetworkConfig = { ...network, id, kind: "custom", custom: true };
-    setCustomNetworks(prev => [...prev, full]);
-    return full;
-  }, []);
-
-  const removeCustomNetwork = useCallback((id: string) => {
-    setCustomNetworks(prev => prev.filter(n => n.id !== id));
-    if (activeId === id) setActiveId(BUILTIN_NETWORKS[0].id);
-  }, [activeId, setActiveId]);
-
-  const value = useMemo(
-    () => ({ networks, active, setActiveId, addCustomNetwork, removeCustomNetwork }),
-    [networks, active, setActiveId, addCustomNetwork, removeCustomNetwork]
+  const addCustomNetwork = useCallback(
+    (network: Omit<NetworkConfig, "id" | "kind" | "custom">) => {
+      const id = `custom-${Date.now()}`;
+      const full: NetworkConfig = {
+        ...network,
+        id,
+        kind: "custom",
+        custom: true,
+      };
+      setCustomNetworks((prev) => [...prev, full]);
+      return full;
+    },
+    [],
   );
 
-  return <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>;
+  const removeCustomNetwork = useCallback(
+    (id: string) => {
+      setCustomNetworks((prev) => prev.filter((n) => n.id !== id));
+      if (activeId === id) setActiveId(BUILTIN_NETWORKS[0].id);
+    },
+    [activeId, setActiveId],
+  );
+
+  const value = useMemo(
+    () => ({
+      networks,
+      active,
+      setActiveId,
+      addCustomNetwork,
+      removeCustomNetwork,
+    }),
+    [networks, active, setActiveId, addCustomNetwork, removeCustomNetwork],
+  );
+
+  return (
+    <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>
+  );
 }
 
 export function useNetwork(): NetworkContextValue {

@@ -2,10 +2,18 @@ import { Link, useLocation } from "react-router-dom";
 
 const NAV_LINKS: { label: string; to: string; description: string }[] = [
   { label: "Home", to: "/", description: "Recent contract events" },
-  { label: "Search", to: "/search", description: "Find contracts, wallets & events" },
+  {
+    label: "Search",
+    to: "/search",
+    description: "Find contracts, wallets & events",
+  },
   { label: "Graph", to: "/graph", description: "Contract relationship graph" },
   { label: "XDR Inspector", to: "/xdr", description: "Decode XDR envelopes" },
-  { label: "Sandbox", to: "/sandbox", description: "Prototype against live contracts" },
+  {
+    label: "Sandbox",
+    to: "/sandbox",
+    description: "Prototype against live contracts",
+  },
 ];
 
 export default function NotFound() {
@@ -88,7 +96,9 @@ export default function NotFound() {
                 }}
               >
                 <span style={{ fontWeight: 500 }}>{label}</span>
-                <span style={{ color: "var(--muted)", fontSize: 13 }}>{description}</span>
+                <span style={{ color: "var(--muted)", fontSize: 13 }}>
+                  {description}
+                </span>
               </Link>
             </li>
           ))}

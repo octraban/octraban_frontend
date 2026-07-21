@@ -31,9 +31,11 @@ describe("WalletPage", () => {
     render(
       <Wrapper>
         <WalletPage />
-      </Wrapper>
+      </Wrapper>,
     );
-    expect(await screen.findByText("No Soroban interactions found for this address")).toBeDefined();
+    expect(
+      await screen.findByText("No Soroban interactions found for this address"),
+    ).toBeDefined();
   });
 
   it("shows address in page heading even with no events", async () => {
@@ -41,8 +43,10 @@ describe("WalletPage", () => {
     render(
       <Wrapper>
         <WalletPage />
-      </Wrapper>
+      </Wrapper>,
     );
-    expect(await screen.findByText("GA3X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X")).toBeDefined();
+    expect(
+      await screen.findByText("GA3X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X"),
+    ).toBeDefined();
   });
 });

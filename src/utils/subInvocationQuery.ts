@@ -79,7 +79,9 @@ export function parseQuery(query: string): SubInvocationFilter {
 
   if (freeTerms.length > 0) {
     const freeText = freeTerms.join(" ");
-    filter.arg_query = filter.arg_query ? `${filter.arg_query} ${freeText}` : freeText;
+    filter.arg_query = filter.arg_query
+      ? `${filter.arg_query} ${freeText}`
+      : freeText;
   }
 
   return filter;
@@ -97,10 +99,12 @@ export function filterToQuery(filter: SubInvocationFilter): string {
   }
   if (filter.gas_min != null) parts.push(`gas:>${filter.gas_min}`);
   if (filter.gas_max != null) parts.push(`gas:<${filter.gas_max}`);
-  if (filter.date_from && filter.date_to) parts.push(`date:${filter.date_from}..${filter.date_to}`);
+  if (filter.date_from && filter.date_to)
+    parts.push(`date:${filter.date_from}..${filter.date_to}`);
   else if (filter.date_from) parts.push(`date:${filter.date_from}`);
   if (filter.arg_query) parts.push(`arg:${filter.arg_query}`);
-  if (filter.has_reentrancy != null) parts.push(`reentrant:${filter.has_reentrancy}`);
+  if (filter.has_reentrancy != null)
+    parts.push(`reentrant:${filter.has_reentrancy}`);
   if (filter.ledger_min != null) parts.push(`ledger:>=${filter.ledger_min}`);
   if (filter.ledger_max != null) parts.push(`ledger:<${filter.ledger_max}`);
   if (filter.tx_hash) parts.push(`tx:${filter.tx_hash}`);
@@ -144,7 +148,9 @@ export function computeDepthDistribution(
     .map(([depth, count]) => ({ depth, count }));
 }
 
-export function detectReentrancy(items: SubInvocationExtended[]): SubInvocationExtended[] {
+export function detectReentrancy(
+  items: SubInvocationExtended[],
+): SubInvocationExtended[] {
   // Reentrancy: same contract_id appears more than once in a call chain (same tx_hash)
   const byTx = new Map<string, SubInvocationExtended[]>();
   for (const inv of items) {
@@ -158,7 +164,9 @@ export function detectReentrancy(items: SubInvocationExtended[]): SubInvocationE
     const seen = new Set<string>();
     for (const inv of chain) {
       if (seen.has(inv.contract_id)) {
-        reentrant.push(...chain.filter((i) => i.contract_id === inv.contract_id));
+        reentrant.push(
+          ...chain.filter((i) => i.contract_id === inv.contract_id),
+        );
         break;
       }
       seen.add(inv.contract_id);
@@ -191,7 +199,9 @@ export function buildDependencyMap(
   return Object.fromEntries(Object.entries(map).map(([k, v]) => [k, [...v]]));
 }
 
-export function computeLongestChain(items: SubInvocationExtended[]): SubInvocationExtended[] {
+export function computeLongestChain(
+  items: SubInvocationExtended[],
+): SubInvocationExtended[] {
   const byTx = new Map<string, SubInvocationExtended[]>();
   for (const inv of items) {
     const bucket = byTx.get(inv.parent_tx_hash) ?? [];
@@ -238,7 +248,10 @@ export function fuzzyMatch(text: string, query: string): boolean {
   return qi === q.length;
 }
 
-export function matchesArgQuery(inv: SubInvocationExtended, query: string): boolean {
+export function matchesArgQuery(
+  inv: SubInvocationExtended,
+  query: string,
+): boolean {
   if (!query) return true;
   const argsStr = JSON.stringify(inv.args ?? "").toLowerCase();
   const fnStr = inv.function.toLowerCase();
@@ -270,5 +283,7 @@ export function matchesArgQuery(inv: SubInvocationExtended, query: string): bool
     return false;
   }
 
-  return fuzzyMatch(argsStr, q) || fuzzyMatch(fnStr, q) || fuzzyMatch(contractStr, q);
+  return (
+    fuzzyMatch(argsStr, q) || fuzzyMatch(fnStr, q) || fuzzyMatch(contractStr, q)
+  );
 }

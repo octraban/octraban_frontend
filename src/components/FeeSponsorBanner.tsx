@@ -92,7 +92,17 @@ export default function FeeSponsorBanner({ feeBump }: Props) {
   );
 }
 
-function TierRow({ role, label, address, color }: { role: string; label: string; address: string; color: string }) {
+function TierRow({
+  role,
+  label,
+  address,
+  color,
+}: {
+  role: string;
+  label: string;
+  address: string;
+  color: string;
+}) {
   return (
     <div
       style={{

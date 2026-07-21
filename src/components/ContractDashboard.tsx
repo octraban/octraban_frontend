@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 /**
  * Multi-Network Contract Management Dashboard
@@ -6,13 +6,13 @@ import React, { useState } from 'react';
  * upgrade execution, DAO voting integrations, pausing, and admin transfer.
  */
 export const ContractDashboard = () => {
-  const [network, setNetwork] = useState('testnet');
+  const [network, setNetwork] = useState("testnet");
   const [contractDetails] = useState({
-    status: 'Deployed',
-    address: 'CABCD...789',
-    version: 'v2.1.0',
-    admin: 'GABC...123',
-    lastUpgrade: '2024-06-01 14:30 UTC'
+    status: "Deployed",
+    address: "CABCD...789",
+    version: "v2.1.0",
+    admin: "GABC...123",
+    lastUpgrade: "2024-06-01 14:30 UTC",
   });
 
   const handleTransferAdmin = () => {
@@ -39,9 +39,9 @@ export const ContractDashboard = () => {
     <div className="p-6 bg-gray-900 text-white rounded-lg shadow-xl max-w-4xl mx-auto mt-10">
       <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
         <h1 className="text-2xl font-bold">ExplorerContract Manager</h1>
-        <select 
+        <select
           className="bg-gray-800 border border-gray-600 rounded px-4 py-2"
-          value={network} 
+          value={network}
           onChange={(e) => setNetwork(e.target.value)}
         >
           <option value="testnet">Testnet</option>
@@ -51,24 +51,50 @@ export const ContractDashboard = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-8 text-lg">
-        <div><span className="text-gray-400">Status:</span> ✅ {contractDetails.status} ({network})</div>
-        <div><span className="text-gray-400">Address:</span> {contractDetails.address}</div>
-        <div><span className="text-gray-400">Version:</span> {contractDetails.version}</div>
-        <div><span className="text-gray-400">Admin:</span> {contractDetails.admin}</div>
-        <div><span className="text-gray-400">Last Upgrade:</span> {contractDetails.lastUpgrade}</div>
+        <div>
+          <span className="text-gray-400">Status:</span> ✅{" "}
+          {contractDetails.status} ({network})
+        </div>
+        <div>
+          <span className="text-gray-400">Address:</span>{" "}
+          {contractDetails.address}
+        </div>
+        <div>
+          <span className="text-gray-400">Version:</span>{" "}
+          {contractDetails.version}
+        </div>
+        <div>
+          <span className="text-gray-400">Admin:</span> {contractDetails.admin}
+        </div>
+        <div>
+          <span className="text-gray-400">Last Upgrade:</span>{" "}
+          {contractDetails.lastUpgrade}
+        </div>
       </div>
 
       <div className="flex gap-4 border-t border-gray-700 pt-6">
-        <button onClick={handleUpgrade} className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded font-medium transition-colors">
+        <button
+          onClick={handleUpgrade}
+          className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded font-medium transition-colors"
+        >
           Upgrade (DAO)
         </button>
-        <button onClick={handlePause} className="bg-red-600 hover:bg-red-700 px-6 py-2 rounded font-medium transition-colors">
+        <button
+          onClick={handlePause}
+          className="bg-red-600 hover:bg-red-700 px-6 py-2 rounded font-medium transition-colors"
+        >
           Emergency Pause
         </button>
-        <button onClick={handleVerify} className="bg-green-600 hover:bg-green-700 px-6 py-2 rounded font-medium transition-colors">
+        <button
+          onClick={handleVerify}
+          className="bg-green-600 hover:bg-green-700 px-6 py-2 rounded font-medium transition-colors"
+        >
           Verify
         </button>
-        <button onClick={handleTransferAdmin} className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded font-medium transition-colors">
+        <button
+          onClick={handleTransferAdmin}
+          className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded font-medium transition-colors"
+        >
           Transfer Admin
         </button>
       </div>

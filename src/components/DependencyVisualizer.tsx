@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { parseDependencies, buildDependencyTree, calculateBundleSize } from "../services/dependencies";
+import {
+  parseDependencies,
+  buildDependencyTree,
+  calculateBundleSize,
+} from "../services/dependencies";
 import "../styles/DependencyVisualizer.css";
 
 interface DependencyVisualizerProps {
@@ -7,7 +11,10 @@ interface DependencyVisualizerProps {
   isVisible: boolean;
 }
 
-const DependencyVisualizer: React.FC<DependencyVisualizerProps> = ({ packageJsonContent, isVisible }) => {
+const DependencyVisualizer: React.FC<DependencyVisualizerProps> = ({
+  packageJsonContent,
+  isVisible,
+}) => {
   const [deps, setDeps] = useState<Record<string, any>>({});
   const [bundleSize, setBundleSize] = useState("0 KB");
   const [loading, setLoading] = useState(false);
@@ -40,7 +47,9 @@ const DependencyVisualizer: React.FC<DependencyVisualizerProps> = ({ packageJson
     d.vulnerabilities?.some((v: any) => v.severity === "critical"),
   );
 
-  const highVulns = Object.values(deps).filter((d: any) => d.vulnerabilities?.some((v: any) => v.severity === "high"));
+  const highVulns = Object.values(deps).filter((d: any) =>
+    d.vulnerabilities?.some((v: any) => v.severity === "high"),
+  );
 
   return (
     <div className="dependency-visualizer">
@@ -60,7 +69,11 @@ const DependencyVisualizer: React.FC<DependencyVisualizerProps> = ({ packageJson
           <div key={name} className="dep-item">
             <div className="dep-name">
               {dep.vulnerabilities?.length > 0 && (
-                <span className={`vuln-badge ${dep.vulnerabilities[0]?.severity || "info"}`}>⚠</span>
+                <span
+                  className={`vuln-badge ${dep.vulnerabilities[0]?.severity || "info"}`}
+                >
+                  ⚠
+                </span>
               )}
               <span>{name}</span>
               <span className="dep-version">@{dep.version}</span>

@@ -1,7 +1,10 @@
 declare module "monaco-editor" {
   export type editor = typeof import("monaco-editor").editor;
   export namespace editor {
-    let create: (domElement: HTMLElement, options?: any) => IStandaloneCodeEditor;
+    let create: (
+      domElement: HTMLElement,
+      options?: any,
+    ) => IStandaloneCodeEditor;
     let setModelLanguage: (model: unknown, languageId: string) => void;
     interface IStandaloneCodeEditor {
       getValue(): string;

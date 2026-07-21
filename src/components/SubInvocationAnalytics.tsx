@@ -21,7 +21,15 @@ function short(id: string) {
   return id.length > 20 ? `${id.slice(0, 10)}…${id.slice(-8)}` : id;
 }
 
-function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
+function StatCard({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string | number;
+  sub?: string;
+}) {
   return (
     <div
       style={{
@@ -33,20 +41,44 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
         flex: "1 1 120px",
       }}
     >
-      <div style={{ fontSize: 22, fontWeight: 700, color: "var(--accent)" }}>{value}</div>
-      <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{label}</div>
-      {sub && <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{sub}</div>}
+      <div style={{ fontSize: 22, fontWeight: 700, color: "var(--accent)" }}>
+        {value}
+      </div>
+      <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>
+        {label}
+      </div>
+      {sub && (
+        <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
+          {sub}
+        </div>
+      )}
     </div>
   );
 }
 
-function BarChart({ data, label }: { data: { label: string; value: number }[]; label: string }) {
+function BarChart({
+  data,
+  label,
+}: {
+  data: { label: string; value: number }[];
+  label: string;
+}) {
   const max = Math.max(...data.map((d) => d.value), 1);
   return (
     <div>
-      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+        {label}
+      </div>
       {data.slice(0, 8).map((d, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            marginBottom: 4,
+          }}
+        >
           <div
             style={{
               fontSize: 10,
@@ -81,7 +113,14 @@ function BarChart({ data, label }: { data: { label: string; value: number }[]; l
               }}
             />
           </div>
-          <div style={{ fontSize: 10, color: "var(--muted)", width: 28, textAlign: "right" }}>
+          <div
+            style={{
+              fontSize: 10,
+              color: "var(--muted)",
+              width: 28,
+              textAlign: "right",
+            }}
+          >
             {d.value}
           </div>
         </div>
@@ -91,8 +130,14 @@ function BarChart({ data, label }: { data: { label: string; value: number }[]; l
 }
 
 export default function SubInvocationAnalytics({ invocations }: Props) {
-  const topContracts = useMemo(() => computeTopContracts(invocations, 8), [invocations]);
-  const depthDist = useMemo(() => computeDepthDistribution(invocations), [invocations]);
+  const topContracts = useMemo(
+    () => computeTopContracts(invocations, 8),
+    [invocations],
+  );
+  const depthDist = useMemo(
+    () => computeDepthDistribution(invocations),
+    [invocations],
+  );
   const avgDepth = useMemo(() => computeAvgDepth(invocations), [invocations]);
   const maxDepth = useMemo(() => computeMaxDepth(invocations), [invocations]);
   const reentrant = useMemo(() => detectReentrancy(invocations), [invocations]);
@@ -148,13 +193,19 @@ export default function SubInvocationAnalytics({ invocations }: Props) {
         <div className="card">
           <BarChart
             label="Top Contracts by Call Count"
-            data={topContracts.map((c) => ({ label: short(c.contract_id), value: c.call_count }))}
+            data={topContracts.map((c) => ({
+              label: short(c.contract_id),
+              value: c.call_count,
+            }))}
           />
         </div>
         <div className="card">
           <BarChart
             label="Depth Distribution"
-            data={depthDist.map((d) => ({ label: `depth ${d.depth}`, value: d.count }))}
+            data={depthDist.map((d) => ({
+              label: `depth ${d.depth}`,
+              value: d.count,
+            }))}
           />
         </div>
       </div>
@@ -165,20 +216,34 @@ export default function SubInvocationAnalytics({ invocations }: Props) {
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
             Centrality (most depended-upon contracts)
           </div>
-          <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
+          <table
+            style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}
+          >
             <thead>
               <tr style={{ color: "var(--muted)", fontSize: 11 }}>
-                <th style={{ textAlign: "left", padding: "4px 8px" }}>Contract</th>
-                <th style={{ textAlign: "right", padding: "4px 8px" }}>Dependents</th>
+                <th style={{ textAlign: "left", padding: "4px 8px" }}>
+                  Contract
+                </th>
+                <th style={{ textAlign: "right", padding: "4px 8px" }}>
+                  Dependents
+                </th>
               </tr>
             </thead>
             <tbody>
               {centrality.map((c, i) => (
                 <tr key={i} style={{ borderTop: "1px solid var(--border)" }}>
-                  <td style={{ padding: "4px 8px", fontFamily: "monospace", fontSize: 11 }}>
+                  <td
+                    style={{
+                      padding: "4px 8px",
+                      fontFamily: "monospace",
+                      fontSize: 11,
+                    }}
+                  >
                     {short(c.id)}
                   </td>
-                  <td style={{ padding: "4px 8px", textAlign: "right" }}>{c.score}</td>
+                  <td style={{ padding: "4px 8px", textAlign: "right" }}>
+                    {c.score}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -207,9 +272,19 @@ export default function SubInvocationAnalytics({ invocations }: Props) {
       {reentrant.length > 0 && (
         <div
           className="card"
-          style={{ border: "1px solid #dc2626", background: "rgba(220,38,38,0.06)" }}
+          style={{
+            border: "1px solid #dc2626",
+            background: "rgba(220,38,38,0.06)",
+          }}
         >
-          <div style={{ fontSize: 12, fontWeight: 600, color: "#dc2626", marginBottom: 8 }}>
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: "#dc2626",
+              marginBottom: 8,
+            }}
+          >
             ⚠ Reentrancy Detected ({reentrant.length} invocations)
           </div>
           <div style={{ fontSize: 11, color: "var(--muted)" }}>

@@ -17,7 +17,9 @@ describe("XdrInspector", () => {
     const textarea = screen.getByPlaceholderText("Paste Base64 XDR here…");
     fireEvent.change(textarea, { target: { value: "hello world" } });
     expect(
-      screen.getByText("Could not decode XDR. Ensure it is a valid Base64-encoded Soroban XDR string.")
+      screen.getByText(
+        "Could not decode XDR. Ensure it is a valid Base64-encoded Soroban XDR string.",
+      ),
     ).toBeDefined();
   });
 
@@ -26,7 +28,9 @@ describe("XdrInspector", () => {
     const textarea = screen.getByPlaceholderText("Paste Base64 XDR here…");
     fireEvent.change(textarea, { target: { value: "AAAAAA==" } });
     expect(
-      screen.getByText("Could not decode XDR. Ensure it is a valid Base64-encoded Soroban XDR string.")
+      screen.getByText(
+        "Could not decode XDR. Ensure it is a valid Base64-encoded Soroban XDR string.",
+      ),
     ).toBeDefined();
   });
 });

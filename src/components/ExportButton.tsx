@@ -8,13 +8,17 @@ interface ExportButtonProps {
   params?: Record<string, string | undefined>;
 }
 
-export default function ExportButton({ target, params = {} }: ExportButtonProps) {
+export default function ExportButton({
+  target,
+  params = {},
+}: ExportButtonProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function close(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     }
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
@@ -86,8 +90,13 @@ export default function ExportButton({ target, params = {} }: ExportButtonProps)
                 cursor: "pointer",
                 fontSize: 13,
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "var(--accent-muted, rgba(255,255,255,0.06))")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background =
+                  "var(--accent-muted, rgba(255,255,255,0.06))")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "transparent")
+              }
             >
               {fmt.toUpperCase()}
             </button>

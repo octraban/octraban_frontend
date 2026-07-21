@@ -16,14 +16,21 @@ function fmtAddr(addr: string) {
   return addr.length > 12 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
 }
 
-export default function PrivilegedRoles({ contractId }: { contractId: string }) {
+export default function PrivilegedRoles({
+  contractId,
+}: {
+  contractId: string;
+}) {
   const { data: roles = [], isLoading } = useQuery({
     queryKey: ["roles", contractId],
     queryFn: () => api.roles(contractId),
     enabled: !!contractId,
   });
 
-  if (isLoading) return <p style={{ color: "var(--muted)", fontSize: 13 }}>Loading roles…</p>;
+  if (isLoading)
+    return (
+      <p style={{ color: "var(--muted)", fontSize: 13 }}>Loading roles…</p>
+    );
 
   if (roles.length === 0) {
     return (
@@ -38,7 +45,9 @@ export default function PrivilegedRoles({ contractId }: { contractId: string }) 
   return (
     <div className="card">
       <h3 style={{ marginBottom: 12, fontSize: 14 }}>Privileged Roles</h3>
-      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+      <table
+        style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}
+      >
         <thead>
           <tr style={{ color: "var(--muted)" }}>
             <th style={th}>Role</th>
@@ -70,8 +79,12 @@ export default function PrivilegedRoles({ contractId }: { contractId: string }) 
               <td style={{ ...td, fontFamily: "monospace" }}>
                 <span title={r.address}>{fmtAddr(r.address)}</span>
               </td>
-              <td style={{ ...td, color: "var(--muted)" }}>{r.ledger ?? "—"}</td>
-              <td style={{ ...td, color: "var(--muted)", fontSize: 12 }}>{new Date(r.updated_at).toLocaleString()}</td>
+              <td style={{ ...td, color: "var(--muted)" }}>
+                {r.ledger ?? "—"}
+              </td>
+              <td style={{ ...td, color: "var(--muted)", fontSize: 12 }}>
+                {new Date(r.updated_at).toLocaleString()}
+              </td>
             </tr>
           ))}
         </tbody>

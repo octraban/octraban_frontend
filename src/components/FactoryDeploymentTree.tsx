@@ -48,9 +48,17 @@ function DeploymentMethodBadge({ method }: { method?: string }) {
         fontWeight: 600,
         letterSpacing: 0.3,
       }}
-      title={method === "wasm_hash" ? "Deployed from pre-uploaded WASM hash" : "Stellar Asset Contract"}
+      title={
+        method === "wasm_hash"
+          ? "Deployed from pre-uploaded WASM hash"
+          : "Stellar Asset Contract"
+      }
     >
-      {method === "wasm_hash" ? "WASM" : method === "stellar_asset" ? "SAC" : method.toUpperCase()}
+      {method === "wasm_hash"
+        ? "WASM"
+        : method === "stellar_asset"
+          ? "SAC"
+          : method.toUpperCase()}
     </span>
   );
 }
@@ -91,7 +99,8 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
           ⬢ FACTORY DEPLOYMENT TRACE
         </span>
         <span style={{ color: "var(--muted)", fontSize: 13 }}>
-          {contracts.length} contract{contracts.length !== 1 ? "s" : ""} deployed in single transaction
+          {contracts.length} contract{contracts.length !== 1 ? "s" : ""}{" "}
+          deployed in single transaction
         </span>
       </div>
 
@@ -110,7 +119,9 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
             fontSize: 13,
           }}
         >
-          <span style={{ color: "#d2a8ff", fontWeight: 700, fontSize: 14 }}>⬡ Factory Contract</span>
+          <span style={{ color: "#d2a8ff", fontWeight: 700, fontSize: 14 }}>
+            ⬡ Factory Contract
+          </span>
           {factoryContractId ? (
             <Link
               to={`/contract/${factoryContractId}`}
@@ -160,7 +171,11 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
               }}
             >
               <span style={{ color: "var(--muted)", fontSize: 14 }}>└─</span>
-              <span style={{ color: "var(--text)", fontWeight: 600, minWidth: 80 }}>Contract #{c.index + 1}</span>
+              <span
+                style={{ color: "var(--text)", fontWeight: 600, minWidth: 80 }}
+              >
+                Contract #{c.index + 1}
+              </span>
 
               <Link
                 to={`/contract/${c.contractId}`}
@@ -206,8 +221,9 @@ export default function FactoryDeploymentTree({ deployment }: Props) {
           fontStyle: "italic",
         }}
       >
-        💡 This transaction executed a factory pattern, programmatically deploying multiple contracts from a single
-        parent contract. Click any contract ID to view its profile.
+        💡 This transaction executed a factory pattern, programmatically
+        deploying multiple contracts from a single parent contract. Click any
+        contract ID to view its profile.
       </div>
     </div>
   );
