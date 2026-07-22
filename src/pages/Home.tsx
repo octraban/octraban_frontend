@@ -4,6 +4,7 @@ import { api } from "../api";
 import type { DecodedEvent } from "../api";
 import EventTable from "../components/EventTable";
 import ExportButton from "../components/ExportButton";
+import ErrorState from "../components/ErrorState";
 import { useEventStream } from "../hooks/useEventStream";
 
 const FUNCTIONS = [
@@ -45,7 +46,12 @@ export default function Home() {
   const [txType, setTxType] = useState<TxType>("all");
 
   const queryClient = useQueryClient();
-  const { data: events = [], isLoading } = useQuery({
+  const {
+    data: events = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["events", fnFilter, page, txType],
     queryFn: () =>
       api.events({
@@ -147,6 +153,11 @@ export default function Home() {
       <div className="card">
         {isLoading ? (
           <p style={{ color: "var(--muted)" }}>Loading…</p>
+        ) : error ? (
+          <ErrorState
+            message="Could not reach the indexer backend. Please check your connection and try again."
+            onRetry={() => refetch()}
+          />
         ) : (
           <EventTable events={events} />
         )}

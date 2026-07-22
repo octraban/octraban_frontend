@@ -106,7 +106,21 @@ export default function SearchPage() {
       {q.trim() && <ExampleQueries />}
 
       {error && (
-        <p style={{ color: "#f85149" }}>{String((error as Error).message)}</p>
+        <div
+          style={{
+            padding: "12px 16px",
+            background: "#fef2f2",
+            borderRadius: 8,
+            border: "1px solid #fecaca",
+            color: "#991b1b",
+            fontSize: 14,
+          }}
+          data-testid="error-state"
+        >
+          <strong>Search failed:</strong>{" "}
+          {String((error as Error).message)}. The indexer backend may be
+          unavailable — please try again.
+        </div>
       )}
       {isLoading && <p style={{ color: "var(--muted)" }}>Searching…</p>}
 
