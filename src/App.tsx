@@ -18,9 +18,14 @@ const SetupPage = lazy(() => import("./pages/SetupPage"));
 const BatchMultiCall = lazy(() => import("./pages/BatchMultiCall"));
 const SubInvocationPage = lazy(() => import("./pages/SubInvocationPage"));
 const RateLimitDashboard = lazy(() => import("./pages/RateLimitDashboard"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 function Fallback() {
-  return <p style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>Loading…</p>;
+  return (
+    <p style={{ padding: 32, textAlign: "center", color: "var(--muted)" }}>
+      Loading…
+    </p>
+  );
 }
 
 export default function App() {
@@ -32,7 +37,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/contract/:id" element={<ContractPage />} />
-            <Route path="/contract/:id/workspace" element={<DeveloperWorkspace />} />
+            <Route
+              path="/contract/:id/workspace"
+              element={<DeveloperWorkspace />}
+            />
             <Route path="/wallet/:address" element={<WalletPage />} />
             <Route path="/event/:seq" element={<EventPage />} />
             <Route path="/search" element={<SearchPage />} />
@@ -45,6 +53,7 @@ export default function App() {
             <Route path="/batch" element={<BatchMultiCall />} />
             <Route path="/sub-invocations" element={<SubInvocationPage />} />
             <Route path="/admin/rate-limits" element={<RateLimitDashboard />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>

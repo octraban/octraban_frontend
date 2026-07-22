@@ -19,10 +19,30 @@ export const BATCH_TEMPLATES: Record<string, BatchTemplate> = {
       },
     ],
     parameters: [
-      { name: "router_contract", type: "contract", placeholder: "Router contract ID", required: true },
-      { name: "token_in", type: "address", placeholder: "Input token contract", required: true },
-      { name: "token_out", type: "address", placeholder: "Output token contract", required: true },
-      { name: "amount_in", type: "amount", placeholder: "Amount to swap", required: true },
+      {
+        name: "router_contract",
+        type: "contract",
+        placeholder: "Router contract ID",
+        required: true,
+      },
+      {
+        name: "token_in",
+        type: "address",
+        placeholder: "Input token contract",
+        required: true,
+      },
+      {
+        name: "token_out",
+        type: "address",
+        placeholder: "Output token contract",
+        required: true,
+      },
+      {
+        name: "amount_in",
+        type: "amount",
+        placeholder: "Amount to swap",
+        required: true,
+      },
     ],
   },
   "nft-mint-list": {
@@ -46,7 +66,11 @@ export const BATCH_TEMPLATES: Record<string, BatchTemplate> = {
         contractId: "{{nft_contract}}",
         functionName: "approve",
         args: [
-          { name: "operator", value: "{{marketplace_contract}}", type: "address" },
+          {
+            name: "operator",
+            value: "{{marketplace_contract}}",
+            type: "address",
+          },
           { name: "id", value: "output:nft-mint:token_id", type: "u32" },
         ],
       },
@@ -62,12 +86,32 @@ export const BATCH_TEMPLATES: Record<string, BatchTemplate> = {
       },
     ],
     parameters: [
-      { name: "nft_contract", type: "contract", placeholder: "NFT contract ID", required: true },
-      { name: "marketplace_contract", type: "contract", placeholder: "Marketplace contract ID", required: true },
-      { name: "recipient", type: "address", placeholder: "Recipient address", required: true },
+      {
+        name: "nft_contract",
+        type: "contract",
+        placeholder: "NFT contract ID",
+        required: true,
+      },
+      {
+        name: "marketplace_contract",
+        type: "contract",
+        placeholder: "Marketplace contract ID",
+        required: true,
+      },
+      {
+        name: "recipient",
+        type: "address",
+        placeholder: "Recipient address",
+        required: true,
+      },
       { name: "name", type: "string", placeholder: "NFT name", required: true },
       { name: "uri", type: "string", placeholder: "Token URI", required: true },
-      { name: "price", type: "amount", placeholder: "List price", required: true },
+      {
+        name: "price",
+        type: "amount",
+        placeholder: "List price",
+        required: true,
+      },
     ],
   },
   "lp-add-remove": {
@@ -89,11 +133,36 @@ export const BATCH_TEMPLATES: Record<string, BatchTemplate> = {
       },
     ],
     parameters: [
-      { name: "lp_contract", type: "contract", placeholder: "LP contract ID", required: true },
-      { name: "token_a", type: "address", placeholder: "First token", required: true },
-      { name: "token_b", type: "address", placeholder: "Second token", required: true },
-      { name: "amount_a", type: "amount", placeholder: "Amount A", required: true },
-      { name: "amount_b", type: "amount", placeholder: "Amount B", required: true },
+      {
+        name: "lp_contract",
+        type: "contract",
+        placeholder: "LP contract ID",
+        required: true,
+      },
+      {
+        name: "token_a",
+        type: "address",
+        placeholder: "First token",
+        required: true,
+      },
+      {
+        name: "token_b",
+        type: "address",
+        placeholder: "Second token",
+        required: true,
+      },
+      {
+        name: "amount_a",
+        type: "amount",
+        placeholder: "Amount A",
+        required: true,
+      },
+      {
+        name: "amount_b",
+        type: "amount",
+        placeholder: "Amount B",
+        required: true,
+      },
     ],
   },
   "stake-unstake": {
@@ -113,9 +182,24 @@ export const BATCH_TEMPLATES: Record<string, BatchTemplate> = {
       },
     ],
     parameters: [
-      { name: "staking_contract", type: "contract", placeholder: "Staking contract ID", required: true },
-      { name: "stake_amount", type: "amount", placeholder: "Amount to stake", required: true },
-      { name: "validator", type: "address", placeholder: "Validator address", required: true },
+      {
+        name: "staking_contract",
+        type: "contract",
+        placeholder: "Staking contract ID",
+        required: true,
+      },
+      {
+        name: "stake_amount",
+        type: "amount",
+        placeholder: "Amount to stake",
+        required: true,
+      },
+      {
+        name: "validator",
+        type: "address",
+        placeholder: "Validator address",
+        required: true,
+      },
     ],
   },
   "multi-transfer": {
@@ -125,7 +209,12 @@ export const BATCH_TEMPLATES: Record<string, BatchTemplate> = {
     icon: "📤",
     calls: [],
     parameters: [
-      { name: "token_contract", type: "contract", placeholder: "Token contract ID", required: true },
+      {
+        name: "token_contract",
+        type: "contract",
+        placeholder: "Token contract ID",
+        required: true,
+      },
     ],
   },
   "auction-bid-withdraw": {
@@ -138,14 +227,22 @@ export const BATCH_TEMPLATES: Record<string, BatchTemplate> = {
         id: "auction-bid",
         contractId: "{{auction_contract}}",
         functionName: "bid",
-        args: [
-          { name: "bid_amount", value: "{{bid_amount}}", type: "i128" },
-        ],
+        args: [{ name: "bid_amount", value: "{{bid_amount}}", type: "i128" }],
       },
     ],
     parameters: [
-      { name: "auction_contract", type: "contract", placeholder: "Auction contract ID", required: true },
-      { name: "bid_amount", type: "amount", placeholder: "Bid amount", required: true },
+      {
+        name: "auction_contract",
+        type: "contract",
+        placeholder: "Auction contract ID",
+        required: true,
+      },
+      {
+        name: "bid_amount",
+        type: "amount",
+        placeholder: "Bid amount",
+        required: true,
+      },
     ],
   },
 };
@@ -173,18 +270,24 @@ export function fillTemplateParameters(
   values: Record<string, string>,
 ): BatchCall[] {
   const result: BatchCall[] = [];
-  
+
   for (const call of template.calls) {
     const filledCall: BatchCall = {
       ...call,
-      contractId: call.contractId.replace(/\{\{(\w+)\}\}/g, (_, key) => values[key] || ""),
+      contractId: call.contractId.replace(
+        /\{\{(\w+)\}\}/g,
+        (_, key) => values[key] || "",
+      ),
       args: call.args.map((arg) => ({
         ...arg,
-        value: arg.value.replace(/\{\{(\w+)\}\}/g, (_, key) => values[key] || ""),
+        value: arg.value.replace(
+          /\{\{(\w+)\}\}/g,
+          (_, key) => values[key] || "",
+        ),
       })),
     };
     result.push(filledCall);
   }
-  
+
   return result;
 }

@@ -31,7 +31,9 @@ export default function WalletPage() {
         {isLoading ? (
           <p style={{ color: "var(--muted)" }}>Loading…</p>
         ) : events.length === 0 ? (
-          <p style={{ color: "var(--muted)" }}>No Soroban interactions found for this address</p>
+          <p style={{ color: "var(--muted)" }}>
+            No Soroban interactions found for this address
+          </p>
         ) : (
           <EventTable events={events} />
         )}

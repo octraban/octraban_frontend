@@ -21,13 +21,17 @@ function scValToTree(val: xdr.ScVal): TreeNode {
     case xdr.ScValType.scvU128(): {
       const u = val.u128();
       return {
-        u128: String((BigInt(u.hi().toString()) << 64n) | BigInt(u.lo().toString())),
+        u128: String(
+          (BigInt(u.hi().toString()) << 64n) | BigInt(u.lo().toString()),
+        ),
       };
     }
     case xdr.ScValType.scvI128(): {
       const i = val.i128();
       return {
-        i128: String((BigInt(i.hi().toString()) << 64n) | BigInt(i.lo().toString())),
+        i128: String(
+          (BigInt(i.hi().toString()) << 64n) | BigInt(i.lo().toString()),
+        ),
       };
     }
     case xdr.ScValType.scvBytes():
@@ -73,7 +77,9 @@ function muxedToGAddress(ma: xdr.MuxedAccount): string {
   }
 }
 
-function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: string } {
+function tryDecode(
+  b64: string,
+): { tree: TreeNode; label: string } | { error: string } {
   const trimmed = b64.trim();
   if (!trimmed) return { error: "Paste a Base64 XDR string above." };
 
@@ -98,12 +104,15 @@ function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: st
               const auths = (body as any).invokeHostFunction().auth() ?? [];
               for (const authEntry of auths) {
                 const creds = authEntry.credentials();
-                if (creds.switch().name === "sorobanCredentialsSourceAccount") continue;
+                if (creds.switch().name === "sorobanCredentialsSourceAccount")
+                  continue;
                 try {
                   const scAddr = creds.address().address();
                   const addrType = scAddr.switch().name;
                   if (addrType === "scAddressTypeAccount") {
-                    actual_caller = StrKey.encodeEd25519PublicKey(scAddr.accountId().ed25519());
+                    actual_caller = StrKey.encodeEd25519PublicKey(
+                      scAddr.accountId().ed25519(),
+                    );
                     break outer;
                   }
                   if (addrType === "scAddressTypeContract") {
@@ -123,7 +132,9 @@ function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: st
             "Tier 1 — Sponsor Wallet (pays fee)": sponsor,
             "Tier 2 — Channel Account (sequence)": channel_account,
           };
-          if (actual_caller) chain_of_custody["Tier 3 — Actual Caller (contract logic)"] = actual_caller;
+          if (actual_caller)
+            chain_of_custody["Tier 3 — Actual Caller (contract logic)"] =
+              actual_caller;
 
           return {
             type: "FeeBumpTransactionEnvelope",
@@ -133,7 +144,10 @@ function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: st
               const name = body.switch().name;
               if (name === "invokeHostFunction") {
                 const hf = (body as any).invokeHostFunction().hostFunction();
-                if (hf.switch() === xdr.HostFunctionType.hostFunctionTypeInvokeContract()) {
+                if (
+                  hf.switch() ===
+                  xdr.HostFunctionType.hostFunctionTypeInvokeContract()
+                ) {
                   const inv = hf.invokeContract();
                   return {
                     operation: "invokeHostFunction",
@@ -147,7 +161,9 @@ function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: st
             }),
           } as TreeNode;
         }
-        const tx = env.value().tx ? env.value().tx() : (env as any).v0?.().tx?.();
+        const tx = env.value().tx
+          ? env.value().tx()
+          : (env as any).v0?.().tx?.();
         const ops = (tx as any).operations?.() ?? [];
         return {
           type: "TransactionEnvelope",
@@ -156,7 +172,10 @@ function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: st
             const name = body.switch().name;
             if (name === "invokeHostFunction") {
               const hf = (body as any).invokeHostFunction().hostFunction();
-              if (hf.switch() === xdr.HostFunctionType.hostFunctionTypeInvokeContract()) {
+              if (
+                hf.switch() ===
+                xdr.HostFunctionType.hostFunctionTypeInvokeContract()
+              ) {
                 const inv = hf.invokeContract();
                 return {
                   operation: "invokeHostFunction",
@@ -202,7 +221,8 @@ function tryDecode(b64: string): { tree: TreeNode; label: string } | { error: st
     }
   }
   return {
-    error: "Could not decode XDR. Ensure it is a valid Base64-encoded Soroban XDR string.",
+    error:
+      "Could not decode XDR. Ensure it is a valid Base64-encoded Soroban XDR string.",
   };
 }
 
@@ -274,7 +294,8 @@ function TreeView({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
   }
 
   if (Array.isArray(node)) {
-    if (node.length === 0) return <span style={{ color: "var(--muted)" }}>[]</span>;
+    if (node.length === 0)
+      return <span style={{ color: "var(--muted)" }}>[]</span>;
     return (
       <span>
         <button
@@ -293,7 +314,9 @@ function TreeView({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
           <div style={{ marginLeft: indent + 16 }}>
             {node.map((item, i) => (
               <div key={i} style={{ marginTop: 2 }}>
-                <span style={{ color: "var(--muted)", fontSize: 11 }}>[{i}] </span>
+                <span style={{ color: "var(--muted)", fontSize: 11 }}>
+                  [{i}]{" "}
+                </span>
                 <TreeView node={item} depth={depth + 1} />
               </div>
             ))}
@@ -310,7 +333,9 @@ function TreeView({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
         const isLeaf = typeof v === "string";
         return (
           <div key={k} style={{ marginTop: 4, marginLeft: indent }}>
-            <span style={{ color: "var(--accent)", fontWeight: 600 }}>{k}: </span>
+            <span style={{ color: "var(--accent)", fontWeight: 600 }}>
+              {k}:{" "}
+            </span>
             {isLeaf ? (
               <span>
                 <span style={{ color: valueColor(k) }}>{v}</span>
@@ -341,7 +366,8 @@ export default function XdrInspector() {
       <div className="card">
         <h2 style={{ marginBottom: 8 }}>XDR-to-JSON Workbench</h2>
         <p style={{ color: "var(--muted)", marginBottom: 12, fontSize: 13 }}>
-          Paste a raw Base64-encoded Soroban XDR string to instantly view a decoded, color-coded JSON tree.
+          Paste a raw Base64-encoded Soroban XDR string to instantly view a
+          decoded, color-coded JSON tree.
         </p>
         <textarea
           value={input}
@@ -377,7 +403,9 @@ export default function XdrInspector() {
                 }}
               >
                 <span className="badge">{decoded.label}</span>
-                <span style={{ color: "var(--muted)", fontSize: 12 }}>decoded successfully</span>
+                <span style={{ color: "var(--muted)", fontSize: 12 }}>
+                  decoded successfully
+                </span>
                 <button
                   onClick={copyAll}
                   style={{

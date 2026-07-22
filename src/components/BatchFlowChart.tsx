@@ -20,17 +20,25 @@ import ReactFlow, {
   NodeChange,
 } from "react-flow-renderer";
 import { BatchCall, ExecutionMode } from "../types/batch";
-import { BATCH_TEMPLATES, fillTemplateParameters } from "../services/batchTemplates";
+import {
+  BATCH_TEMPLATES,
+  fillTemplateParameters,
+} from "../services/batchTemplates";
 
 interface BatchFlowChartProps {
   initialCalls?: BatchCall[];
   onCallsChange?: (calls: BatchCall[]) => void;
-  onSimulate?: (mode: ExecutionMode, calls: BatchCall[]) => Promise<void> | void;
+  onSimulate?: (
+    mode: ExecutionMode,
+    calls: BatchCall[],
+  ) => Promise<void> | void;
 }
 
 function toBatchCall(node: Node): BatchCall {
   const label = String(node.data.label ?? "");
-  const [functionName, contractId] = label.split("@").map((part) => part.trim());
+  const [functionName, contractId] = label
+    .split("@")
+    .map((part) => part.trim());
 
   return {
     id: node.id,
@@ -78,11 +86,14 @@ export default function BatchFlowChart({
   onCallsChange,
   onSimulate,
 }: BatchFlowChartProps) {
-  const [nodes, setNodes, _onNodesChange] = useNodesState([]);
-  const [edges, setEdges, _onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes] = useNodesState([]);
+  const [edges, setEdges] = useEdgesState([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
-  const [templateValues, setTemplateValues] = useState<Record<string, string>>({});
-  const [executionMode, setExecutionMode] = useState<ExecutionMode>("sequential");
+  const [templateValues, setTemplateValues] = useState<Record<string, string>>(
+    {},
+  );
+  const [executionMode, setExecutionMode] =
+    useState<ExecutionMode>("sequential");
   const [showTemplateSelector, setShowTemplateSelector] = useState(true);
 
   // Convert calls to nodes
@@ -138,7 +149,7 @@ export default function BatchFlowChart({
   const handleApplyTemplate = () => {
     const template = BATCH_TEMPLATES[selectedTemplate];
     if (!template) return;
-    
+
     const filledCalls = fillTemplateParameters(template, templateValues);
     initializeNodes(filledCalls);
     setShowTemplateSelector(false);
@@ -157,18 +168,37 @@ export default function BatchFlowChart({
     setNodes((nds) => [...nds, newNode]);
     setEdges((eds) => {
       const previous = nodes[nodes.length - 1];
-      return previous ? [...eds, { id: `${previous.id}-${newId}`, source: previous.id, target: newId }] : eds;
+      return previous
+        ? [
+            ...eds,
+            {
+              id: `${previous.id}-${newId}`,
+              source: previous.id,
+              target: newId,
+            },
+          ]
+        : eds;
     });
   };
 
   const handleSimulate = () => {
-    const calls = nodes.map(toBatchCall).filter((call) => call.contractId && call.functionName);
+    const calls = nodes
+      .map(toBatchCall)
+      .filter((call) => call.contractId && call.functionName);
     if (!calls.length) return;
     onSimulate?.(executionMode, calls);
   };
 
   return (
-    <div style={{ position: "relative", height: 500, border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+    <div
+      style={{
+        position: "relative",
+        height: 500,
+        border: "1px solid var(--border)",
+        borderRadius: 8,
+        overflow: "hidden",
+      }}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}

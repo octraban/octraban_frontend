@@ -11,7 +11,9 @@ export interface SnippetConfig {
 
 export function generateJavaScriptSnippet(config: SnippetConfig): string {
   const params = (config.functionParams || []).map((p) => p.name).join(", ");
-  const paramTypes = (config.functionParams || []).map((p) => `  ${p.name}, // ${p.type}`).join("\n");
+  const paramTypes = (config.functionParams || [])
+    .map((p) => `  ${p.name}, // ${p.type}`)
+    .join("\n");
 
   return `import { Keypair, Client, StrKey, nativeToScval } from "@stellar/js-sdk";
 
@@ -45,7 +47,9 @@ ${paramTypes ? paramTypes : "      // Add your parameters here"}
 }
 
 export function generateRustSnippet(config: SnippetConfig): string {
-  const params = (config.functionParams || []).map((p) => `${p.name}: ${p.type}`).join(", ");
+  const params = (config.functionParams || [])
+    .map((p) => `${p.name}: ${p.type}`)
+    .join(", ");
 
   return `use soroban_sdk::{contract, contractimpl, Env, Symbol, symbol_short};
 

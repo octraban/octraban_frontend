@@ -18,7 +18,9 @@ describe("SearchPage", () => {
     });
 
     (global as any).fetch = fetchMock;
-    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -35,13 +37,22 @@ describe("SearchPage", () => {
             <Route path="/search" element={<SearchPage />} />
           </Routes>
         </MemoryRouter>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
 
-    const resultMessage = await screen.findByTestId("no-results");
-    expect(resultMessage.textContent).toMatch(/no results for.*nonexistent/i);
-    expect(resultMessage.textContent).toMatch(/no results for.*nonexistent/i);
+    const resultMessage = await screen.findByText((_, element) => {
+      const matchesText = /No results for.*nonexistent/i.test(
+        element?.textContent ?? "",
+      );
+      const childrenMatch = Array.from(element?.children ?? []).some((child) =>
+        /No results for.*nonexistent/i.test(child.textContent ?? ""),
+      );
+      return matchesText && !childrenMatch;
+    });
+    expect(resultMessage).toBeDefined();
     expect(consoleErrorSpy).not.toHaveBeenCalled();
-    expect(fetchMock).toHaveBeenCalledWith("/api/search?q=nonexistent&limit=50");
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/search?q=nonexistent&limit=50",
+    );
   });
 });

@@ -10,7 +10,13 @@ import UpgradeRecommendations from "../components/UpgradeRecommendations";
 
 type Window = "1h" | "24h" | "7d";
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Card({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div
       style={{
@@ -21,7 +27,14 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
         marginBottom: 20,
       }}
     >
-      <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600, color: "#111827" }}>
+      <h3
+        style={{
+          margin: "0 0 16px",
+          fontSize: 15,
+          fontWeight: 600,
+          color: "#111827",
+        }}
+      >
         {title}
       </h3>
       {children}
@@ -30,7 +43,9 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 }
 
 export default function RateLimitDashboard() {
-  const [adminToken, setAdminToken] = useState(() => sessionStorage.getItem("admin_token") ?? "");
+  const [adminToken, setAdminToken] = useState(
+    () => sessionStorage.getItem("admin_token") ?? "",
+  );
   const [tokenInput, setTokenInput] = useState("");
   const [authed, setAuthed] = useState(false);
 
@@ -49,7 +64,9 @@ export default function RateLimitDashboard() {
     try {
       const [hitsRes, topRes, heatmapRes, recsRes] = await Promise.all([
         fetch("/api/admin/analytics/rate-limit-hits?minutes=60", { headers }),
-        fetch(`/api/admin/analytics/top-users?window=${topWindow}`, { headers }),
+        fetch(`/api/admin/analytics/top-users?window=${topWindow}`, {
+          headers,
+        }),
         fetch("/api/admin/analytics/violation-heatmap", { headers }),
         fetch("/api/admin/analytics/upgrade-recommendations", { headers }),
       ]);
@@ -221,7 +238,11 @@ export default function RateLimitDashboard() {
       </Card>
 
       <Card title="Top Users by Request Volume">
-        <TopUsersTable data={topUsers} window={topWindow} onWindowChange={setTopWindow} />
+        <TopUsersTable
+          data={topUsers}
+          window={topWindow}
+          onWindowChange={setTopWindow}
+        />
       </Card>
 
       <Card title="Violation Heat Map (last 30 days)">

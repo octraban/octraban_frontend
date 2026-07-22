@@ -41,26 +41,77 @@ export default function TopUsersTable({ data, window, onWindowChange }: Props) {
       </div>
 
       {data.length === 0 ? (
-        <p style={{ color: "#9ca3af", fontSize: 13 }}>No data for this window.</p>
+        <p style={{ color: "#9ca3af", fontSize: 13 }}>
+          No data for this window.
+        </p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+        <table
+          style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}
+        >
           <thead>
             <tr style={{ borderBottom: "2px solid #e5e7eb" }}>
-              <th style={{ textAlign: "left", padding: "6px 8px", color: "#6b7280" }}>#</th>
-              <th style={{ textAlign: "left", padding: "6px 8px", color: "#6b7280" }}>Key Name</th>
-              <th style={{ textAlign: "left", padding: "6px 8px", color: "#6b7280" }}>Key ID</th>
-              <th style={{ textAlign: "right", padding: "6px 8px", color: "#6b7280" }}>Requests</th>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "6px 8px",
+                  color: "#6b7280",
+                }}
+              >
+                #
+              </th>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "6px 8px",
+                  color: "#6b7280",
+                }}
+              >
+                Key Name
+              </th>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "6px 8px",
+                  color: "#6b7280",
+                }}
+              >
+                Key ID
+              </th>
+              <th
+                style={{
+                  textAlign: "right",
+                  padding: "6px 8px",
+                  color: "#6b7280",
+                }}
+              >
+                Requests
+              </th>
             </tr>
           </thead>
           <tbody>
             {data.map((row, i) => (
-              <tr key={row.api_key_id} style={{ borderBottom: "1px solid #f3f4f6" }}>
-                <td style={{ padding: "6px 8px", color: "#9ca3af" }}>{i + 1}</td>
-                <td style={{ padding: "6px 8px", fontWeight: 500 }}>{row.key_name ?? "—"}</td>
-                <td style={{ padding: "6px 8px" }}>
-                  <code style={{ fontSize: 11, color: "#6b7280" }}>{row.api_key_id?.slice(0, 8)}…</code>
+              <tr
+                key={row.api_key_id}
+                style={{ borderBottom: "1px solid #f3f4f6" }}
+              >
+                <td style={{ padding: "6px 8px", color: "#9ca3af" }}>
+                  {i + 1}
                 </td>
-                <td style={{ padding: "6px 8px", textAlign: "right", fontWeight: 600 }}>
+                <td style={{ padding: "6px 8px", fontWeight: 500 }}>
+                  {row.key_name ?? "—"}
+                </td>
+                <td style={{ padding: "6px 8px" }}>
+                  <code style={{ fontSize: 11, color: "#6b7280" }}>
+                    {row.api_key_id?.slice(0, 8)}…
+                  </code>
+                </td>
+                <td
+                  style={{
+                    padding: "6px 8px",
+                    textAlign: "right",
+                    fontWeight: 600,
+                  }}
+                >
                   {Number(row.total_requests).toLocaleString()}
                 </td>
               </tr>

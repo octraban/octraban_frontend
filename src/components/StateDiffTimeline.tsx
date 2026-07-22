@@ -52,7 +52,11 @@ export default function StateDiffTimeline({ contractId }: Props) {
   const maxIndex = ledgerGroups.length - 1;
   const safeSliderIndex = Math.min(sliderIndex, Math.max(maxIndex, 0));
   const current = ledgerGroups[safeSliderIndex];
-  const visibleEntries = current ? (filterKey ? current.entries.filter((e) => e.key === filterKey) : current.entries) : [];
+  const visibleEntries = current
+    ? filterKey
+      ? current.entries.filter((e) => e.key === filterKey)
+      : current.entries
+    : [];
 
   // Cumulative state up to current ledger for context
   const cumulativeState = useMemo(() => {
@@ -67,7 +71,8 @@ export default function StateDiffTimeline({ contractId }: Props) {
     return state;
   }, [ledgerGroups, safeSliderIndex]);
 
-  if (isLoading) return <p style={{ color: "var(--muted)" }}>Loading state diffs…</p>;
+  if (isLoading)
+    return <p style={{ color: "var(--muted)" }}>Loading state diffs…</p>;
 
   if (!current) {
     return (
@@ -80,7 +85,10 @@ export default function StateDiffTimeline({ contractId }: Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {/* Slider control */}
-      <div className="card" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div
+        className="card"
+        style={{ display: "flex", flexDirection: "column", gap: 10 }}
+      >
         <div
           style={{
             display: "flex",
@@ -88,7 +96,9 @@ export default function StateDiffTimeline({ contractId }: Props) {
             alignItems: "center",
           }}
         >
-          <span style={{ fontSize: 13, fontWeight: 600 }}>Block {current.ledger.toLocaleString()}</span>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>
+            Block {current.ledger.toLocaleString()}
+          </span>
           <span style={{ fontSize: 12, color: "var(--muted)" }}>
             {safeSliderIndex + 1} / {ledgerGroups.length} snapshots
           </span>
@@ -105,7 +115,9 @@ export default function StateDiffTimeline({ contractId }: Props) {
         />
 
         {/* Mini timeline ticks */}
-        <div style={{ display: "flex", gap: 2, height: 6, alignItems: "flex-end" }}>
+        <div
+          style={{ display: "flex", gap: 2, height: 6, alignItems: "flex-end" }}
+        >
           {ledgerGroups.map((g, i) => (
             <div
               key={g.ledger}
@@ -115,7 +127,11 @@ export default function StateDiffTimeline({ contractId }: Props) {
                 flex: 1,
                 height: Math.min(6, 2 + g.entries.length),
                 background:
-                  i === safeSliderIndex ? "var(--accent)" : i < safeSliderIndex ? "var(--muted)" : "var(--border)",
+                  i === safeSliderIndex
+                    ? "var(--accent)"
+                    : i < safeSliderIndex
+                      ? "var(--muted)"
+                      : "var(--border)",
                 borderRadius: 2,
                 cursor: "pointer",
                 transition: "background 0.15s",
@@ -135,7 +151,9 @@ export default function StateDiffTimeline({ contractId }: Props) {
             flexWrap: "wrap",
           }}
         >
-          <span style={{ fontSize: 12, color: "var(--muted)" }}>Filter key:</span>
+          <span style={{ fontSize: 12, color: "var(--muted)" }}>
+            Filter key:
+          </span>
           <button
             onClick={() => setFilterKey("")}
             style={{
@@ -157,7 +175,8 @@ export default function StateDiffTimeline({ contractId }: Props) {
               style={{
                 padding: "3px 10px",
                 fontSize: 11,
-                background: filterKey === k ? "var(--accent)" : "var(--surface)",
+                background:
+                  filterKey === k ? "var(--accent)" : "var(--surface)",
                 color: filterKey === k ? "#fff" : "var(--muted)",
                 border: "1px solid var(--border)",
                 borderRadius: 12,
@@ -176,7 +195,10 @@ export default function StateDiffTimeline({ contractId }: Props) {
       )}
 
       {/* Changes at current ledger */}
-      <div className="card" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div
+        className="card"
+        style={{ display: "flex", flexDirection: "column", gap: 8 }}
+      >
         <h4 style={{ fontSize: 13, margin: 0, marginBottom: 4 }}>
           Changes at ledger {current.ledger.toLocaleString()}
           {current.entries[0]?.tx_hash && (
@@ -194,7 +216,9 @@ export default function StateDiffTimeline({ contractId }: Props) {
         </h4>
 
         {visibleEntries.length === 0 ? (
-          <p style={{ color: "var(--muted)", fontSize: 12 }}>No changes for this key at this ledger.</p>
+          <p style={{ color: "var(--muted)", fontSize: 12 }}>
+            No changes for this key at this ledger.
+          </p>
         ) : (
           visibleEntries.map((d, i) => (
             <div
@@ -278,7 +302,8 @@ export default function StateDiffTimeline({ contractId }: Props) {
             userSelect: "none",
           }}
         >
-          Cumulative state at ledger {current.ledger.toLocaleString()} ({Object.keys(cumulativeState).length} keys)
+          Cumulative state at ledger {current.ledger.toLocaleString()} (
+          {Object.keys(cumulativeState).length} keys)
         </summary>
         <div
           style={{
@@ -307,7 +332,9 @@ export default function StateDiffTimeline({ contractId }: Props) {
               >
                 {k}
               </span>
-              <span style={{ color: "var(--fg)", wordBreak: "break-all" }}>{v ?? "(removed)"}</span>
+              <span style={{ color: "var(--fg)", wordBreak: "break-all" }}>
+                {v ?? "(removed)"}
+              </span>
             </div>
           ))}
         </div>

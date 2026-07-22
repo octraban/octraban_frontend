@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { NETWORK_COLORS, useNetwork, type NetworkConfig } from "../contexts/NetworkContext";
+import {
+  NETWORK_COLORS,
+  useNetwork,
+  type NetworkConfig,
+} from "../contexts/NetworkContext";
 
 type HealthState = "checking" | "connected" | "degraded" | "down";
 
@@ -47,11 +51,25 @@ function NetworkBadge({ network }: { network: NetworkConfig }) {
 }
 
 export default function NetworkSwitcher() {
-  const { networks, active, setActiveId, addCustomNetwork, removeCustomNetwork } = useNetwork();
+  const {
+    networks,
+    active,
+    setActiveId,
+    addCustomNetwork,
+    removeCustomNetwork,
+  } = useNetwork();
   const [open, setOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [health, setHealth] = useState<Health>({ state: "checking", latencyMs: null });
-  const [form, setForm] = useState({ name: "", rpcUrl: "", horizonUrl: "", passphrase: "" });
+  const [health, setHealth] = useState<Health>({
+    state: "checking",
+    latencyMs: null,
+  });
+  const [form, setForm] = useState({
+    name: "",
+    rpcUrl: "",
+    horizonUrl: "",
+    passphrase: "",
+  });
   const [formError, setFormError] = useState<string | null>(null);
   const [validating, setValidating] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -59,17 +77,19 @@ export default function NetworkSwitcher() {
   useEffect(() => {
     let cancelled = false;
     setHealth({ state: "checking", latencyMs: null });
-    probeNetwork(active.rpcUrl).then(h => {
+    probeNetwork(active.rpcUrl).then((h) => {
       if (!cancelled) setHealth(h);
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [active.id, active.rpcUrl]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "n") {
         e.preventDefault();
-        setOpen(o => !o);
+        setOpen((o) => !o);
       }
       if (e.key === "Escape") setOpen(false);
     }
@@ -98,7 +118,9 @@ export default function NetworkSwitcher() {
     const probed = await probeNetwork(form.rpcUrl.trim());
     setValidating(false);
     if (probed.state === "down") {
-      setFormError("Could not reach this RPC URL. Check the address and try again.");
+      setFormError(
+        "Could not reach this RPC URL. Check the address and try again.",
+      );
       return;
     }
     const network = addCustomNetwork({
@@ -116,7 +138,7 @@ export default function NetworkSwitcher() {
     <div ref={rootRef} style={{ position: "relative" }}>
       <button
         type="button"
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((o) => !o)}
         title="Switch network (Ctrl+Shift+N)"
         style={{
           background: "transparent",
@@ -132,9 +154,13 @@ export default function NetworkSwitcher() {
       >
         <NetworkBadge network={active} />
         {active.name}
-        <span style={{ marginLeft: 6, color: HEALTH_DOT[health.state] }}>●</span>
+        <span style={{ marginLeft: 6, color: HEALTH_DOT[health.state] }}>
+          ●
+        </span>
         {health.latencyMs != null && (
-          <span style={{ marginLeft: 4, color: "var(--muted)", fontSize: 11 }}>{health.latencyMs}ms</span>
+          <span style={{ marginLeft: 4, color: "var(--muted)", fontSize: 11 }}>
+            {health.latencyMs}ms
+          </span>
         )}
       </button>
 
@@ -153,7 +179,7 @@ export default function NetworkSwitcher() {
             padding: 8,
           }}
         >
-          {networks.map(n => (
+          {networks.map((n) => (
             <div
               key={n.id}
               style={{
@@ -163,20 +189,37 @@ export default function NetworkSwitcher() {
                 padding: "6px 8px",
                 borderRadius: 6,
                 cursor: "pointer",
-                background: n.id === active.id ? "var(--bg2, rgba(124,58,237,0.1))" : "transparent",
+                background:
+                  n.id === active.id
+                    ? "var(--bg2, rgba(124,58,237,0.1))"
+                    : "transparent",
               }}
-              onClick={() => { setActiveId(n.id); setOpen(false); }}
+              onClick={() => {
+                setActiveId(n.id);
+                setOpen(false);
+              }}
             >
-              <span style={{ fontSize: 13, display: "flex", alignItems: "center" }}>
+              <span
+                style={{ fontSize: 13, display: "flex", alignItems: "center" }}
+              >
                 <NetworkBadge network={n} />
                 {n.name}
               </span>
               {n.custom && (
                 <button
                   type="button"
-                  onClick={e => { e.stopPropagation(); removeCustomNetwork(n.id); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeCustomNetwork(n.id);
+                  }}
                   title="Remove custom network"
-                  style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 12 }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--muted)",
+                    cursor: "pointer",
+                    fontSize: 12,
+                  }}
                 >
                   ✕
                 </button>
@@ -184,7 +227,9 @@ export default function NetworkSwitcher() {
             </div>
           ))}
 
-          <div style={{ borderTop: "1px solid var(--border)", margin: "8px 0" }} />
+          <div
+            style={{ borderTop: "1px solid var(--border)", margin: "8px 0" }}
+          />
 
           {!showAddForm ? (
             <button
@@ -204,37 +249,60 @@ export default function NetworkSwitcher() {
               + Add custom network
             </button>
           ) : (
-            <form onSubmit={handleAddNetwork} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <form
+              onSubmit={handleAddNetwork}
+              style={{ display: "flex", flexDirection: "column", gap: 6 }}
+            >
               <input
                 placeholder="Name (e.g. Local RPC)"
                 value={form.name}
-                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, name: e.target.value }))
+                }
                 style={{ fontSize: 12 }}
               />
               <input
                 placeholder="RPC URL"
                 value={form.rpcUrl}
-                onChange={e => setForm(f => ({ ...f, rpcUrl: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, rpcUrl: e.target.value }))
+                }
                 style={{ fontSize: 12 }}
               />
               <input
                 placeholder="Horizon URL (optional)"
                 value={form.horizonUrl}
-                onChange={e => setForm(f => ({ ...f, horizonUrl: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, horizonUrl: e.target.value }))
+                }
                 style={{ fontSize: 12 }}
               />
               <input
                 placeholder="Network passphrase"
                 value={form.passphrase}
-                onChange={e => setForm(f => ({ ...f, passphrase: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, passphrase: e.target.value }))
+                }
                 style={{ fontSize: 12 }}
               />
-              {formError && <p style={{ color: "#f85149", fontSize: 11, margin: 0 }}>{formError}</p>}
+              {formError && (
+                <p style={{ color: "#f85149", fontSize: 11, margin: 0 }}>
+                  {formError}
+                </p>
+              )}
               <div style={{ display: "flex", gap: 6 }}>
-                <button type="submit" disabled={validating} style={{ flex: 1, fontSize: 12 }}>
+                <button
+                  type="submit"
+                  disabled={validating}
+                  style={{ flex: 1, fontSize: 12 }}
+                >
                   {validating ? "Validating…" : "Save & switch"}
                 </button>
-                <button type="button" onClick={() => setShowAddForm(false)} style={{ fontSize: 12 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddForm(false)}
+                  style={{ fontSize: 12 }}
+                >
                   Cancel
                 </button>
               </div>

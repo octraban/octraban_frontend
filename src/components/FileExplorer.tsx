@@ -6,7 +6,11 @@ interface FileExplorerProps {
   onSelectFile: (path: string) => void;
 }
 
-const FileExplorer: React.FC<FileExplorerProps> = ({ files, selectedFile, onSelectFile }) => {
+const FileExplorer: React.FC<FileExplorerProps> = ({
+  files,
+  selectedFile,
+  onSelectFile,
+}) => {
   const groupedFiles = files.reduce(
     (acc, file) => {
       const parts = file.path.split("/");

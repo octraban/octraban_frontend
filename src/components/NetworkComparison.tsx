@@ -6,8 +6,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api";
 
-function StatusBadge({ deployed, error }: { deployed: boolean; error?: string }) {
-  if (error) return <span style={{ color: "#ef4444", fontWeight: 600 }}>Error</span>;
+function StatusBadge({
+  deployed,
+  error,
+}: {
+  deployed: boolean;
+  error?: string;
+}) {
+  if (error)
+    return <span style={{ color: "#ef4444", fontWeight: 600 }}>Error</span>;
   return deployed ? (
     <span style={{ color: "#22c55e", fontWeight: 600 }}>✓ Live</span>
   ) : (
@@ -15,7 +22,11 @@ function StatusBadge({ deployed, error }: { deployed: boolean; error?: string })
   );
 }
 
-export default function NetworkComparison({ contractId }: { contractId: string }) {
+export default function NetworkComparison({
+  contractId,
+}: {
+  contractId: string;
+}) {
   const { data, isLoading, error } = useQuery({
     queryKey: ["network-comparison", contractId],
     queryFn: () => api.networkComparison(contractId),
@@ -23,12 +34,23 @@ export default function NetworkComparison({ contractId }: { contractId: string }
   });
   const statuses = Array.isArray(data?.statuses) ? data.statuses : [];
 
-  if (isLoading) return <p style={{ color: "var(--muted)" }}>Checking networks…</p>;
-  if (error) return <p style={{ color: "#ef4444" }}>Failed to load network comparison.</p>;
+  if (isLoading)
+    return <p style={{ color: "var(--muted)" }}>Checking networks…</p>;
+  if (error)
+    return (
+      <p style={{ color: "#ef4444" }}>Failed to load network comparison.</p>
+    );
   if (statuses.length === 0) {
     return (
       <div className="card" style={{ color: "var(--muted)", fontSize: 13 }}>
-        <strong style={{ display: "block", color: "var(--text)", fontSize: 14, marginBottom: 6 }}>
+        <strong
+          style={{
+            display: "block",
+            color: "var(--text)",
+            fontSize: 14,
+            marginBottom: 6,
+          }}
+        >
           No network data available
         </strong>
         No deployment status was returned for this contract.
@@ -38,7 +60,9 @@ export default function NetworkComparison({ contractId }: { contractId: string }
 
   return (
     <div className="card">
-      <h3 style={{ marginBottom: 12, fontSize: 14 }}>Network Deployment Status</h3>
+      <h3 style={{ marginBottom: 12, fontSize: 14 }}>
+        Network Deployment Status
+      </h3>
 
       {data?.hasVersionMismatch && (
         <div
@@ -52,7 +76,8 @@ export default function NetworkComparison({ contractId }: { contractId: string }
             color: "#ef4444",
           }}
         >
-          ⚠ WASM hash mismatch detected across networks — contract versions differ.
+          ⚠ WASM hash mismatch detected across networks — contract versions
+          differ.
         </div>
       )}
 
@@ -73,9 +98,16 @@ export default function NetworkComparison({ contractId }: { contractId: string }
           </thead>
           <tbody>
             {statuses.map((s) => (
-              <tr key={s.network} style={{ borderBottom: "1px solid var(--border)" }}>
+              <tr
+                key={s.network}
+                style={{ borderBottom: "1px solid var(--border)" }}
+              >
                 <td style={td}>
-                  <span style={{ textTransform: "capitalize", fontWeight: 500 }}>{s.network}</span>
+                  <span
+                    style={{ textTransform: "capitalize", fontWeight: 500 }}
+                  >
+                    {s.network}
+                  </span>
                 </td>
                 <td style={td}>
                   <StatusBadge deployed={s.deployed} error={s.error} />

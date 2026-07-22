@@ -21,7 +21,13 @@ function buildArgList(args: { name: string; type?: string }[] = []): string {
   return args.map((a) => a.name).join(", ");
 }
 
-function jsSnippet(contractId: string, fnName: string, rpcUrl: string, passphrase: string, args: Props["args"] = []): string {
+function jsSnippet(
+  contractId: string,
+  fnName: string,
+  rpcUrl: string,
+  passphrase: string,
+  args: Props["args"] = [],
+): string {
   const argList = buildArgList(args);
   return `import { Contract, SorobanRpc, TransactionBuilder, BASE_FEE } from "@stellar/stellar-sdk";
 
@@ -40,7 +46,13 @@ const result = await rpc.sendTransaction(prepared);
 console.log(result);`;
 }
 
-function pythonSnippet(contractId: string, fnName: string, rpcUrl: string, passphrase: string, args: Props["args"] = []): string {
+function pythonSnippet(
+  contractId: string,
+  fnName: string,
+  rpcUrl: string,
+  passphrase: string,
+  args: Props["args"] = [],
+): string {
   const argList = buildArgList(args);
   return `from stellar_sdk import SorobanServer, Keypair, TransactionBuilder
 from stellar_sdk.soroban_rpc import SendTransactionStatus
@@ -66,8 +78,15 @@ response = server.send_transaction(tx)
 print(response.status)`;
 }
 
-function rustSnippet(contractId: string, fnName: string, args: Props["args"] = []): string {
-  const argList = args.length ? args.map((a) => `    // ${a.name}: ${a.type ?? "ScVal"}`).join("\n") + "\n" : "";
+function rustSnippet(
+  contractId: string,
+  fnName: string,
+  args: Props["args"] = [],
+): string {
+  const argList = args.length
+    ? args.map((a) => `    // ${a.name}: ${a.type ?? "ScVal"}`).join("\n") +
+      "\n"
+    : "";
   return `use soroban_sdk::{contract, contractimpl, Address, Env};
 // Client generated from contract spec:
 // stellar contract bindings rust --contract-id ${contractId} --output-dir ./bindings
@@ -93,9 +112,21 @@ export default function SdkSnippet({ contractId, fnName, args = [] }: Props) {
   const [copied, setCopied] = useState(false);
 
   const snippets: Record<Lang, string> = {
-    javascript: jsSnippet(contractId, fnName, active.rpcUrl, active.passphrase, args),
-    python:     pythonSnippet(contractId, fnName, active.rpcUrl, active.passphrase, args),
-    rust:       rustSnippet(contractId, fnName, args),
+    javascript: jsSnippet(
+      contractId,
+      fnName,
+      active.rpcUrl,
+      active.passphrase,
+      args,
+    ),
+    python: pythonSnippet(
+      contractId,
+      fnName,
+      active.rpcUrl,
+      active.passphrase,
+      args,
+    ),
+    rust: rustSnippet(contractId, fnName, args),
   };
 
   const snippet = snippets[lang];
@@ -126,7 +157,10 @@ export default function SdkSnippet({ contractId, fnName, args = [] }: Props) {
               style={{
                 padding: "3px 10px",
                 fontSize: 12,
-                background: lang === l.key ? "var(--accent, #7c3aed)" : "var(--bg2, #1e1e2e)",
+                background:
+                  lang === l.key
+                    ? "var(--accent, #7c3aed)"
+                    : "var(--bg2, #1e1e2e)",
                 color: lang === l.key ? "#fff" : "var(--muted)",
                 border: "1px solid var(--border, #333)",
                 borderRadius: 4,

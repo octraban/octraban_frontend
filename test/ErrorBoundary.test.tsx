@@ -11,7 +11,7 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary>
         <p>Hello</p>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
     expect(screen.getByText("Hello")).toBeDefined();
   });
@@ -21,7 +21,7 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary>
         <Bomb />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
     expect(screen.getByText("Something went wrong")).toBeDefined();
     expect(screen.getByText("💥")).toBeDefined();
@@ -34,7 +34,7 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary fallback={<p>Custom error</p>}>
         <Bomb />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
     expect(screen.getByText("Custom error")).toBeDefined();
     vi.restoreAllMocks();

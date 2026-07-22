@@ -33,7 +33,11 @@ import FiatValue from "./FiatValue";
  *   args     = ["GABC…", "100", "GXYZ…"]
  *   → "GABC… sent 100 to GXYZ…"
  */
-function fillTemplate(template: string, fn: LocalAbiFn, args: string[]): string {
+function fillTemplate(
+  template: string,
+  fn: LocalAbiFn,
+  args: string[],
+): string {
   const params = fn.params ?? [];
   return template.replace(/\{(\w+)\}/g, (_match, key) => {
     // Try named param first
@@ -41,7 +45,8 @@ function fillTemplate(template: string, fn: LocalAbiFn, args: string[]): string 
     if (idx !== -1 && args[idx] !== undefined) return String(args[idx]);
     // Try numeric index
     const numIdx = parseInt(key, 10);
-    if (!isNaN(numIdx) && args[numIdx] !== undefined) return String(args[numIdx]);
+    if (!isNaN(numIdx) && args[numIdx] !== undefined)
+      return String(args[numIdx]);
     return `{${key}}`;
   });
 }
@@ -76,7 +81,9 @@ function buildLocalDescription(ev: DecodedEvent, fn: LocalAbiFn): string {
 
 // ── Transfer fiat helper (mirrors EventTable) ─────────────────────────────────
 
-function parseTransfer(description: string): { amount: number; symbol: string } | null {
+function parseTransfer(
+  description: string,
+): { amount: number; symbol: string } | null {
   const m = description.match(/transferred\s+([\d,.]+)\s+([A-Z]{2,10})/i);
   if (!m) return null;
   const amount = parseFloat(m[1].replace(/,/g, ""));
@@ -90,7 +97,9 @@ function FunctionBadge({ fn }: { fn: string }) {
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
         <span className="badge wrap">Wrap Native Asset</span>
-        <span style={{ fontSize: 11, color: "var(--muted)" }}>Classic XLM → Soroban</span>
+        <span style={{ fontSize: 11, color: "var(--muted)" }}>
+          Classic XLM → Soroban
+        </span>
       </span>
     );
   }
@@ -98,7 +107,9 @@ function FunctionBadge({ fn }: { fn: string }) {
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
         <span className="badge unwrap">Unwrap Native Asset</span>
-        <span style={{ fontSize: 11, color: "var(--muted)" }}>Soroban → Classic XLM</span>
+        <span style={{ fontSize: 11, color: "var(--muted)" }}>
+          Soroban → Classic XLM
+        </span>
       </span>
     );
   }
@@ -123,7 +134,9 @@ export default function LocalAbiEventTable({ events, localAbi }: Props) {
   }
 
   // Build a quick lookup map
-  const fnMap = new Map<string, LocalAbiFn>(localAbi.functions.map((f) => [f.name, f]));
+  const fnMap = new Map<string, LocalAbiFn>(
+    localAbi.functions.map((f) => [f.name, f]),
+  );
 
   return (
     <div style={{ overflowX: "auto" }}>
@@ -150,8 +163,12 @@ export default function LocalAbiEventTable({ events, localAbi }: Props) {
         />
         Descriptions rendered using local ABI —{" "}
         <span style={{ color: "var(--muted)" }}>
-          {localAbi.functions.filter((f) => events.some((e) => e.function === f.name)).length} of{" "}
-          {localAbi.functions.length} functions matched
+          {
+            localAbi.functions.filter((f) =>
+              events.some((e) => e.function === f.name),
+            ).length
+          }{" "}
+          of {localAbi.functions.length} functions matched
         </span>
       </div>
 
@@ -172,11 +189,16 @@ export default function LocalAbiEventTable({ events, localAbi }: Props) {
         <tbody>
           {events.map((ev) => {
             const localFn = fnMap.get(ev.function);
-            const description = localFn ? buildLocalDescription(ev, localFn) : ev.description;
+            const description = localFn
+              ? buildLocalDescription(ev, localFn)
+              : ev.description;
             const usedLocal = !!localFn;
 
             return (
-              <tr key={ev.seq} style={{ borderBottom: "1px solid var(--border)" }}>
+              <tr
+                key={ev.seq}
+                style={{ borderBottom: "1px solid var(--border)" }}
+              >
                 <td style={td}>
                   <Link to={`/event/${ev.seq}`}>#{ev.seq}</Link>
                 </td>
@@ -225,7 +247,9 @@ export default function LocalAbiEventTable({ events, localAbi }: Props) {
                   {ev.function === "transfer" &&
                     (() => {
                       const t = parseTransfer(description);
-                      return t ? <FiatValue amount={t.amount} symbol={t.symbol} /> : null;
+                      return t ? (
+                        <FiatValue amount={t.amount} symbol={t.symbol} />
+                      ) : null;
                     })()}
                 </td>
               </tr>

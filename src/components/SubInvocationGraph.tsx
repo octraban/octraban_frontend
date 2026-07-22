@@ -36,7 +36,10 @@ export default function SubInvocationGraph({ invocations }: Props) {
       // Build node call-count map
       const callCount = new Map<string, number>();
       for (const inv of invocations) {
-        callCount.set(inv.contract_id, (callCount.get(inv.contract_id) ?? 0) + 1);
+        callCount.set(
+          inv.contract_id,
+          (callCount.get(inv.contract_id) ?? 0) + 1,
+        );
       }
 
       // Build edges from adjacent depth-pairs within the same tx
@@ -67,7 +70,9 @@ export default function SubInvocationGraph({ invocations }: Props) {
             id,
             label: short(id),
             count: callCount.get(id) ?? 1,
-            contractType: invocations.find((i) => i.contract_id === id)?.contract_type ?? "other",
+            contractType:
+              invocations.find((i) => i.contract_id === id)?.contract_type ??
+              "other",
           },
         })),
         ...[...edgeSet.entries()].map(([key, weight], idx) => {
@@ -123,7 +128,11 @@ export default function SubInvocationGraph({ invocations }: Props) {
   }, [invocations]);
 
   if (invocations.length === 0) {
-    return <p style={{ color: "var(--muted)", padding: 12 }}>No invocations to graph.</p>;
+    return (
+      <p style={{ color: "var(--muted)", padding: 12 }}>
+        No invocations to graph.
+      </p>
+    );
   }
 
   const uniqueContracts = new Set(invocations.map((i) => i.contract_id)).size;
@@ -139,8 +148,17 @@ export default function SubInvocationGraph({ invocations }: Props) {
           alignItems: "center",
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 600 }}>Force-Directed Call Graph</span>
-        <div style={{ display: "flex", gap: 12, fontSize: 11, color: "var(--muted)" }}>
+        <span style={{ fontSize: 13, fontWeight: 600 }}>
+          Force-Directed Call Graph
+        </span>
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            fontSize: 11,
+            color: "var(--muted)",
+          }}
+        >
           {Object.entries(CONTRACT_TYPE_COLORS).map(([type, color]) => (
             <span key={type}>
               <span
@@ -167,9 +185,11 @@ export default function SubInvocationGraph({ invocations }: Props) {
           borderRadius: "0 0 8px 8px",
         }}
       />
-      <p style={{ fontSize: 11, color: "var(--muted)", padding: "4px 16px 8px" }}>
-        Scroll to zoom · Drag to pan · {uniqueContracts} contracts · {invocations.length} invocations
-        · Node size = call frequency
+      <p
+        style={{ fontSize: 11, color: "var(--muted)", padding: "4px 16px 8px" }}
+      >
+        Scroll to zoom · Drag to pan · {uniqueContracts} contracts ·{" "}
+        {invocations.length} invocations · Node size = call frequency
       </p>
     </div>
   );

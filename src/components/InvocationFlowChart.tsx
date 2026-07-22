@@ -23,7 +23,10 @@ const V_GAP = 16; // vertical gap between siblings
 // Measure total height needed for a subtree
 function treeHeight(node: InvocationNode): number {
   if (!node.children?.length) return NODE_H;
-  const childrenH = node.children.reduce((s, c) => s + treeHeight(c) + V_GAP, -V_GAP);
+  const childrenH = node.children.reduce(
+    (s, c) => s + treeHeight(c) + V_GAP,
+    -V_GAP,
+  );
   return Math.max(NODE_H, childrenH);
 }
 
@@ -55,7 +58,9 @@ function layout(node: InvocationNode, x: number, y: number): Positioned {
   return { node, x, y: centredY, children };
 }
 
-function collectEdges(p: Positioned): { x1: number; y1: number; x2: number; y2: number }[] {
+function collectEdges(
+  p: Positioned,
+): { x1: number; y1: number; x2: number; y2: number }[] {
   const edges: { x1: number; y1: number; x2: number; y2: number }[] = [];
   for (const child of p.children) {
     edges.push({
@@ -159,7 +164,14 @@ export default function InvocationFlowChart({ root }: Props) {
             );
           })}
           <defs>
-            <marker id="arrow" markerWidth={8} markerHeight={8} refX={8} refY={3} orient="auto">
+            <marker
+              id="arrow"
+              markerWidth={8}
+              markerHeight={8}
+              refX={8}
+              refY={3}
+              orient="auto"
+            >
               <path d="M0,0 L0,6 L8,3 z" fill="var(--muted)" />
             </marker>
           </defs>

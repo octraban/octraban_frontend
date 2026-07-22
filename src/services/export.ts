@@ -27,7 +27,10 @@ export function downloadZip(blob: Blob, filename: string): void {
 }
 
 export function generateSandboxId(): string {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
 }
 
 export function createShareableUrl(sandboxId: string): string {

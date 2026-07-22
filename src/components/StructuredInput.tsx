@@ -21,7 +21,11 @@ import type { TypeIndex } from "./StructuredValue";
 function primitiveInputType(type: string): string {
   const t = type.toLowerCase();
   if (t === "bool") return "checkbox";
-  if (t.includes("int") || ["u32", "i32", "u64", "i64", "u128", "i128", "u256", "i256"].includes(t)) return "number";
+  if (
+    t.includes("int") ||
+    ["u32", "i32", "u64", "i64", "u128", "i128", "u256", "i256"].includes(t)
+  )
+    return "number";
   return "text";
 }
 
@@ -40,7 +44,13 @@ interface StructuredInputProps {
   label?: string;
 }
 
-export default function StructuredInput({ type, value, onChange, typeIndex, label }: StructuredInputProps) {
+export default function StructuredInput({
+  type,
+  value,
+  onChange,
+  typeIndex,
+  label,
+}: StructuredInputProps) {
   const typeDef = typeIndex.get(type);
 
   // ── Struct ────────────────────────────────────────────────────────────────
@@ -58,7 +68,14 @@ export default function StructuredInput({ type, value, onChange, typeIndex, labe
 
   // ── Enum ──────────────────────────────────────────────────────────────────
   if (typeDef?.kind === "enum" || typeDef?.kind === "error_enum") {
-    return <EnumInput typeDef={typeDef} value={value as number | null} onChange={onChange} label={label ?? type} />;
+    return (
+      <EnumInput
+        typeDef={typeDef}
+        value={value as number | null}
+        onChange={onChange}
+        label={label ?? type}
+      />
+    );
   }
 
   // ── Union ─────────────────────────────────────────────────────────────────
@@ -76,7 +93,12 @@ export default function StructuredInput({ type, value, onChange, typeIndex, labe
 
   // ── Primitive / unknown type ──────────────────────────────────────────────
   return (
-    <PrimitiveInput type={type} value={value as string | boolean | null} onChange={onChange} label={label ?? type} />
+    <PrimitiveInput
+      type={type}
+      value={value as string | boolean | null}
+      onChange={onChange}
+      label={label ?? type}
+    />
   );
 }
 
@@ -90,7 +112,13 @@ interface StructInputProps {
   label: string;
 }
 
-function StructInput({ typeDef, value, onChange, typeIndex, label }: StructInputProps) {
+function StructInput({
+  typeDef,
+  value,
+  onChange,
+  typeIndex,
+  label,
+}: StructInputProps) {
   const fields = typeDef.fields ?? [];
   const current = value ?? {};
 
@@ -101,7 +129,10 @@ function StructInput({ typeDef, value, onChange, typeIndex, label }: StructInput
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={{ fontSize: 11, color: "var(--muted)", fontWeight: 600 }}>
-        {label} <span style={{ color: "var(--accent)", fontWeight: 400 }}>({typeDef.name})</span>
+        {label}{" "}
+        <span style={{ color: "var(--accent)", fontWeight: 400 }}>
+          ({typeDef.name})
+        </span>
       </span>
       <div
         style={{
@@ -113,9 +144,13 @@ function StructInput({ typeDef, value, onChange, typeIndex, label }: StructInput
         }}
       >
         {fields.map((field) => (
-          <div key={field.name} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <div
+            key={field.name}
+            style={{ display: "flex", flexDirection: "column", gap: 3 }}
+          >
             <label style={{ fontSize: 11, color: "var(--muted)" }}>
-              {field.name} <span style={{ color: "var(--accent)" }}>({field.type})</span>
+              {field.name}{" "}
+              <span style={{ color: "var(--accent)" }}>({field.type})</span>
             </label>
             <StructuredInput
               type={field.type}
@@ -148,7 +183,11 @@ function EnumInput({ typeDef, value, onChange, label }: EnumInputProps) {
       <span style={{ fontSize: 11, color: "var(--muted)" }}>
         {label} <span style={{ color: "var(--accent)" }}>({typeDef.name})</span>
       </span>
-      <select value={selected} onChange={(e) => onChange(Number(e.target.value))} style={{ width: "100%" }}>
+      <select
+        value={selected}
+        onChange={(e) => onChange(Number(e.target.value))}
+        style={{ width: "100%" }}
+      >
         {cases.map((c) => (
           <option key={c.name} value={c.value ?? 0}>
             {c.name} ({c.value ?? 0})
@@ -174,7 +213,13 @@ interface UnionInputProps {
   label: string;
 }
 
-function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputProps) {
+function UnionInput({
+  typeDef,
+  value,
+  onChange,
+  typeIndex,
+  label,
+}: UnionInputProps) {
   const cases = typeDef.cases ?? [];
   const selectedVariant = value?.variant ?? cases[0]?.name ?? "";
   const matchedCase = cases.find((c) => c.name === selectedVariant);
@@ -193,7 +238,11 @@ function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputPr
       <span style={{ fontSize: 11, color: "var(--muted)" }}>
         {label} <span style={{ color: "var(--accent)" }}>({typeDef.name})</span>
       </span>
-      <select value={selectedVariant} onChange={(e) => handleVariantChange(e.target.value)} style={{ width: "100%" }}>
+      <select
+        value={selectedVariant}
+        onChange={(e) => handleVariantChange(e.target.value)}
+        style={{ width: "100%" }}
+      >
         {cases.map((c) => (
           <option key={c.name} value={c.name}>
             {c.name}
@@ -215,7 +264,10 @@ function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputPr
           {payloadTypes.length === 1 ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
               <label style={{ fontSize: 11, color: "var(--muted)" }}>
-                data <span style={{ color: "var(--accent)" }}>({payloadTypes[0]})</span>
+                data{" "}
+                <span style={{ color: "var(--accent)" }}>
+                  ({payloadTypes[0]})
+                </span>
               </label>
               <StructuredInput
                 type={payloadTypes[0]}
@@ -226,9 +278,14 @@ function UnionInput({ typeDef, value, onChange, typeIndex, label }: UnionInputPr
             </div>
           ) : (
             payloadTypes.map((pt, i) => {
-              const dataArr = Array.isArray(value?.data) ? (value!.data as unknown[]) : [];
+              const dataArr = Array.isArray(value?.data)
+                ? (value!.data as unknown[])
+                : [];
               return (
-                <div key={i} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                <div
+                  key={i}
+                  style={{ display: "flex", flexDirection: "column", gap: 3 }}
+                >
                   <label style={{ fontSize: 11, color: "var(--muted)" }}>
                     [{i}] <span style={{ color: "var(--accent)" }}>({pt})</span>
                   </label>

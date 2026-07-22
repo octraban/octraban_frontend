@@ -1,4 +1,10 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 :root {
   --bg: #0d1117;
@@ -22,12 +28,26 @@
   --yellow: #d97706;
 }
 
-body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; font-size: 14px; transition: background 200ms ease, color 200ms ease; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  transition:
+    background 200ms ease,
+    color 200ms ease;
+}
 
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
 
-input, select {
+input,
+select {
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
@@ -35,9 +55,15 @@ input, select {
   padding: 6px 10px;
   font-size: 14px;
   outline: none;
-  transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease;
 }
-input:focus, select:focus { border-color: var(--accent); }
+input:focus,
+select:focus {
+  border-color: var(--accent);
+}
 
 button {
   background: var(--accent);
@@ -47,16 +73,24 @@ button {
   padding: 6px 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 200ms ease, color 200ms ease, opacity 200ms ease;
+  transition:
+    background 200ms ease,
+    color 200ms ease,
+    opacity 200ms ease;
 }
-button:hover { opacity: 0.85; }
+button:hover {
+  opacity: 0.85;
+}
 
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 17px;
-  transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease;
 }
 
 .badge {
@@ -67,10 +101,27 @@ button:hover { opacity: 0.85; }
   font-weight: 600;
   background: var(--border);
   color: var(--text);
-  transition: background 200ms ease, color 200ms ease;
+  transition:
+    background 200ms ease,
+    color 200ms ease;
 }
-.badge.green { background: #1a3a22; color: var(--green); }
-.badge.yellow { background: #3a2e0a; color: var(--yellow); }
-.badge.wrap { background: #0d2a3a; color: #15a2e4; }
-.badge.unwrap { background: #2a1a0d; color: #e8a44a; }
-.badge.clawback { background: #3a0d0d; color: #f85149; }
+.badge.green {
+  background: #1a3a22;
+  color: var(--green);
+}
+.badge.yellow {
+  background: #3a2e0a;
+  color: var(--yellow);
+}
+.badge.wrap {
+  background: #0d2a3a;
+  color: #15a2e4;
+}
+.badge.unwrap {
+  background: #2a1a0d;
+  color: #e8a44a;
+}
+.badge.clawback {
+  background: #3a0d0d;
+  color: #f85149;
+}

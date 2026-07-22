@@ -1,6 +1,5 @@
 // Issue #210: Sub-invocation search filters — test suite (40+ cases)
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
 import {
   parseQuery,
   filterToQuery,
@@ -40,8 +39,20 @@ const CHAIN_A: SubInvocationExtended[] = [
 ];
 
 const CHAIN_B: SubInvocationExtended[] = [
-  inv({ id: 4, parent_tx_hash: "txB", depth: 0, contract_id: "CAAA", function: "burn" }),
-  inv({ id: 5, parent_tx_hash: "txB", depth: 1, contract_id: "CAAA", function: "transfer" }), // reentrant
+  inv({
+    id: 4,
+    parent_tx_hash: "txB",
+    depth: 0,
+    contract_id: "CAAA",
+    function: "burn",
+  }),
+  inv({
+    id: 5,
+    parent_tx_hash: "txB",
+    depth: 1,
+    contract_id: "CAAA",
+    function: "transfer",
+  }), // reentrant
 ];
 
 // ── parseQuery ────────────────────────────────────────────────────────────────
@@ -94,19 +105,27 @@ describe("parseQuery", () => {
   });
 
   it("parses arg: filter", () => {
-    expect(parseQuery("arg:amount>100")).toMatchObject({ arg_query: "amount>100" });
+    expect(parseQuery("arg:amount>100")).toMatchObject({
+      arg_query: "amount>100",
+    });
   });
 
   it("parses reentrant:true", () => {
-    expect(parseQuery("reentrant:true")).toMatchObject({ has_reentrancy: true });
+    expect(parseQuery("reentrant:true")).toMatchObject({
+      has_reentrancy: true,
+    });
   });
 
   it("parses reentrant:false", () => {
-    expect(parseQuery("reentrant:false")).toMatchObject({ has_reentrancy: false });
+    expect(parseQuery("reentrant:false")).toMatchObject({
+      has_reentrancy: false,
+    });
   });
 
   it("parses ledger:> filter", () => {
-    expect(parseQuery("ledger:>1000000")).toMatchObject({ ledger_min: 1000000 });
+    expect(parseQuery("ledger:>1000000")).toMatchObject({
+      ledger_min: 1000000,
+    });
   });
 
   it("parses tx: filter", () => {

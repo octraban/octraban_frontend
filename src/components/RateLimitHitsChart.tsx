@@ -8,7 +8,11 @@ interface HitDataPoint {
 
 export default function RateLimitHitsChart({ data }: { data: HitDataPoint[] }) {
   if (!data.length) {
-    return <p style={{ color: "#9ca3af", fontSize: 13 }}>No rate limit hits in the selected window.</p>;
+    return (
+      <p style={{ color: "#9ca3af", fontSize: 13 }}>
+        No rate limit hits in the selected window.
+      </p>
+    );
   }
 
   const maxHits = Math.max(...data.map((d) => Number(d.hits)), 1);
@@ -52,9 +56,15 @@ export default function RateLimitHitsChart({ data }: { data: HitDataPoint[] }) {
           marginTop: 4,
         }}
       >
-        <span>{data[0] ? new Date(data[0].minute).toLocaleTimeString() : ""}</span>
+        <span>
+          {data[0] ? new Date(data[0].minute).toLocaleTimeString() : ""}
+        </span>
         <span>Peak: {maxHits} hits/min</span>
-        <span>{data[data.length - 1] ? new Date(data[data.length - 1].minute).toLocaleTimeString() : ""}</span>
+        <span>
+          {data[data.length - 1]
+            ? new Date(data[data.length - 1].minute).toLocaleTimeString()
+            : ""}
+        </span>
       </div>
     </div>
   );
