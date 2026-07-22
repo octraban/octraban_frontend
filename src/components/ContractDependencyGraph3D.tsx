@@ -130,9 +130,42 @@ export default function ContractDependencyGraph3D() {
     return <p style={{ color: "var(--muted)", padding: 24 }}>Loading graph…</p>;
   if (error)
     return (
-      <p style={{ color: "#ef4444", padding: 24 }}>
-        Failed to load contract graph.
-      </p>
+      <div
+        style={{
+          textAlign: "center",
+          padding: "48px 24px",
+          background: "#fef2f2",
+          borderRadius: 8,
+          border: "1px solid #fecaca",
+        }}
+        data-testid="error-state"
+      >
+        <div style={{ fontSize: 32, marginBottom: 8 }}>⚠️</div>
+        <p style={{ color: "#991b1b", fontSize: 14, marginBottom: 0 }}>
+          Failed to load contract graph. The indexer backend may be unavailable.
+        </p>
+      </div>
+    );
+
+  if (!initial || initial.nodes.length === 0)
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          padding: "48px 24px",
+          color: "var(--muted)",
+        }}
+        data-testid="empty-state"
+      >
+        <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
+        <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>
+          No graph data yet
+        </h3>
+        <p style={{ fontSize: 14 }}>
+          No cross-contract calls have been indexed yet. Check back once some
+          Soroban transactions have been processed.
+        </p>
+      </div>
     );
 
   const nodeCount = initial?.nodes.length ?? 0;

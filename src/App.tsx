@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Nav from "./components/Nav";
 import ErrorBoundary from "./components/ErrorBoundary";
+import BackendStatusBanner from "./components/BackendStatusBanner";
 
 const Home = lazy(() => import("./pages/Home"));
 const ContractPage = lazy(() => import("./pages/ContractPage"));
@@ -31,6 +32,7 @@ function Fallback() {
 export default function App() {
   return (
     <ErrorBoundary>
+      <BackendStatusBanner />
       <Nav />
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 16px" }}>
         <Suspense fallback={<Fallback />}>

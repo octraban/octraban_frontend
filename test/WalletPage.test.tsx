@@ -6,9 +6,11 @@ vi.mock("react-router-dom", () => ({
   useParams: () => ({ address: "GA3X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X" }),
 }));
 
+const mockWallet = vi.fn();
+
 vi.mock("../src/api", () => ({
   api: {
-    wallet: vi.fn().mockResolvedValue([]),
+    wallet: mockWallet,
   },
 }));
 
@@ -27,6 +29,7 @@ describe("WalletPage", () => {
   });
 
   it("renders with empty-state message when no events", async () => {
+    mockWallet.mockResolvedValue([]);
     const WalletPage = (await import("../src/pages/WalletPage")).default;
     render(
       <Wrapper>
@@ -39,6 +42,7 @@ describe("WalletPage", () => {
   });
 
   it("shows address in page heading even with no events", async () => {
+    mockWallet.mockResolvedValue([]);
     const WalletPage = (await import("../src/pages/WalletPage")).default;
     render(
       <Wrapper>
@@ -47,6 +51,20 @@ describe("WalletPage", () => {
     );
     expect(
       await screen.findByText("GA3X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X"),
+    ).toBeDefined();
+  });
+
+  it("shows error state when the API request fails", async () => {
+    mockWallet.mockRejectedValue(new Error("API 503: /wallet/GA3X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X"));
+    const WalletPage = (await import("../src/pages/WalletPage")).default;
+    render(
+      <Wrapper>
+        <WalletPage />
+      </Wrapper>,
+    );
+    expect(await screen.findByTestId("error-state")).toBeDefined();
+    expect(
+      screen.getByText(/Could not reach the indexer backend/i),
     ).toBeDefined();
   });
 });

@@ -25,6 +25,8 @@ import RwaMetadataDisplay from "../components/RwaMetadataDisplay";
 import SourceVerificationBadge from "../components/SourceVerificationBadge";
 import StateDiffTimeline from "../components/StateDiffTimeline";
 import ExportButton from "../components/ExportButton";
+import EmptyStateShared from "../components/EmptyState";
+import ErrorState from "../components/ErrorState";
 
 type Tab =
   | "overview"
@@ -35,24 +37,6 @@ type Tab =
   | "networks"
   | "graph"
   | "state-diff";
-
-function EmptyState({ title, message }: { title: string; message: string }) {
-  return (
-    <div className="card" style={{ color: "var(--muted)", fontSize: 13 }}>
-      <strong
-        style={{
-          display: "block",
-          color: "var(--text)",
-          fontSize: 14,
-          marginBottom: 6,
-        }}
-      >
-        {title}
-      </strong>
-      {message}
-    </div>
-  );
-}
 
 function isInvocationNode(value: unknown): value is InvocationNode {
   if (!value || typeof value !== "object") return false;
@@ -74,7 +58,7 @@ export default function ContractPage() {
   // ── Local ABI (session-only, never sent to server) ──────────────────────────
   const { localAbi, loadAbi, clearAbi, parseError } = useLocalAbi(id);
 
-  const { data: meta, isLoading: metaLoading } = useQuery({
+  const { data: meta, isLoading: metaLoading, error: metaError, refetch: metaRefetch } = useQuery({
     queryKey: ["contract", id],
     queryFn: () => api.contract(id),
     enabled: !!id,
@@ -108,6 +92,18 @@ export default function ContractPage() {
   const isUnverified = !meta || functions.length === 0;
 
   if (metaLoading) return <p style={{ color: "var(--muted)" }}>Loading…</p>;
+  if (metaError) {
+    const is404 =
+      (metaError as Error).message?.includes("404");
+    if (!is404)
+      return (
+        <ErrorState
+          title="Could not load contract"
+          message="The indexer backend could not be reached. Please check your connection and try again."
+          onRetry={() => metaRefetch()}
+        />
+      );
+  }
   if (!meta) {
     // Contract not in the registry — show the upload zone as the primary UI
     return (
@@ -491,7 +487,7 @@ export default function ContractPage() {
               </div>
             </div>
           ) : (
-            <EmptyState
+            <EmptyStateShared
               title="No functions available"
               message="This contract did not return ABI function metadata yet."
             />
@@ -535,7 +531,7 @@ export default function ContractPage() {
               filename={meta.source_file ?? `${id.slice(0, 8)}.rs`}
             />
           ) : (
-            <EmptyState
+            <EmptyStateShared
               title="No source available"
               message="No verified source files were returned for this contract."
             />
@@ -582,7 +578,7 @@ export default function ContractPage() {
         (isInvocationNode(invocationTree) ? (
           <InvocationFlowChart root={invocationTree} />
         ) : (
-          <EmptyState
+          <EmptyStateShared
             title="No invocation flow available"
             message="No cross-contract invocation trace has been recorded for this contract yet."
           />
