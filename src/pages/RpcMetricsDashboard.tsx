@@ -103,14 +103,41 @@ export default function RpcMetricsDashboard() {
             marginBottom: 16,
             color: "#991b1b",
           }}
+          data-testid="error-state"
         >
-          Failed to load metrics: {error}
+          Failed to load metrics: {error}. The backend may be unavailable —
+          data will refresh automatically when it comes back online.
         </div>
       )}
 
-      {metrics.length === 0 && !error && (
+      {!error && metrics.length === 0 && lastUpdated ? (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "48px 24px",
+            color: "var(--muted)",
+          }}
+          data-testid="empty-state"
+        >
+          <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
+          <h3
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              color: "var(--text)",
+              marginBottom: 8,
+            }}
+          >
+            No RPC nodes configured
+          </h3>
+          <p style={{ fontSize: 14 }}>
+            The backend returned no RPC node metrics. Check your node
+            configuration.
+          </p>
+        </div>
+      ) : !error && metrics.length === 0 ? (
         <p style={{ color: "#888" }}>Loading…</p>
-      )}
+      ) : null}
 
       <div style={{ display: "grid", gap: 16 }}>
         {metrics.map((node) => (

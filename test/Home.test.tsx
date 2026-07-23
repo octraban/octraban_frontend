@@ -126,3 +126,29 @@ describe("Home — empty events array", () => {
     expect(screen.getByText(/Next →/)).toBeDefined();
   });
 });
+
+import { api } from "../src/api";
+
+describe("Home — API error", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(api.events).mockRejectedValue(
+      new Error("API 503: /events"),
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("shows the error state when the API call rejects", async () => {
+    renderHome();
+    expect(await screen.findByTestId("error-state")).toBeDefined();
+  });
+
+  it("shows a retry button in the error state", async () => {
+    renderHome();
+    await screen.findByTestId("error-state");
+    expect(screen.getByRole("button", { name: /retry/i })).toBeDefined();
+  });
+});

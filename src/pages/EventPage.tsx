@@ -9,16 +9,25 @@ import RestoreFootprintPanel from "../components/RestoreFootprintPanel";
 import HeuristicParams from "../components/HeuristicParams";
 import ZkCostDelta from "../components/ZkCostDelta";
 import FactoryDeploymentTree from "../components/FactoryDeploymentTree";
+import ErrorState from "../components/ErrorState";
 
 export default function EventPage() {
   const { seq = "0" } = useParams();
 
-  const { data: ev, isLoading } = useQuery({
+  const { data: ev, isLoading, error, refetch } = useQuery({
     queryKey: ["event", seq],
     queryFn: () => api.event(Number(seq)),
   });
 
   if (isLoading) return <p style={{ color: "var(--muted)" }}>Loading…</p>;
+  if (error)
+    return (
+      <ErrorState
+        title="Could not load event"
+        message="The indexer backend could not be reached. Please check your connection and try again."
+        onRetry={() => refetch()}
+      />
+    );
   if (!ev)
     return (
       <div style={{ textAlign: "center", marginTop: "2rem" }}>
