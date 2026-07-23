@@ -404,6 +404,12 @@ export default function BatchMultiCall() {
           >
             Export as JSON
           </button>
+          <button onClick={exportAsFoundry} disabled={calls.length === 0} style={{ fontSize: 12 }}>
+            Export as Foundry (.sol)
+          </button>
+          <button onClick={exportAsCli} disabled={calls.length === 0} style={{ fontSize: 12 }}>
+            Export as CLI (.sh)
+          </button>
         </div>
       </div>
     </div>
