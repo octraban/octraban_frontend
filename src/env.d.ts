@@ -1,3 +1,9 @@
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_API_URL?: string;
+}
+
 declare module "monaco-editor" {
   export type editor = typeof import("monaco-editor").editor;
   export namespace editor {
