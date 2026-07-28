@@ -170,11 +170,11 @@ Octraban is split across three repositories:
 
 ### Port topology
 
-| Service                          | Default port | Notes                                              |
-| -------------------------------- | ------------ | -------------------------------------------------- |
+| Service                          | Default port | Notes                                                              |
+| -------------------------------- | ------------ | ------------------------------------------------------------------ |
 | **octraban_frontend** (Vite dev) | `:5173`      | `npm run dev`; production build served on `:3000` (nginx / Docker) |
-| **octraban_backend** (indexer)   | `:3001`      | All `/api/*` traffic is proxied here               |
-| **Soroban RPC**                  | n/a          | `VITE_SOROBAN_RPC_URL` (testnet default)           |
+| **octraban_backend** (indexer)   | `:3001`      | All `/api/*` traffic is proxied here                               |
+| **Soroban RPC**                  | n/a          | `VITE_SOROBAN_RPC_URL` (testnet default)                           |
 
 ```
 Browser (user)
@@ -203,82 +203,82 @@ In development, Vite proxies every `/api/*` request to `http://localhost:3001` (
 
 ### Health
 
-| Method | Path         | Description                                      |
-| ------ | ------------ | ------------------------------------------------ |
+| Method | Path          | Description                                                                               |
+| ------ | ------------- | ----------------------------------------------------------------------------------------- |
 | GET    | `/api/health` | Liveness check — 200 OK when the indexer is up. Used by `BackendStatusBanner` on startup. |
 
 ### Explorer — read endpoints
 
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| GET | `/api/events` | Paginated event list (`?contract=&fn=&page=&type=`) |
-| GET | `/api/events/:seq` | Single decoded event |
-| GET | `/api/events/:seq/zk-costs` | CAP-0080 ZK host-function telemetry for an event |
-| GET | `/api/search` | Universal search (`?q=&limit=`) — contracts, events, wallets |
-| GET | `/api/contracts/:id` | Contract metadata + ABI |
-| GET | `/api/contracts/:id/abi` | Download ABI as JSON blob |
-| GET | `/api/contracts/:id/spec-full` | Full contract spec (functions + custom types) |
-| GET | `/api/contracts/:id/migration-status` | SEP-49 migration state |
-| GET | `/api/contracts/:id/roles` | Privileged role addresses |
-| GET | `/api/contracts/:id/network-comparison` | State across networks |
-| GET | `/api/contracts/:id/address-graph` | Address relationship graph data |
-| GET | `/api/contracts/:id/circuit-breaker` | Circuit-breaker pause status |
-| GET | `/api/contracts/:id/rwa-metadata` | Real-world asset token metadata |
-| GET | `/api/contracts/:id/source-verifications` | Multi-sig source verifications (`?wasm_hash=`) |
-| GET | `/api/contracts/:id/ttl` | Live TTL for instance + code entries |
-| GET | `/api/contracts/:id/state-diffs` | Storage state-diff timeline (`?key=`) |
-| GET | `/api/contracts/:id/quorum-freeze` | CAP-0077 quorum-freeze status |
-| GET | `/api/burn-alerts` | Burn-rate alerts (`?contract=`) |
-| GET | `/api/wallet/:address` | Events for a wallet address |
-| GET | `/api/contract-graph` | Global contract dependency graph (`?limit=`) |
-| GET | `/api/v1/contracts/:id/events-deep` | Events where contract appears directly or as sub-invocation (`?page=`) |
+| Method | Path                                      | Description                                                            |
+| ------ | ----------------------------------------- | ---------------------------------------------------------------------- |
+| GET    | `/api/events`                             | Paginated event list (`?contract=&fn=&page=&type=`)                    |
+| GET    | `/api/events/:seq`                        | Single decoded event                                                   |
+| GET    | `/api/events/:seq/zk-costs`               | CAP-0080 ZK host-function telemetry for an event                       |
+| GET    | `/api/search`                             | Universal search (`?q=&limit=`) — contracts, events, wallets           |
+| GET    | `/api/contracts/:id`                      | Contract metadata + ABI                                                |
+| GET    | `/api/contracts/:id/abi`                  | Download ABI as JSON blob                                              |
+| GET    | `/api/contracts/:id/spec-full`            | Full contract spec (functions + custom types)                          |
+| GET    | `/api/contracts/:id/migration-status`     | SEP-49 migration state                                                 |
+| GET    | `/api/contracts/:id/roles`                | Privileged role addresses                                              |
+| GET    | `/api/contracts/:id/network-comparison`   | State across networks                                                  |
+| GET    | `/api/contracts/:id/address-graph`        | Address relationship graph data                                        |
+| GET    | `/api/contracts/:id/circuit-breaker`      | Circuit-breaker pause status                                           |
+| GET    | `/api/contracts/:id/rwa-metadata`         | Real-world asset token metadata                                        |
+| GET    | `/api/contracts/:id/source-verifications` | Multi-sig source verifications (`?wasm_hash=`)                         |
+| GET    | `/api/contracts/:id/ttl`                  | Live TTL for instance + code entries                                   |
+| GET    | `/api/contracts/:id/state-diffs`          | Storage state-diff timeline (`?key=`)                                  |
+| GET    | `/api/contracts/:id/quorum-freeze`        | CAP-0077 quorum-freeze status                                          |
+| GET    | `/api/burn-alerts`                        | Burn-rate alerts (`?contract=`)                                        |
+| GET    | `/api/wallet/:address`                    | Events for a wallet address                                            |
+| GET    | `/api/contract-graph`                     | Global contract dependency graph (`?limit=`)                           |
+| GET    | `/api/v1/contracts/:id/events-deep`       | Events where contract appears directly or as sub-invocation (`?page=`) |
 
 ### Transactions & sub-invocations
 
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| GET | `/api/transactions/:txHash/sub-invocations` | Sub-invocation tree for a transaction |
-| GET | `/api/transactions/:txHash/status` | Transaction status (polling) |
-| GET | `/api/transactions/:txHash/status/stream` | Live status via Server-Sent Events |
-| GET | `/api/transactions/:txHash/call-path-metrics` | Analytical call-path metrics |
-| GET | `/api/transactions/compare` | Cross-transaction tree diff (`?a=&b=`) |
-| GET | `/api/sub-invocations/search` | Filtered sub-invocation search (8+ filter params) |
-| GET | `/api/sub-invocations/analytics` | Aggregate analytics across all sub-invocations |
-| GET | `/api/sub-invocations/stream` | SSE feed of live sub-invocations (`?contract=&function=`) |
+| Method | Path                                          | Description                                               |
+| ------ | --------------------------------------------- | --------------------------------------------------------- |
+| GET    | `/api/transactions/:txHash/sub-invocations`   | Sub-invocation tree for a transaction                     |
+| GET    | `/api/transactions/:txHash/status`            | Transaction status (polling)                              |
+| GET    | `/api/transactions/:txHash/status/stream`     | Live status via Server-Sent Events                        |
+| GET    | `/api/transactions/:txHash/call-path-metrics` | Analytical call-path metrics                              |
+| GET    | `/api/transactions/compare`                   | Cross-transaction tree diff (`?a=&b=`)                    |
+| GET    | `/api/sub-invocations/search`                 | Filtered sub-invocation search (8+ filter params)         |
+| GET    | `/api/sub-invocations/analytics`              | Aggregate analytics across all sub-invocations            |
+| GET    | `/api/sub-invocations/stream`                 | SSE feed of live sub-invocations (`?contract=&function=`) |
 
 ### Write & simulation
 
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| POST | `/api/contracts/:id/source-verifications` | Submit a source verification signature |
-| POST | `/api/simulate` | Simulate a single contract invocation |
-| POST | `/api/batch/simulate` | Batch multi-call simulation |
-| POST | `/api/batch/estimate-gas` | Batch gas estimation |
-| POST | `/api/batch/optimize` | Batch call-order optimisation |
-| POST | `/api/batch/validate` | Batch call validation |
+| Method | Path                                      | Description                            |
+| ------ | ----------------------------------------- | -------------------------------------- |
+| POST   | `/api/contracts/:id/source-verifications` | Submit a source verification signature |
+| POST   | `/api/simulate`                           | Simulate a single contract invocation  |
+| POST   | `/api/batch/simulate`                     | Batch multi-call simulation            |
+| POST   | `/api/batch/estimate-gas`                 | Batch gas estimation                   |
+| POST   | `/api/batch/optimize`                     | Batch call-order optimisation          |
+| POST   | `/api/batch/validate`                     | Batch call validation                  |
 
 ### Sandbox persistence
 
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| POST   | `/api/sandbox` | Save a sandbox session |
-| GET    | `/api/sandbox/:id` | Load a sandbox session |
-| DELETE | `/api/sandbox/:id` | Delete a sandbox session |
-| GET    | `/api/sandboxes` | List sandbox sessions (`?limit=&offset=`) |
+| Method | Path               | Description                               |
+| ------ | ------------------ | ----------------------------------------- |
+| POST   | `/api/sandbox`     | Save a sandbox session                    |
+| GET    | `/api/sandbox/:id` | Load a sandbox session                    |
+| DELETE | `/api/sandbox/:id` | Delete a sandbox session                  |
+| GET    | `/api/sandboxes`   | List sandbox sessions (`?limit=&offset=`) |
 
 ### Operations & admin
 
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| GET | `/api/rpc-metrics` | RPC layer latency, throughput, and circuit-breaker state |
-| GET | `/api/admin/analytics/rate-limit-hits` | Rate-limit hit counts (`?minutes=60`) |
-| GET | `/api/admin/analytics/top-users` | Top rate-limit offenders (`?window=`) |
-| GET | `/api/admin/analytics/violation-heatmap` | Rate-limit heatmap |
-| GET | `/api/admin/analytics/upgrade-recommendations` | Upgrade advisories |
-| GET | `/api/setup/doctor` | Backend diagnostic / health check |
-| POST | `/api/setup/test-db` | Test database connection |
-| POST | `/api/setup/save-config` | Persist backend configuration |
-| POST | `/api/setup/db-init` | Initialise the database |
+| Method | Path                                           | Description                                              |
+| ------ | ---------------------------------------------- | -------------------------------------------------------- |
+| GET    | `/api/rpc-metrics`                             | RPC layer latency, throughput, and circuit-breaker state |
+| GET    | `/api/admin/analytics/rate-limit-hits`         | Rate-limit hit counts (`?minutes=60`)                    |
+| GET    | `/api/admin/analytics/top-users`               | Top rate-limit offenders (`?window=`)                    |
+| GET    | `/api/admin/analytics/violation-heatmap`       | Rate-limit heatmap                                       |
+| GET    | `/api/admin/analytics/upgrade-recommendations` | Upgrade advisories                                       |
+| GET    | `/api/setup/doctor`                            | Backend diagnostic / health check                        |
+| POST   | `/api/setup/test-db`                           | Test database connection                                 |
+| POST   | `/api/setup/save-config`                       | Persist backend configuration                            |
+| POST   | `/api/setup/db-init`                           | Initialise the database                                  |
 
 ---
 

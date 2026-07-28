@@ -38,6 +38,12 @@ export default function Nav() {
         ⬡ Octraban
       </Link>
       <Link
+        to="/explorer"
+        style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}
+      >
+        Explorer
+      </Link>
+      <Link
         to="/search"
         style={{ fontSize: 13, whiteSpace: "nowrap", color: "var(--muted)" }}
       >

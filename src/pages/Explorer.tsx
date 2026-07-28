@@ -40,7 +40,7 @@ const TYPE_LABELS: { key: TxType; label: string; title: string }[] = [
   },
 ];
 
-export default function Home() {
+export default function Explorer() {
   const [fnFilter, setFnFilter] = useState("");
   const [page, setPage] = useState(1);
   const [txType, setTxType] = useState<TxType>("all");

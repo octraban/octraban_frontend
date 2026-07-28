@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import BackendStatusBanner from "../src/components/BackendStatusBanner";
 
@@ -35,13 +35,10 @@ function mockFetchNetworkError() {
 // ---------------------------------------------------------------------------
 
 beforeEach(() => {
-  vi.useFakeTimers();
   vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
 afterEach(() => {
-  vi.runOnlyPendingTimers();
-  vi.useRealTimers();
   vi.restoreAllMocks();
 });
 
@@ -55,9 +52,7 @@ describe("BackendStatusBanner", () => {
     render(<BackendStatusBanner />);
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId("backend-status-banner"),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId("backend-status-banner")).toBeInTheDocument();
     });
 
     expect(screen.getByText(/indexer unreachable/i)).toBeInTheDocument();
@@ -68,9 +63,7 @@ describe("BackendStatusBanner", () => {
     render(<BackendStatusBanner />);
 
     await waitFor(() => {
-      expect(
-        screen.getByTestId("backend-status-banner"),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId("backend-status-banner")).toBeInTheDocument();
     });
   });
 
@@ -90,9 +83,9 @@ describe("BackendStatusBanner", () => {
     mockFetchOk();
     render(<BackendStatusBanner />);
 
-    // Give the async check time to resolve.
-    await act(async () => {
-      await vi.runAllTimersAsync();
+    // Wait for a short tick to let the promise resolve
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled();
     });
 
     expect(
@@ -102,7 +95,7 @@ describe("BackendStatusBanner", () => {
 
   it("hides the banner after the user dismisses it", async () => {
     mockFetchFail();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     render(<BackendStatusBanner />);
 
     await waitFor(() => {

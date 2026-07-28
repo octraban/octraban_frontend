@@ -4,7 +4,8 @@ import Nav from "./components/Nav";
 import ErrorBoundary from "./components/ErrorBoundary";
 import BackendStatusBanner from "./components/BackendStatusBanner";
 
-const Home = lazy(() => import("./pages/Home"));
+const Landing = lazy(() => import("./pages/Landing"));
+const Explorer = lazy(() => import("./pages/Explorer"));
 const ContractPage = lazy(() => import("./pages/ContractPage"));
 const WalletPage = lazy(() => import("./pages/WalletPage"));
 const EventPage = lazy(() => import("./pages/EventPage"));
@@ -37,7 +38,8 @@ export default function App() {
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 16px" }}>
         <Suspense fallback={<Fallback />}>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/explorer" element={<Explorer />} />
             <Route path="/contract/:id" element={<ContractPage />} />
             <Route
               path="/contract/:id/workspace"

@@ -55,7 +55,9 @@ describe("WalletPage", () => {
   });
 
   it("shows error state when the API request fails", async () => {
-    mockWallet.mockRejectedValue(new Error("API 503: /wallet/GA3X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X"));
+    mockWallet.mockRejectedValue(
+      new Error("API 503: /wallet/GA3X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X5X"),
+    );
     const WalletPage = (await import("../src/pages/WalletPage")).default;
     render(
       <Wrapper>
