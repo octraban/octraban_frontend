@@ -24,7 +24,9 @@ type Status = "checking" | "ok" | "unreachable";
 
 async function checkHealth(): Promise<boolean> {
   try {
-    const res = await fetch("/api/health", { signal: AbortSignal.timeout(4000) });
+    const res = await fetch("/api/health", {
+      signal: AbortSignal.timeout(4000),
+    });
     return res.ok;
   } catch {
     return false;

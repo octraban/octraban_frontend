@@ -105,8 +105,8 @@ export default function RpcMetricsDashboard() {
           }}
           data-testid="error-state"
         >
-          Failed to load metrics: {error}. The backend may be unavailable —
-          data will refresh automatically when it comes back online.
+          Failed to load metrics: {error}. The backend may be unavailable — data
+          will refresh automatically when it comes back online.
         </div>
       )}
 

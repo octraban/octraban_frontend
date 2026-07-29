@@ -158,7 +158,14 @@ export default function ContractDependencyGraph3D() {
         data-testid="empty-state"
       >
         <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
-        <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 8 }}>
+        <h3
+          style={{
+            fontSize: 16,
+            fontWeight: 600,
+            color: "var(--text)",
+            marginBottom: 8,
+          }}
+        >
           No graph data yet
         </h3>
         <p style={{ fontSize: 14 }}>

@@ -14,7 +14,12 @@ import ErrorState from "../components/ErrorState";
 export default function EventPage() {
   const { seq = "0" } = useParams();
 
-  const { data: ev, isLoading, error, refetch } = useQuery({
+  const {
+    data: ev,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["event", seq],
     queryFn: () => api.event(Number(seq)),
   });

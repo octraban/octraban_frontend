@@ -54,14 +54,14 @@ function EventPageLazy() {
 import React from "react";
 
 describe("EventPage — empty state (event not found)", () => {
-  it('shows "Event not found" when API resolves to undefined', async () => {
-    mockEvent.mockResolvedValue(undefined);
+  it('shows "Event not found" when API resolves to null', async () => {
+    mockEvent.mockResolvedValue(null);
     renderEventPage();
     expect(await screen.findByText(/event not found/i)).toBeDefined();
   });
 
   it('renders a "Back to events" link in the not-found state', async () => {
-    mockEvent.mockResolvedValue(undefined);
+    mockEvent.mockResolvedValue(null);
     renderEventPage();
     await screen.findByText(/event not found/i);
     expect(screen.getByText(/back to events/i)).toBeDefined();
@@ -79,9 +79,7 @@ describe("EventPage — error state (backend failure)", () => {
     mockEvent.mockRejectedValue(new Error("API 503: /events/42"));
     renderEventPage();
     await screen.findByTestId("error-state");
-    expect(
-      screen.getByText(/indexer backend/i),
-    ).toBeDefined();
+    expect(screen.getByText(/indexer backend/i)).toBeDefined();
   });
 
   it("shows a retry button in the error state", async () => {

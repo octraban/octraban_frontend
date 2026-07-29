@@ -1,5 +1,5 @@
 /**
- * Issue #430 — Home.tsx: renders without error when API returns an empty events array.
+ * Issue #430 — Explorer.tsx: renders without error when API returns an empty events array.
  *
  * Mocks the api module so that api.events resolves to [] and asserts:
  *   1. The empty-state message is visible ("No events yet")
@@ -12,7 +12,7 @@ import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import ErrorBoundary from "../src/components/ErrorBoundary";
-import Home from "../src/pages/Home";
+import Explorer from "../src/pages/Explorer";
 
 // ---------------------------------------------------------------------------
 // Module-level mocks
@@ -62,13 +62,13 @@ function makeQueryClient() {
   });
 }
 
-function renderHome() {
+function renderExplorer() {
   const queryClient = makeQueryClient();
   return render(
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
-          <Home />
+          <Explorer />
         </MemoryRouter>
       </QueryClientProvider>
     </ErrorBoundary>,
@@ -79,7 +79,7 @@ function renderHome() {
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("Home — empty events array", () => {
+describe("Explorer — empty events array", () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
@@ -91,33 +91,33 @@ describe("Home — empty events array", () => {
   });
 
   it("renders the page heading without crashing", async () => {
-    renderHome();
+    renderExplorer();
     // The heading is synchronously present — no async wait needed.
     expect(screen.getByText("Octraban")).toBeDefined();
   });
 
   it('shows the "No events yet" empty-state message after the query resolves', async () => {
-    renderHome();
+    renderExplorer();
     // Wait for the async query to settle and the empty-state to appear.
     const emptyState = await screen.findByText(/no events yet/i);
     expect(emptyState).toBeDefined();
   });
 
   it("does not render the error boundary fallback", async () => {
-    renderHome();
+    renderExplorer();
     await screen.findByText(/no events yet/i);
     // If the error boundary caught an error it would show "Something went wrong".
     expect(screen.queryByText("Something went wrong")).toBeNull();
   });
 
   it("does not emit console.error during the render cycle", async () => {
-    renderHome();
+    renderExplorer();
     await screen.findByText(/no events yet/i);
     expect(consoleErrorSpy).not.toHaveBeenCalled();
   });
 
   it("renders filter controls even when there are no events", async () => {
-    renderHome();
+    renderExplorer();
     await screen.findByText(/no events yet/i);
     // Function-filter label should be visible.
     expect(screen.getByText("Function:")).toBeDefined();
@@ -129,12 +129,10 @@ describe("Home — empty events array", () => {
 
 import { api } from "../src/api";
 
-describe("Home — API error", () => {
+describe("Explorer — API error", () => {
   beforeEach(() => {
     vi.spyOn(console, "error").mockImplementation(() => {});
-    vi.mocked(api.events).mockRejectedValue(
-      new Error("API 503: /events"),
-    );
+    vi.mocked(api.events).mockRejectedValue(new Error("API 503: /events"));
   });
 
   afterEach(() => {
@@ -142,12 +140,12 @@ describe("Home — API error", () => {
   });
 
   it("shows the error state when the API call rejects", async () => {
-    renderHome();
+    renderExplorer();
     expect(await screen.findByTestId("error-state")).toBeDefined();
   });
 
   it("shows a retry button in the error state", async () => {
-    renderHome();
+    renderExplorer();
     await screen.findByTestId("error-state");
     expect(screen.getByRole("button", { name: /retry/i })).toBeDefined();
   });

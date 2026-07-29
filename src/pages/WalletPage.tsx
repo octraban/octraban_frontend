@@ -7,7 +7,12 @@ import ErrorState from "../components/ErrorState";
 export default function WalletPage() {
   const { address = "" } = useParams();
 
-  const { data: events = [], isLoading, error, refetch } = useQuery({
+  const {
+    data: events = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["wallet", address],
     queryFn: () => api.wallet(address),
     enabled: !!address,

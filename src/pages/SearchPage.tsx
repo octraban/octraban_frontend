@@ -117,9 +117,8 @@ export default function SearchPage() {
           }}
           data-testid="error-state"
         >
-          <strong>Search failed:</strong>{" "}
-          {String((error as Error).message)}. The indexer backend may be
-          unavailable — please try again.
+          <strong>Search failed:</strong> {String((error as Error).message)}.
+          The indexer backend may be unavailable — please try again.
         </div>
       )}
       {isLoading && <p style={{ color: "var(--muted)" }}>Searching…</p>}

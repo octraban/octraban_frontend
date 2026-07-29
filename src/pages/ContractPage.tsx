@@ -58,7 +58,12 @@ export default function ContractPage() {
   // ── Local ABI (session-only, never sent to server) ──────────────────────────
   const { localAbi, loadAbi, clearAbi, parseError } = useLocalAbi(id);
 
-  const { data: meta, isLoading: metaLoading, error: metaError, refetch: metaRefetch } = useQuery({
+  const {
+    data: meta,
+    isLoading: metaLoading,
+    error: metaError,
+    refetch: metaRefetch,
+  } = useQuery({
     queryKey: ["contract", id],
     queryFn: () => api.contract(id),
     enabled: !!id,
@@ -93,8 +98,7 @@ export default function ContractPage() {
 
   if (metaLoading) return <p style={{ color: "var(--muted)" }}>Loading…</p>;
   if (metaError) {
-    const is404 =
-      (metaError as Error).message?.includes("404");
+    const is404 = (metaError as Error).message?.includes("404");
     if (!is404)
       return (
         <ErrorState
