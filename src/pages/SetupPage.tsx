@@ -1,25 +1,6 @@
 import { useState, useEffect } from "react";
-
-interface DoctorReport {
-  runtimes: Record<
-    string,
-    { status: string; version?: string; message: string }
-  >;
-  database: { connected: boolean; message: string };
-  env: Record<string, { status: string; value: string; message: string }>;
-  ports: Record<string, { status: string; inUse: boolean; message: string }>;
-  system: {
-    disk: { status: string; freeGB?: string; message: string };
-    memory: {
-      status: string;
-      totalGB?: string;
-      freeGB?: string;
-      message: string;
-    };
-  };
-  gitHooks: { status: string; message: string };
-  docker: { status: string; message: string };
-}
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { api } from "../api";
 
 export default function SetupPage() {
   // Form state
@@ -29,123 +10,63 @@ export default function SetupPage() {
   );
   const [pollMs, setPollMs] = useState("5000");
 
-  // Health report state
-  const [report, setReport] = useState<DoctorReport | null>(null);
-  const [loadingDoctor, setLoadingDoctor] = useState(true);
-  const [doctorError, setDoctorError] = useState("");
-
-  // Action states
-  const [testingDb, setTestingDb] = useState(false);
-  const [dbTestResult, setDbTestResult] = useState<{
-    success: boolean;
-    error?: string;
-  } | null>(null);
-
-  const [savingConfig, setSavingConfig] = useState(false);
+  const [dbTestResult, setDbTestResult] = useState<{ success: boolean; error?: string; } | null>(null);
   const [saveResult, setSaveResult] = useState<boolean | null>(null);
+  const [dbInitResult, setDbInitResult] = useState<{ success: boolean; error?: string; } | null>(null);
 
-  const [initializingDb, setInitializingDb] = useState(false);
-  const [dbInitResult, setDbInitResult] = useState<{
-    success: boolean;
-    error?: string;
-  } | null>(null);
+  const { data: report, error, isPending: loadingDoctor, refetch: fetchDiagnostics } = useQuery({
+    queryKey: ["setupDoctor"],
+    queryFn: api.setupDoctor,
+  });
 
-  // Fetch diagnostics
-  const fetchDiagnostics = async () => {
-    setLoadingDoctor(true);
-    setDoctorError("");
-    try {
-      const res = await fetch("/api/setup/doctor");
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setReport(data);
-
-      // Pre-fill form from report values if configured
-      if (data.env.SOROBAN_RPC_URL?.value !== "Not set") {
-        setRpcUrl(data.env.SOROBAN_RPC_URL.value);
-      }
-      if (data.env.DATABASE_URL?.value !== "Not set") {
-        setDbUrl(data.env.DATABASE_URL.value);
-      }
-    } catch (err: any) {
-      setDoctorError(`Failed to load health diagnostics: ${err.message}`);
-    } finally {
-      setLoadingDoctor(false);
-    }
-  };
+  const doctorError = error instanceof Error ? `Failed to load health diagnostics: ${error.message}` : error ? String(error) : "";
 
   useEffect(() => {
-    fetchDiagnostics();
-  }, []);
-
-  // Handlers
-  const handleTestConnection = async () => {
-    setTestingDb(true);
-    setDbTestResult(null);
-    try {
-      const res = await fetch("/api/setup/test-db", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ databaseUrl: dbUrl }),
-      });
-      const data = await res.json();
-      setDbTestResult(data);
-    } catch (err: any) {
-      setDbTestResult({ success: false, error: err.message });
-    } finally {
-      setTestingDb(false);
-    }
-  };
-
-  const handleSaveConfig = async () => {
-    setSavingConfig(true);
-    setSaveResult(null);
-    try {
-      const res = await fetch("/api/setup/save-config", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sorobanRpcUrl: rpcUrl,
-          databaseUrl: dbUrl,
-          pollMs,
-        }),
-      });
-      const data = await res.json();
-      setSaveResult(data.success);
-      if (data.success) {
-        fetchDiagnostics(); // refresh
+    if (report) {
+      if (report.env.SOROBAN_RPC_URL?.value !== "Not set") {
+        setRpcUrl(report.env.SOROBAN_RPC_URL.value);
       }
-    } catch {
-      setSaveResult(false);
-    } finally {
-      setSavingConfig(false);
+      if (report.env.DATABASE_URL?.value !== "Not set") {
+        setDbUrl(report.env.DATABASE_URL.value);
+      }
     }
-  };
+  }, [report]);
 
-  const handleInitDatabase = async () => {
-    setInitializingDb(true);
-    setDbInitResult(null);
-    try {
-      const res = await fetch("/api/setup/db-init", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
+  const testDbMutation = useMutation({
+    mutationFn: () => api.setupTestDb(dbUrl),
+    onSuccess: (data) => setDbTestResult(data),
+    onError: (e: any) => setDbTestResult({ success: false, error: e.message })
+  });
+
+  const saveConfigMutation = useMutation({
+    mutationFn: () => api.setupSaveConfig({ sorobanRpcUrl: rpcUrl, databaseUrl: dbUrl, pollMs }),
+    onSuccess: (data) => {
+      setSaveResult(data.success);
+      if (data.success) fetchDiagnostics();
+    },
+    onError: () => setSaveResult(false)
+  });
+
+  const initDbMutation = useMutation({
+    mutationFn: () => api.setupDbInit(),
+    onSuccess: (data) => {
+      if (data.success) {
         setDbInitResult({ success: true });
         fetchDiagnostics();
       } else {
-        setDbInitResult({
-          success: false,
-          error: data.error || "Initialization failed",
-        });
+        setDbInitResult({ success: false, error: data.error || "Initialization failed" });
       }
-    } catch (err: any) {
-      setDbInitResult({ success: false, error: err.message });
-    } finally {
-      setInitializingDb(false);
-    }
-  };
+    },
+    onError: (e: any) => setDbInitResult({ success: false, error: e.message })
+  });
+
+  const testingDb = testDbMutation.isPending;
+  const savingConfig = saveConfigMutation.isPending;
+  const initializingDb = initDbMutation.isPending;
+
+  const handleTestConnection = () => testDbMutation.mutate();
+  const handleSaveConfig = () => saveConfigMutation.mutate();
+  const handleInitDatabase = () => initDbMutation.mutate();
 
   // Diagnostic helper functions
   const getBadgeClass = (status: string) => {
@@ -413,7 +334,7 @@ export default function SetupPage() {
           >
             <h3 style={{ fontSize: 16 }}>System Health & Prerequisites</h3>
             <button
-              onClick={fetchDiagnostics}
+              onClick={() => fetchDiagnostics()}
               style={{
                 padding: "4px 10px",
                 fontSize: 12,

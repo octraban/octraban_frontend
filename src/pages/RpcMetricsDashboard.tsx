@@ -2,18 +2,8 @@
  * RPC Node Performance Dashboard
  * Polls /api/rpc-metrics every 15 s and renders latency sparklines + uptime.
  */
-import { useEffect, useState } from "react";
-
-interface NodeMetrics {
-  url: string;
-  latencyAvgMs: number | null;
-  latencyP95Ms: number | null;
-  errorRate: number;
-  uptime: number;
-  lastLedger: number;
-  sampleCount: number;
-  history: number[];
-}
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../api";
 
 function Sparkline({ values }: { values: number[] }) {
   if (!values.length) return <span style={{ color: "#888" }}>no data</span>;
@@ -54,27 +44,14 @@ function StatusBadge({ healthy }: { healthy: boolean }) {
 }
 
 export default function RpcMetricsDashboard() {
-  const [metrics, setMetrics] = useState<NodeMetrics[]>([]);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { data: metrics = [], error, dataUpdatedAt } = useQuery({
+    queryKey: ["rpcMetrics"],
+    queryFn: api.rpcMetrics,
+    refetchInterval: 15000,
+  });
 
-  const fetchMetrics = async () => {
-    try {
-      const res = await fetch("/api/rpc-metrics");
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setMetrics(await res.json());
-      setLastUpdated(new Date());
-      setError(null);
-    } catch (e: any) {
-      setError(e.message);
-    }
-  };
-
-  useEffect(() => {
-    fetchMetrics();
-    const id = setInterval(fetchMetrics, 15_000);
-    return () => clearInterval(id);
-  }, []);
+  const lastUpdated = dataUpdatedAt ? new Date(dataUpdatedAt) : null;
+  const errorMessage = error instanceof Error ? error.message : error ? String(error) : null;
 
   return (
     <div>
@@ -94,7 +71,7 @@ export default function RpcMetricsDashboard() {
         )}
       </div>
 
-      {error && (
+      {errorMessage && (
         <div
           style={{
             padding: 12,
@@ -105,12 +82,12 @@ export default function RpcMetricsDashboard() {
           }}
           data-testid="error-state"
         >
-          Failed to load metrics: {error}. The backend may be unavailable — data
+          Failed to load metrics: {errorMessage}. The backend may be unavailable — data
           will refresh automatically when it comes back online.
         </div>
       )}
 
-      {!error && metrics.length === 0 && lastUpdated ? (
+      {!errorMessage && metrics.length === 0 && lastUpdated ? (
         <div
           style={{
             textAlign: "center",
@@ -135,7 +112,7 @@ export default function RpcMetricsDashboard() {
             configuration.
           </p>
         </div>
-      ) : !error && metrics.length === 0 ? (
+      ) : !errorMessage && metrics.length === 0 ? (
         <p style={{ color: "#888" }}>Loading…</p>
       ) : null}
 
