@@ -2,7 +2,9 @@
  * Rate Limit Analytics Dashboard
  * Polls analytics endpoints every 5 seconds. Requires admin authentication.
  */
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../api";
 import RateLimitHitsChart from "../components/RateLimitHitsChart";
 import TopUsersTable from "../components/TopUsersTable";
 import ViolationHeatmap from "../components/ViolationHeatmap";
@@ -47,63 +49,53 @@ export default function RateLimitDashboard() {
     () => sessionStorage.getItem("admin_token") ?? "",
   );
   const [tokenInput, setTokenInput] = useState("");
-  const [authed, setAuthed] = useState(false);
-
-  const [hitsData, setHitsData] = useState([]);
-  const [topUsers, setTopUsers] = useState([]);
-  const [heatmap, setHeatmap] = useState([]);
-  const [recommendations, setRecommendations] = useState([]);
   const [topWindow, setTopWindow] = useState<Window>("24h");
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
-  const headers = { Authorization: `Bearer ${adminToken}` };
+  const queryOpts = {
+    enabled: !!adminToken,
+    refetchInterval: 5000,
+    retry: false,
+  };
 
-  const fetchAll = useCallback(async () => {
-    if (!adminToken) return;
-    try {
-      const [hitsRes, topRes, heatmapRes, recsRes] = await Promise.all([
-        fetch("/api/admin/analytics/rate-limit-hits?minutes=60", { headers }),
-        fetch(`/api/admin/analytics/top-users?window=${topWindow}`, {
-          headers,
-        }),
-        fetch("/api/admin/analytics/violation-heatmap", { headers }),
-        fetch("/api/admin/analytics/upgrade-recommendations", { headers }),
-      ]);
+  const hitsQuery = useQuery({
+    queryKey: ["rateLimitHits", adminToken, 60],
+    queryFn: () => api.adminRateLimitHits(adminToken, 60),
+    ...queryOpts,
+  });
 
-      if (hitsRes.status === 401) {
-        setAuthed(false);
-        setError("Invalid or expired admin token.");
-        return;
-      }
+  const topUsersQuery = useQuery({
+    queryKey: ["topUsers", adminToken, topWindow],
+    queryFn: () => api.adminTopUsers(adminToken, topWindow),
+    ...queryOpts,
+  });
 
-      setHitsData(await hitsRes.json());
-      setTopUsers(await topRes.json());
-      setHeatmap(await heatmapRes.json());
-      setRecommendations(await recsRes.json());
-      setLastUpdated(new Date());
-      setAuthed(true);
-      setError(null);
-    } catch (e: any) {
-      setError(e.message);
-    }
-  }, [adminToken, topWindow]);
+  const heatmapQuery = useQuery({
+    queryKey: ["violationHeatmap", adminToken],
+    queryFn: () => api.adminViolationHeatmap(adminToken),
+    ...queryOpts,
+  });
 
-  useEffect(() => {
-    if (!adminToken) return;
-    fetchAll();
-    const id = setInterval(fetchAll, 5_000);
-    return () => clearInterval(id);
-  }, [fetchAll]);
+  const recsQuery = useQuery({
+    queryKey: ["upgradeRecommendations", adminToken],
+    queryFn: () => api.adminUpgradeRecommendations(adminToken),
+    ...queryOpts,
+  });
 
-  // Re-fetch top users when window changes
-  useEffect(() => {
-    if (!authed) return;
-    fetch(`/api/admin/analytics/top-users?window=${topWindow}`, { headers })
-      .then((r) => r.json())
-      .then(setTopUsers)
-      .catch(() => {});
-  }, [topWindow]);
+  const queries = [hitsQuery, topUsersQuery, heatmapQuery, recsQuery];
+  
+  const isUnauthorized = queries.some(
+    (q) => q.error instanceof Error && q.error.message.includes("401")
+  );
+
+  const error = isUnauthorized ? "Invalid or expired admin token." : queries.find((q) => q.error)?.error?.toString() || null;
+  const authed = !!adminToken && hitsQuery.isSuccess && !isUnauthorized;
+  
+  const hitsData = hitsQuery.data || [];
+  const topUsers = topUsersQuery.data || [];
+  const heatmap = heatmapQuery.data || [];
+  const recommendations = recsQuery.data || [];
+  
+  const lastUpdated = queries[0].dataUpdatedAt ? new Date(queries[0].dataUpdatedAt) : null;
 
   // Login screen
   if (!adminToken || !authed) {
@@ -202,7 +194,6 @@ export default function RateLimitDashboard() {
             onClick={() => {
               sessionStorage.removeItem("admin_token");
               setAdminToken("");
-              setAuthed(false);
             }}
             style={{
               padding: "4px 12px",

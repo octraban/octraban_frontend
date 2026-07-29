@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useCallback } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { api } from "../api";
 import BatchFlowChart from "../components/BatchFlowChart";
 import {
@@ -50,101 +51,59 @@ export default function BatchMultiCall() {
     useState<ExecutionMode>("sequential");
   const [sourceAccount, setSourceAccount] = useState("");
   const [simResult, setSimResult] = useState<SimResult | null>(null);
-  const [loading, setLoading] = useState(false);
+  const simulateMutation = useMutation({
+    mutationFn: ({ batchCalls }: { batchCalls: BatchCall[] }) => 
+      api.batchSimulate(batchCalls, sourceAccount || "GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN"),
+    onSuccess: (data) => setSimResult(data),
+    onError: (e: any) => setSimResult({ success: false, error: e.message })
+  });
+
+  const estimateGasMutation = useMutation({
+    mutationFn: () => api.batchEstimateGas(calls, sourceAccount),
+    onSuccess: (data: any) => setSimResult({ success: true, totalGas: data.totalGas, estimates: data.estimates }),
+    onError: (e: any) => setSimResult({ success: false, error: e.message })
+  });
+
+  const validateMutation = useMutation({
+    mutationFn: () => api.batchValidate(calls, sourceAccount),
+    onSuccess: (data: any) => setSimResult({ success: data.valid, conflicts: data.conflicts, errors: data.errors }),
+    onError: (e: any) => setSimResult({ success: false, error: e.message })
+  });
+
+  const optimizeMutation = useMutation({
+    mutationFn: () => api.batchOptimize(calls, sourceAccount),
+    onSuccess: (data: any) => setSimResult({ success: true, optimizedOrder: data.optimizedOrder }),
+    onError: (e: any) => setSimResult({ success: false, error: e.message })
+  });
+
+  const loading = simulateMutation.isPending || estimateGasMutation.isPending || validateMutation.isPending || optimizeMutation.isPending;
 
   const handleSimulate = useCallback(
-    async (mode: ExecutionMode, batchCalls: BatchCall[]) => {
+    (_mode: ExecutionMode, batchCalls: BatchCall[]) => {
       if (!batchCalls.length) return;
-
-      setLoading(true);
       setSimResult(null);
-
-      try {
-        const response = await fetch("/api/batch/simulate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            calls: batchCalls,
-            sourceAccount:
-              sourceAccount ||
-              "GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN",
-          }),
-        });
-        const data = await response.json();
-        setSimResult(data);
-      } catch (e: any) {
-        setSimResult({ success: false, error: e.message });
-      } finally {
-        setLoading(false);
-      }
+      simulateMutation.mutate({ batchCalls });
     },
-    [sourceAccount],
+    [simulateMutation],
   );
 
-  const handleEstimateGas = useCallback(async () => {
+  const handleEstimateGas = useCallback(() => {
     if (!calls.length) return;
+    setSimResult(null);
+    estimateGasMutation.mutate();
+  }, [calls, estimateGasMutation]);
 
-    setLoading(true);
-    try {
-      const response = await fetch("/api/batch/estimate-gas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ calls, sourceAccount }),
-      });
-      const data = await response.json();
-      setSimResult({
-        success: true,
-        totalGas: data.totalGas,
-        estimates: data.estimates,
-      });
-    } catch (e: any) {
-      setSimResult({ success: false, error: e.message });
-    } finally {
-      setLoading(false);
-    }
-  }, [calls, sourceAccount]);
-
-  const handleValidate = useCallback(async () => {
+  const handleValidate = useCallback(() => {
     if (!calls.length) return;
+    setSimResult(null);
+    validateMutation.mutate();
+  }, [calls, validateMutation]);
 
-    setLoading(true);
-    try {
-      const response = await fetch("/api/batch/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ calls, sourceAccount }),
-      });
-      const data = await response.json();
-      setSimResult({
-        success: data.valid,
-        conflicts: data.conflicts,
-        errors: data.errors,
-      });
-    } catch (e: any) {
-      setSimResult({ success: false, error: e.message });
-    } finally {
-      setLoading(false);
-    }
-  }, [calls, sourceAccount]);
-
-  const handleOptimize = useCallback(async () => {
+  const handleOptimize = useCallback(() => {
     if (!calls.length) return;
-
-    setLoading(true);
-    try {
-      const response = await fetch("/api/batch/optimize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ calls, sourceAccount }),
-      });
-      const data = await response.json();
-      setSimResult({ success: true, optimizedOrder: data.optimizedOrder });
-    } catch (e: any) {
-      setSimResult({ success: false, error: e.message });
-    } finally {
-      setLoading(false);
-    }
-  }, [calls, sourceAccount]);
+    setSimResult(null);
+    optimizeMutation.mutate();
+  }, [calls, optimizeMutation]);
 
   const exportAsHardhat = useCallback(() => {
     downloadText(api.exportBatchAsHardhat(calls), "batch-script.ts");

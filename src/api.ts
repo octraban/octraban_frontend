@@ -408,6 +408,30 @@ export interface TransactionTreeDiff {
   changed: { a: SubInvocationExtended; b: SubInvocationExtended }[];
 }
 
+export interface NodeMetrics {
+  url: string;
+  latencyAvgMs: number | null;
+  latencyP95Ms: number | null;
+  errorRate: number;
+  uptime: number;
+  lastLedger: number;
+  sampleCount: number;
+  history: number[];
+}
+
+export interface DoctorReport {
+  runtimes: Record<string, { status: string; version?: string; message: string }>;
+  database: { connected: boolean; message: string };
+  env: Record<string, { status: string; value: string; message: string }>;
+  ports: Record<string, { status: string; inUse: boolean; message: string }>;
+  system: {
+    disk: { status: string; freeGB?: string; message: string };
+    memory: { status: string; totalGB?: string; freeGB?: string; message: string };
+  };
+  gitHooks: { status: string; message: string };
+  docker: { status: string; message: string };
+}
+
 export const api = {
   events: (params: {
     contract?: string;
@@ -672,4 +696,60 @@ export const api = {
     if (filter?.function) q.set("function", filter.function);
     return `${BASE}/sub-invocations/stream?${q}`;
   },
+
+  // RPC metrics
+  rpcMetrics: () => get<NodeMetrics[]>("/rpc-metrics"),
+
+  // Admin Rate Limit Analytics
+  adminRateLimitHits: (token: string, minutes: number = 60) =>
+    fetch(`${BASE}/admin/analytics/rate-limit-hits?minutes=${minutes}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((r) => {
+      if (!r.ok) throw new Error(`API ${r.status}`);
+      return r.json();
+    }),
+  adminTopUsers: (token: string, window: string = "24h") =>
+    fetch(`${BASE}/admin/analytics/top-users?window=${window}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((r) => {
+      if (!r.ok) throw new Error(`API ${r.status}`);
+      return r.json();
+    }),
+  adminViolationHeatmap: (token: string) =>
+    fetch(`${BASE}/admin/analytics/violation-heatmap`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((r) => {
+      if (!r.ok) throw new Error(`API ${r.status}`);
+      return r.json();
+    }),
+  adminUpgradeRecommendations: (token: string) =>
+    fetch(`${BASE}/admin/analytics/upgrade-recommendations`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((r) => {
+      if (!r.ok) throw new Error(`API ${r.status}`);
+      return r.json();
+    }),
+
+  // Setup Page
+  setupDoctor: () => get<DoctorReport>("/setup/doctor"),
+  setupTestDb: (databaseUrl: string) =>
+    fetch(`${BASE}/setup/test-db`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ databaseUrl }),
+    }).then((r) => r.json()),
+  setupSaveConfig: (config: { sorobanRpcUrl: string; databaseUrl: string; pollMs: string }) =>
+    fetch(`${BASE}/setup/save-config`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(config),
+    }).then((r) => r.json()),
+  setupDbInit: () =>
+    fetch(`${BASE}/setup/db-init`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    }).then((r) => {
+      if (!r.ok) throw new Error(`API ${r.status}`);
+      return r.json();
+    }),
 };

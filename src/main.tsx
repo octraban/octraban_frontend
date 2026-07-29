@@ -6,7 +6,15 @@ import App from "./App";
 import { NetworkProvider } from "./contexts/NetworkContext";
 import "./index.css";
 
-const qc = new QueryClient();
+const qc = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5000,
+      retry: 3,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
