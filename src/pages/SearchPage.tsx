@@ -11,6 +11,7 @@ import {
 } from "../api";
 import { truncateAddress } from "../utils/strkey";
 import EventTable from "../components/EventTable";
+import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 type FilterKind = SearchKind | "all";
 
@@ -33,11 +34,13 @@ export default function SearchPage() {
   const navigate = useNavigate();
   const [q, setQ] = useState(searchParams.get("q") ?? "");
   const kind = (searchParams.get("kind") ?? "all") as FilterKind;
+  const debouncedQ = useDebouncedValue(q, 300);
+  const isDebouncing = q.trim() !== debouncedQ.trim();
 
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["search", q, kind],
-    queryFn: () => api.search(q, 50),
-    enabled: q.trim().length > 0,
+  const { data, error, isLoading, isFetching } = useQuery({
+    queryKey: ["search", debouncedQ, kind],
+    queryFn: () => api.search(debouncedQ, 50),
+    enabled: debouncedQ.trim().length > 0,
   });
 
   const filtered = useMemo(() => filterResults(data, kind), [data, kind]);
@@ -121,15 +124,21 @@ export default function SearchPage() {
           The indexer backend may be unavailable — please try again.
         </div>
       )}
-      {isLoading && <p style={{ color: "var(--muted)" }}>Searching…</p>}
+      {(isDebouncing || isLoading || isFetching) && (
+        <p style={{ color: "var(--muted)" }}>Searching…</p>
+      )}
 
-      {data && !isLoading && <SearchSummary data={data} kind={kind} />}
+      {data && !isDebouncing && !isLoading && (
+        <SearchSummary data={data} kind={kind} />
+      )}
 
-      {data && !isLoading && data.suggestions.length > 0 && (
+      {data && !isDebouncing && !isLoading && data.suggestions.length > 0 && (
         <Suggestions suggestions={data.suggestions} />
       )}
 
-      {data && !isLoading && <Results data={filtered} query={data.query} />}
+      {data && !isDebouncing && !isLoading && (
+        <Results data={filtered} query={data.query} />
+      )}
     </div>
   );
 }
