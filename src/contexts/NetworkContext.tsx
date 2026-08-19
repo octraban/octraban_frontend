@@ -7,53 +7,16 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import {
+  DEFAULT_NETWORK_ID,
+  getBuiltinNetworks,
+  NETWORK_COLORS,
+  type NetworkConfig,
+  type NetworkKind,
+} from "../config/network";
 
-export type NetworkKind = "testnet" | "mainnet" | "futurenet" | "custom";
-
-export interface NetworkConfig {
-  id: string;
-  kind: NetworkKind;
-  name: string;
-  rpcUrl: string;
-  horizonUrl: string;
-  passphrase: string;
-  /** Custom networks only — removable, persisted to localStorage. */
-  custom?: boolean;
-}
-
-export const BUILTIN_NETWORKS: NetworkConfig[] = [
-  {
-    id: "testnet",
-    kind: "testnet",
-    name: "Testnet",
-    rpcUrl: "https://soroban-testnet.stellar.org",
-    horizonUrl: "https://horizon-testnet.stellar.org",
-    passphrase: "Test SDF Network ; September 2015",
-  },
-  {
-    id: "mainnet",
-    kind: "mainnet",
-    name: "Mainnet",
-    rpcUrl: "https://mainnet.sorobanrpc.com",
-    horizonUrl: "https://horizon.stellar.org",
-    passphrase: "Public Global Stellar Network ; September 2015",
-  },
-  {
-    id: "futurenet",
-    kind: "futurenet",
-    name: "Futurenet",
-    rpcUrl: "https://rpc-futurenet.stellar.org",
-    horizonUrl: "https://horizon-futurenet.stellar.org",
-    passphrase: "Test SDF Future Network ; October 2022",
-  },
-];
-
-export const NETWORK_COLORS: Record<NetworkKind, string> = {
-  testnet: "#f59e0b",
-  mainnet: "#3b82f6",
-  futurenet: "#a855f7",
-  custom: "#22c55e",
-};
+export type { NetworkConfig, NetworkKind };
+export { NETWORK_COLORS };
 
 const ACTIVE_KEY = "sb-network-active";
 const CUSTOM_KEY = "sb-network-custom";
@@ -85,16 +48,16 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
   const [customNetworks, setCustomNetworks] =
     useState<NetworkConfig[]>(loadCustomNetworks);
   const [activeId, setActiveIdState] = useState<string>(
-    () => localStorage.getItem(ACTIVE_KEY) || BUILTIN_NETWORKS[0].id,
+    () => localStorage.getItem(ACTIVE_KEY) || DEFAULT_NETWORK_ID,
   );
 
   const networks = useMemo(
-    () => [...BUILTIN_NETWORKS, ...customNetworks],
+    () => [...getBuiltinNetworks(), ...customNetworks],
     [customNetworks],
   );
 
   const active = useMemo(
-    () => networks.find((n) => n.id === activeId) ?? BUILTIN_NETWORKS[0],
+    () => networks.find((n) => n.id === activeId) ?? networks[0],
     [networks, activeId],
   );
 
@@ -125,7 +88,7 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
   const removeCustomNetwork = useCallback(
     (id: string) => {
       setCustomNetworks((prev) => prev.filter((n) => n.id !== id));
-      if (activeId === id) setActiveId(BUILTIN_NETWORKS[0].id);
+      if (activeId === id) setActiveId(DEFAULT_NETWORK_ID);
     },
     [activeId, setActiveId],
   );

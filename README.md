@@ -158,6 +158,11 @@ Copy `.env.example` → `.env` and adjust:
 
 The defaults point at **Stellar testnet**, so a fresh checkout talks to the live testnet deployment out of the box.
 
+Both variables are resolved by [`src/config/network.ts`](src/config/network.ts) — the single source of truth for
+network config. `NetworkContext` reads the testnet entry from this module and layers any custom networks added via
+the network switcher on top; the Sandbox and any code that builds, simulates, or signs a transaction should read the
+RPC URL / passphrase from there (via `useNetwork()`) rather than hardcoding testnet values.
+
 ---
 
 ## 🗺️ How it fits together

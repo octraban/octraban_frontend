@@ -17,8 +17,11 @@ import { generateSandboxId } from "../services/export";
 import { saveSandbox } from "../services/sandbox-api";
 import { createAutoSaver } from "../services/session";
 import { WebContainer } from "@webcontainer/api";
+import { applyNetworkToEnvContent } from "../config/network";
+import { useNetwork } from "../contexts/NetworkContext";
 
 const Sandbox: React.FC = () => {
+  const { active: activeNetwork } = useNetwork();
   const [files, setFiles] = useState<Map<string, SandboxFile>>(new Map());
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
@@ -41,6 +44,14 @@ const Sandbox: React.FC = () => {
       if (!template) throw new Error("Template not found");
 
       const templateMap = new Map(Object.entries(template.files));
+      for (const [path, file] of templateMap) {
+        if (path.endsWith(".env") || path.endsWith(".env.example")) {
+          templateMap.set(path, {
+            ...file,
+            content: applyNetworkToEnvContent(file.content, activeNetwork),
+          });
+        }
+      }
       setFiles(templateMap);
       setSelectedFile(Object.keys(template.files)[0]);
 
