@@ -1,6 +1,15 @@
 import { BatchCall } from "./types/batch";
 
-const BASE = "/api";
+// Resolves the indexer API base URL from VITE_API_URL. Leaving it unset
+// keeps the relative "/api" path, which relies on the dev-server proxy
+// (vite.config.ts) or nginx (nginx.conf) to reach the indexer.
+export function resolveApiBase(
+  env: { VITE_API_URL?: string } = import.meta.env,
+): string {
+  return `${env.VITE_API_URL ?? ""}/api`;
+}
+
+const BASE = resolveApiBase();
 
 export interface SpecType {
   kind: "struct" | "enum" | "union" | "error_enum";
