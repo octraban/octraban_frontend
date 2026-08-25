@@ -153,10 +153,12 @@ Copy `.env.example` → `.env` and adjust:
 | Variable                  | Default                               | Description                                |
 | ------------------------- | ------------------------------------- | ------------------------------------------ |
 | `VITE_INDEXER_URL`        | `http://localhost:3001`               | Octraban indexer API the UI reads from     |
-| `VITE_SOROBAN_RPC_URL`    | `https://soroban-testnet.stellar.org` | Soroban RPC endpoint (used by the Sandbox) |
+| `VITE_SOROBAN_RPC_URL`    | `https://soroban-testnet.stellar.org` | Soroban RPC endpoint                       |
 | `VITE_NETWORK_PASSPHRASE` | `Test SDF Network ; September 2015`   | Stellar network passphrase                 |
 
 The defaults point at **Stellar testnet**, so a fresh checkout talks to the live testnet deployment out of the box.
+
+Both variables are resolved by a single module, [`src/config/network.ts`](src/config/network.ts), rather than being read ad hoc — anywhere the app builds, simulates, or signs a transaction (Sandbox template scaffolding, SDK snippet generation) reads the RPC URL and passphrase from there (directly, or via `useNetwork()`'s `active` network, which is seeded from it). Switching networks at runtime — including adding a custom RPC endpoint — is handled by the network switcher in the header, which layers builtin (testnet/mainnet/futurenet) and custom networks on top of this env-configured default.
 
 ---
 

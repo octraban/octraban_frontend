@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { resolveActiveNetwork } from "../config/network";
 
 export type NetworkKind = "testnet" | "mainnet" | "futurenet" | "custom";
 
@@ -21,14 +22,16 @@ export interface NetworkConfig {
   custom?: boolean;
 }
 
+const defaultNetwork = resolveActiveNetwork();
+
 export const BUILTIN_NETWORKS: NetworkConfig[] = [
   {
-    id: "testnet",
+    id: defaultNetwork.id,
     kind: "testnet",
-    name: "Testnet",
-    rpcUrl: "https://soroban-testnet.stellar.org",
-    horizonUrl: "https://horizon-testnet.stellar.org",
-    passphrase: "Test SDF Network ; September 2015",
+    name: defaultNetwork.name,
+    rpcUrl: defaultNetwork.rpcUrl,
+    horizonUrl: defaultNetwork.horizonUrl,
+    passphrase: defaultNetwork.passphrase,
   },
   {
     id: "mainnet",
