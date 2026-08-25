@@ -7,16 +7,56 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  DEFAULT_NETWORK_ID,
-  getBuiltinNetworks,
-  NETWORK_COLORS,
-  type NetworkConfig,
-  type NetworkKind,
-} from "../config/network";
+import { resolveActiveNetwork } from "../config/network";
 
-export type { NetworkConfig, NetworkKind };
-export { NETWORK_COLORS };
+export type NetworkKind = "testnet" | "mainnet" | "futurenet" | "custom";
+
+export interface NetworkConfig {
+  id: string;
+  kind: NetworkKind;
+  name: string;
+  rpcUrl: string;
+  horizonUrl: string;
+  passphrase: string;
+  /** Custom networks only — removable, persisted to localStorage. */
+  custom?: boolean;
+}
+
+const defaultNetwork = resolveActiveNetwork();
+
+export const BUILTIN_NETWORKS: NetworkConfig[] = [
+  {
+    id: defaultNetwork.id,
+    kind: "testnet",
+    name: defaultNetwork.name,
+    rpcUrl: defaultNetwork.rpcUrl,
+    horizonUrl: defaultNetwork.horizonUrl,
+    passphrase: defaultNetwork.passphrase,
+  },
+  {
+    id: "mainnet",
+    kind: "mainnet",
+    name: "Mainnet",
+    rpcUrl: "https://mainnet.sorobanrpc.com",
+    horizonUrl: "https://horizon.stellar.org",
+    passphrase: "Public Global Stellar Network ; September 2015",
+  },
+  {
+    id: "futurenet",
+    kind: "futurenet",
+    name: "Futurenet",
+    rpcUrl: "https://rpc-futurenet.stellar.org",
+    horizonUrl: "https://horizon-futurenet.stellar.org",
+    passphrase: "Test SDF Future Network ; October 2022",
+  },
+];
+
+export const NETWORK_COLORS: Record<NetworkKind, string> = {
+  testnet: "#f59e0b",
+  mainnet: "#3b82f6",
+  futurenet: "#a855f7",
+  custom: "#22c55e",
+};
 
 const ACTIVE_KEY = "sb-network-active";
 const CUSTOM_KEY = "sb-network-custom";

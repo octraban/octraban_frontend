@@ -1,20 +1,40 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { NetworkProvider } from "../src/contexts/NetworkContext";
+/**
+ * Verifies the Sandbox page scaffolds template files using the passphrase
+ * and RPC URL resolved by src/config/network.ts, rather than a hardcoded
+ * value, so the WebContainer templates always match the app's configured
+ * network.
+ */
 
-const mountFilesMock = vi.fn().mockResolvedValue(undefined);
-const initWebContainerMock = vi.fn().mockResolvedValue({});
-const runCommandMock = vi.fn().mockResolvedValue(0);
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import Sandbox from "../src/pages/Sandbox";
+import type { SandboxFile } from "../src/services/webcontainer";
 
-vi.mock("../src/services/webcontainer", async () => {
-  const actual = await vi.importActual<
-    typeof import("../src/services/webcontainer")
-  >("../src/services/webcontainer");
+const { mockNetwork, mountFiles } = vi.hoisted(() => ({
+  mockNetwork: {
+    id: "testnet",
+    name: "Testnet",
+    rpcUrl: "https://mock-rpc.example.com",
+    horizonUrl: "https://mock-horizon.example.com",
+    passphrase: "Mock Network Passphrase ; 2026",
+  },
+  mountFiles: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock("../src/config/network", () => ({
+  resolveActiveNetwork: vi.fn(() => mockNetwork),
+  DEFAULT_NETWORK: mockNetwork,
+}));
+
+vi.mock("../src/services/webcontainer", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../src/services/webcontainer")>();
   return {
     ...actual,
-    initWebContainer: (...args: unknown[]) => initWebContainerMock(...args),
-    mountFiles: (...args: unknown[]) => mountFilesMock(...args),
-    runCommand: (...args: unknown[]) => runCommandMock(...args),
+    initWebContainer: vi.fn().mockResolvedValue({}),
+    mountFiles,
+    runCommand: vi.fn().mockResolvedValue(0),
   };
 });
 
@@ -22,58 +42,36 @@ vi.mock("../src/services/sandbox-api", () => ({
   saveSandbox: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock("../src/components/Editor", () => ({
-  default: () => <div data-testid="mock-editor" />,
+vi.mock("../src/services/session", () => ({
+  createAutoSaver: vi.fn(() => vi.fn()),
 }));
 
-const MOCK_RPC_URL = "https://mock-rpc.example.com";
-const MOCK_PASSPHRASE = "Mock Passphrase ; For Testing";
+vi.mock("../src/components/Editor", () => ({ default: () => null }));
+vi.mock("../src/components/FileExplorer", () => ({ default: () => null }));
+vi.mock("../src/components/Terminal", () => ({ default: () => null }));
+vi.mock("../src/components/Preview", () => ({ default: () => null }));
+vi.mock("../src/components/ActionBar", () => ({ default: () => null }));
 
-vi.mock("../src/config/network", async () => {
-  const actual = await vi.importActual<
-    typeof import("../src/config/network")
-  >("../src/config/network");
-  return {
-    ...actual,
-    getBuiltinNetworks: () => [
-      {
-        id: "testnet",
-        kind: "testnet" as const,
-        name: "Testnet",
-        rpcUrl: MOCK_RPC_URL,
-        horizonUrl: "https://mock-horizon.example.com",
-        passphrase: MOCK_PASSPHRASE,
-      },
-    ],
-  };
+afterEach(() => {
+  vi.clearAllMocks();
 });
 
-import Sandbox from "../src/pages/Sandbox";
-
 describe("Sandbox", () => {
-  beforeEach(() => {
-    localStorage.clear();
-    mountFilesMock.mockClear();
-  });
+  it("scaffolds the selected template with the resolved network's passphrase and RPC URL", async () => {
+    const user = userEvent.setup();
+    render(<Sandbox />);
 
-  it("mounts the sandbox with the resolved network's RPC URL and passphrase", async () => {
-    render(
-      <NetworkProvider>
-        <Sandbox />
-      </NetworkProvider>,
-    );
+    const templateButton = await screen.findByText("Node.js SDK");
+    await user.click(templateButton);
 
-    fireEvent.click(await screen.findByText(/Node\.js SDK/i));
+    await waitFor(() => {
+      expect(mountFiles).toHaveBeenCalled();
+    });
 
-    await waitFor(() => expect(mountFilesMock).toHaveBeenCalled());
+    const filesMap = mountFiles.mock.calls[0][1] as Map<string, SandboxFile>;
+    const envFile = filesMap.get(".env");
 
-    const mountedFiles = mountFilesMock.mock.calls[0][1] as Map<
-      string,
-      { content: string }
-    >;
-    const envFile = mountedFiles.get(".env");
-
-    expect(envFile?.content).toContain(MOCK_RPC_URL);
-    expect(envFile?.content).toContain(MOCK_PASSPHRASE);
+    expect(envFile?.content).toContain(mockNetwork.rpcUrl);
+    expect(envFile?.content).toContain(mockNetwork.passphrase);
   });
 });

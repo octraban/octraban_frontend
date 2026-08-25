@@ -1,4 +1,9 @@
 import { SandboxFile } from "./webcontainer";
+import {
+  DEFAULT_NETWORK,
+  resolveActiveNetwork,
+  type ResolvedNetworkConfig,
+} from "../config/network";
 
 export interface Template {
   name: string;
@@ -6,7 +11,10 @@ export interface Template {
   files: Record<string, SandboxFile>;
 }
 
-export const TEMPLATES: Record<string, Template> = {
+function buildTemplates(
+  network: ResolvedNetworkConfig,
+): Record<string, Template> {
+  return {
   "node-sdk": {
     name: "Node.js SDK",
     description: "Event listener using Octraban SDK",
@@ -65,7 +73,8 @@ await explorer.start();
       ".env": {
         path: ".env",
         language: "plaintext",
-        content: `SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+        content: `SOROBAN_RPC_URL=${network.rpcUrl}
+NETWORK_PASSPHRASE="${network.passphrase}"
 EXPLORER_CONTRACT_ID=CABCD1234567890ABCD1234567890ABCD1234567890ABCD1234567890ABC
 `,
       },
@@ -188,7 +197,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       ".env.example": {
         path: ".env.example",
         language: "plaintext",
-        content: `VITE_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+        content: `VITE_SOROBAN_RPC_URL=${network.rpcUrl}
+VITE_NETWORK_PASSPHRASE="${network.passphrase}"
 `,
       },
     },
@@ -239,7 +249,8 @@ aiohttp==3.9.0
       ".env": {
         path: ".env",
         language: "plaintext",
-        content: `SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+        content: `SOROBAN_RPC_URL=${network.rpcUrl}
+NETWORK_PASSPHRASE="${network.passphrase}"
 EXPLORER_CONTRACT_ID=CABCD1234567890ABCD1234567890ABCD1234567890ABCD1234567890ABC
 `,
       },
@@ -317,7 +328,7 @@ out = "out"
 libs = ["lib"]
 
 [rpc_endpoints]
-testnet = "https://soroban-testnet.stellar.org"
+testnet = "${network.rpcUrl}"
 `,
       },
       "src/Counter.sol": {
@@ -357,10 +368,20 @@ contract Deploy is Script {
       },
     },
   },
-};
+  };
+}
 
-export function getTemplate(name: string): Template | undefined {
-  return TEMPLATES[name];
+// Kept for callers that only need name/description (e.g. the template
+// picker) and don't care which network the scaffolded files resolve to.
+export const TEMPLATES: Record<string, Template> = buildTemplates(
+  DEFAULT_NETWORK,
+);
+
+export function getTemplate(
+  name: string,
+  network: ResolvedNetworkConfig = resolveActiveNetwork(),
+): Template | undefined {
+  return buildTemplates(network)[name];
 }
 
 export function listTemplates(): Array<{
