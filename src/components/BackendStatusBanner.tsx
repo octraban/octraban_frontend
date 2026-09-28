@@ -120,14 +120,14 @@ export default function BackendStatusBanner() {
         . Contract data, events, and search results will not load until the
         backend is running. See the{" "}
         <a
-          href="https://github.com/pharuq411/octraban_frontend#-how-it-fits-together"
+          href="https://github.com/pharuq411/octraban_backend"
           target="_blank"
           rel="noreferrer noopener"
           style={{ color: "var(--accent, #58a6ff)" }}
         >
-          setup guide
+          backend repository
         </a>{" "}
-        for instructions.
+        for setup instructions.
       </div>
 
       {/* Dismiss */}
