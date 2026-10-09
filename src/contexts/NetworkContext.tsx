@@ -88,16 +88,16 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
   const [customNetworks, setCustomNetworks] =
     useState<NetworkConfig[]>(loadCustomNetworks);
   const [activeId, setActiveIdState] = useState<string>(
-    () => localStorage.getItem(ACTIVE_KEY) || BUILTIN_NETWORKS[0].id,
+    () => localStorage.getItem(ACTIVE_KEY) || DEFAULT_NETWORK_ID,
   );
 
   const networks = useMemo(
-    () => [...BUILTIN_NETWORKS, ...customNetworks],
+    () => [...getBuiltinNetworks(), ...customNetworks],
     [customNetworks],
   );
 
   const active = useMemo(
-    () => networks.find((n) => n.id === activeId) ?? BUILTIN_NETWORKS[0],
+    () => networks.find((n) => n.id === activeId) ?? networks[0],
     [networks, activeId],
   );
 
@@ -128,7 +128,7 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
   const removeCustomNetwork = useCallback(
     (id: string) => {
       setCustomNetworks((prev) => prev.filter((n) => n.id !== id));
-      if (activeId === id) setActiveId(BUILTIN_NETWORKS[0].id);
+      if (activeId === id) setActiveId(DEFAULT_NETWORK_ID);
     },
     [activeId, setActiveId],
   );
