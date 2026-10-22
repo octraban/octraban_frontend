@@ -22,10 +22,15 @@ const { mockNetwork, mountFiles } = vi.hoisted(() => ({
   mountFiles: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock("../src/config/network", () => ({
-  resolveActiveNetwork: vi.fn(() => mockNetwork),
-  DEFAULT_NETWORK: mockNetwork,
-}));
+vi.mock("../src/config/network", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../src/config/network")>();
+  return {
+    ...actual,
+    resolveActiveNetwork: vi.fn(() => mockNetwork),
+    DEFAULT_NETWORK: mockNetwork,
+  };
+});
 
 vi.mock("../src/services/webcontainer", async (importOriginal) => {
   const actual =

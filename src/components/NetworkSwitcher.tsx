@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { NETWORK_COLORS, type NetworkConfig } from "../config/network";
-import { useNetwork } from "../contexts/NetworkContext";
+import {
+  NETWORK_COLORS,
+  useNetwork,
+  type NetworkConfig,
+} from "../contexts/NetworkContext";
 
 type HealthState = "checking" | "connected" | "degraded" | "down";
 

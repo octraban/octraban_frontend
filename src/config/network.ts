@@ -34,3 +34,22 @@ export function resolveActiveNetwork(
     passphrase: env.VITE_NETWORK_PASSPHRASE || DEFAULT_NETWORK.passphrase,
   };
 }
+
+/**
+ * Rewrite a template's `.env` content to target the given network: swap the
+ * default testnet RPC URL for the network's RPC URL, and set (or append) the
+ * network passphrase. Used when scaffolding sandbox templates so generated
+ * projects point at the active network.
+ */
+export function applyNetworkToEnvContent(
+  content: string,
+  network: { rpcUrl: string; passphrase: string },
+): string {
+  let updated = content.split(DEFAULT_NETWORK.rpcUrl).join(network.rpcUrl);
+  if (/^.*PASSPHRASE=.*$/m.test(updated)) {
+    updated = updated.replace(/^(.*PASSPHRASE=).*$/m, `$1${network.passphrase}`);
+  } else {
+    updated = `${updated.trimEnd()}\nNETWORK_PASSPHRASE=${network.passphrase}\n`;
+  }
+  return updated;
+}
