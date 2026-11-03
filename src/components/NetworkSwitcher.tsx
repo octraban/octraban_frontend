@@ -1,9 +1,64 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { isValidHttpUrl } from "../config/network";
 import {
   NETWORK_COLORS,
   useNetwork,
   type NetworkConfig,
 } from "../contexts/NetworkContext";
+
+export { isValidHttpUrl };
+
+export interface CustomNetworkFormValues {
+  name: string;
+  rpcUrl: string;
+  horizonUrl: string;
+  passphrase: string;
+}
+
+export type CustomNetworkField = keyof CustomNetworkFormValues;
+
+export type CustomNetworkFormErrors = Partial<
+  Record<CustomNetworkField, string>
+>;
+
+export function validateCustomNetworkForm(
+  values: CustomNetworkFormValues,
+  existingNetworks: ReadonlyArray<Pick<NetworkConfig, "name">>,
+): CustomNetworkFormErrors {
+  const errors: CustomNetworkFormErrors = {};
+
+  const name = values.name.trim();
+  if (!name) {
+    errors.name = "Network name is required.";
+  } else {
+    const normalized = name.toLowerCase();
+    const isDuplicate = existingNetworks.some(
+      (n) => n.name.trim().toLowerCase() === normalized,
+    );
+    if (isDuplicate) {
+      errors.name = "A network with this name already exists.";
+    }
+  }
+
+  const rpcUrl = values.rpcUrl.trim();
+  if (!rpcUrl) {
+    errors.rpcUrl = "RPC URL is required.";
+  } else if (!isValidHttpUrl(rpcUrl)) {
+    errors.rpcUrl = "Enter a valid http(s) RPC URL.";
+  }
+
+  const horizonUrl = values.horizonUrl.trim();
+  if (horizonUrl && !isValidHttpUrl(horizonUrl)) {
+    errors.horizonUrl = "Enter a valid http(s) Horizon URL.";
+  }
+
+  const passphrase = values.passphrase.trim();
+  if (!passphrase) {
+    errors.passphrase = "Network passphrase is required.";
+  }
+
+  return errors;
+}
 
 type HealthState = "checking" | "connected" | "degraded" | "down";
 
@@ -12,19 +67,51 @@ interface Health {
   latencyMs: number | null;
 }
 
-async function probeNetwork(rpcUrl: string): Promise<Health> {
+type RpcCheckState = "idle" | HealthState;
+
+interface RpcCheck {
+  state: RpcCheckState;
+  latencyMs: number | null;
+}
+
+const PROBE_TIMEOUT_MS = 4000;
+const RPC_CHECK_DEBOUNCE_MS = 300;
+
+const INITIAL_FORM: CustomNetworkFormValues = {
+  name: "",
+  rpcUrl: "",
+  horizonUrl: "",
+  passphrase: "",
+};
+
+async function probeNetwork(
+  rpcUrl: string,
+  externalSignal?: AbortSignal,
+): Promise<Health> {
+  if (externalSignal?.aborted) {
+    return { state: "down", latencyMs: null };
+  }
+  const controller = new AbortController();
+  const onAbort = () => controller.abort();
+  externalSignal?.addEventListener("abort", onAbort, { once: true });
+  const timeoutId = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
+
   const start = performance.now();
   try {
     const res = await fetch(rpcUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getHealth" }),
+      signal: controller.signal,
     });
     const latencyMs = Math.round(performance.now() - start);
     if (!res.ok) return { state: "degraded", latencyMs };
     return { state: latencyMs > 1500 ? "degraded" : "connected", latencyMs };
   } catch {
     return { state: "down", latencyMs: null };
+  } finally {
+    clearTimeout(timeoutId);
+    externalSignal?.removeEventListener("abort", onAbort);
   }
 }
 
@@ -64,24 +151,49 @@ export default function NetworkSwitcher() {
     state: "checking",
     latencyMs: null,
   });
-  const [form, setForm] = useState({
-    name: "",
-    rpcUrl: "",
-    horizonUrl: "",
-    passphrase: "",
+  const [form, setForm] = useState<CustomNetworkFormValues>(INITIAL_FORM);
+  const [touched, setTouched] = useState<
+    Partial<Record<CustomNetworkField, boolean>>
+  >({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [rpcCheck, setRpcCheck] = useState<RpcCheck>({
+    state: "idle",
+    latencyMs: null,
   });
-  const [formError, setFormError] = useState<string | null>(null);
-  const [validating, setValidating] = useState(false);
+
   const rootRef = useRef<HTMLDivElement>(null);
+  const rpcCheckAbortRef = useRef<AbortController | null>(null);
+  const rpcCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelPendingRpcCheck = useCallback(() => {
+    if (rpcCheckTimerRef.current != null) {
+      clearTimeout(rpcCheckTimerRef.current);
+      rpcCheckTimerRef.current = null;
+    }
+    if (rpcCheckAbortRef.current != null) {
+      rpcCheckAbortRef.current.abort();
+      rpcCheckAbortRef.current = null;
+    }
+  }, []);
+
+  const resetAddForm = useCallback(() => {
+    cancelPendingRpcCheck();
+    setForm(INITIAL_FORM);
+    setTouched({});
+    setSubmitAttempted(false);
+    setRpcCheck({ state: "idle", latencyMs: null });
+  }, [cancelPendingRpcCheck]);
 
   useEffect(() => {
     let cancelled = false;
+    const controller = new AbortController();
     setHealth({ state: "checking", latencyMs: null });
-    probeNetwork(active.rpcUrl).then((h) => {
-      if (!cancelled) setHealth(h);
+    void probeNetwork(active.rpcUrl, controller.signal).then((h) => {
+      if (!cancelled && !controller.signal.aborted) setHealth(h);
     });
     return () => {
       cancelled = true;
+      controller.abort();
     };
   }, [active.id, active.rpcUrl]);
 
@@ -91,12 +203,17 @@ export default function NetworkSwitcher() {
         e.preventDefault();
         setOpen((o) => !o);
       }
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        setShowAddForm(false);
+        resetAddForm();
+      }
     }
     function onClickOutside(e: MouseEvent) {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
         setOpen(false);
         setShowAddForm(false);
+        resetAddForm();
       }
     }
     window.addEventListener("keydown", onKey);
@@ -105,24 +222,71 @@ export default function NetworkSwitcher() {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("mousedown", onClickOutside);
     };
-  }, []);
+  }, [resetAddForm]);
 
-  async function handleAddNetwork(e: React.FormEvent) {
+  const errors = useMemo(
+    () => validateCustomNetworkForm(form, networks),
+    [form, networks],
+  );
+  const isFormValid = Object.keys(errors).length === 0;
+  const trimmedRpcUrl = form.rpcUrl.trim();
+  const canProbeRpc = showAddForm && Boolean(trimmedRpcUrl) && !errors.rpcUrl;
+
+  const runRpcCheck = useCallback(
+    (url: string) => {
+      cancelPendingRpcCheck();
+      const controller = new AbortController();
+      rpcCheckAbortRef.current = controller;
+      setRpcCheck({ state: "checking", latencyMs: null });
+      void probeNetwork(url, controller.signal).then((result) => {
+        if (!controller.signal.aborted) {
+          setRpcCheck(result);
+        }
+      });
+    },
+    [cancelPendingRpcCheck],
+  );
+
+  useEffect(() => {
+    if (!canProbeRpc) {
+      cancelPendingRpcCheck();
+      setRpcCheck({ state: "idle", latencyMs: null });
+      return;
+    }
+
+    rpcCheckTimerRef.current = setTimeout(() => {
+      rpcCheckTimerRef.current = null;
+      runRpcCheck(trimmedRpcUrl);
+    }, RPC_CHECK_DEBOUNCE_MS);
+
+    return () => {
+      cancelPendingRpcCheck();
+    };
+  }, [canProbeRpc, trimmedRpcUrl, runRpcCheck, cancelPendingRpcCheck]);
+
+  function updateField(field: CustomNetworkField, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    setTouched((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
+  }
+
+  function markTouched(field: CustomNetworkField) {
+    setTouched((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
+  }
+
+  function fieldError(field: CustomNetworkField): string | undefined {
+    if (!touched[field] && !submitAttempted) return undefined;
+    return errors[field];
+  }
+
+  function handleAddNetwork(e: React.FormEvent) {
     e.preventDefault();
-    setFormError(null);
-    if (!form.name.trim() || !form.rpcUrl.trim() || !form.passphrase.trim()) {
-      setFormError("Name, RPC URL, and passphrase are required.");
+    setSubmitAttempted(true);
+
+    const currentErrors = validateCustomNetworkForm(form, networks);
+    if (Object.keys(currentErrors).length > 0) {
       return;
     }
-    setValidating(true);
-    const probed = await probeNetwork(form.rpcUrl.trim());
-    setValidating(false);
-    if (probed.state === "down") {
-      setFormError(
-        "Could not reach this RPC URL. Check the address and try again.",
-      );
-      return;
-    }
+
     const network = addCustomNetwork({
       name: form.name.trim(),
       rpcUrl: form.rpcUrl.trim(),
@@ -130,9 +294,14 @@ export default function NetworkSwitcher() {
       passphrase: form.passphrase.trim(),
     });
     setActiveId(network.id);
-    setForm({ name: "", rpcUrl: "", horizonUrl: "", passphrase: "" });
+    resetAddForm();
     setShowAddForm(false);
   }
+
+  const nameError = fieldError("name");
+  const rpcUrlError = fieldError("rpcUrl");
+  const horizonUrlError = fieldError("horizonUrl");
+  const passphraseError = fieldError("passphrase");
 
   return (
     <div ref={rootRef} style={{ position: "relative" }}>
@@ -170,7 +339,7 @@ export default function NetworkSwitcher() {
             position: "absolute",
             top: "calc(100% + 6px)",
             right: 0,
-            minWidth: 260,
+            minWidth: 280,
             background: "var(--surface)",
             border: "1px solid var(--border)",
             borderRadius: 8,
@@ -250,57 +419,208 @@ export default function NetworkSwitcher() {
             </button>
           ) : (
             <form
+              noValidate
               onSubmit={handleAddNetwork}
               style={{ display: "flex", flexDirection: "column", gap: 6 }}
             >
-              <input
-                placeholder="Name (e.g. Local RPC)"
-                value={form.name}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, name: e.target.value }))
-                }
-                style={{ fontSize: 12 }}
-              />
-              <input
-                placeholder="RPC URL"
-                value={form.rpcUrl}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, rpcUrl: e.target.value }))
-                }
-                style={{ fontSize: 12 }}
-              />
-              <input
-                placeholder="Horizon URL (optional)"
-                value={form.horizonUrl}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, horizonUrl: e.target.value }))
-                }
-                style={{ fontSize: 12 }}
-              />
-              <input
-                placeholder="Network passphrase"
-                value={form.passphrase}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, passphrase: e.target.value }))
-                }
-                style={{ fontSize: 12 }}
-              />
-              {formError && (
-                <p style={{ color: "#f85149", fontSize: 11, margin: 0 }}>
-                  {formError}
-                </p>
-              )}
+              <div>
+                <input
+                  aria-label="Network name"
+                  aria-invalid={Boolean(nameError)}
+                  aria-describedby={
+                    nameError ? "custom-network-name-error" : undefined
+                  }
+                  placeholder="Name (e.g. Local RPC)"
+                  value={form.name}
+                  onChange={(e) => updateField("name", e.target.value)}
+                  onBlur={() => markTouched("name")}
+                  style={{
+                    fontSize: 12,
+                    width: "100%",
+                    borderColor: nameError ? "#f85149" : undefined,
+                  }}
+                />
+                {nameError && (
+                  <p
+                    id="custom-network-name-error"
+                    role="alert"
+                    style={{
+                      color: "#f85149",
+                      fontSize: 11,
+                      margin: "2px 0 0",
+                    }}
+                  >
+                    {nameError}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <div style={{ display: "flex", gap: 4 }}>
+                  <input
+                    aria-label="RPC URL"
+                    aria-invalid={Boolean(rpcUrlError)}
+                    aria-describedby={
+                      rpcUrlError ? "custom-network-rpc-error" : undefined
+                    }
+                    placeholder="RPC URL"
+                    value={form.rpcUrl}
+                    onChange={(e) => updateField("rpcUrl", e.target.value)}
+                    onBlur={() => markTouched("rpcUrl")}
+                    style={{
+                      fontSize: 12,
+                      flex: 1,
+                      minWidth: 0,
+                      borderColor: rpcUrlError ? "#f85149" : undefined,
+                    }}
+                  />
+                  <button
+                    type="button"
+                    disabled={!canProbeRpc || rpcCheck.state === "checking"}
+                    onClick={() => runRpcCheck(trimmedRpcUrl)}
+                    style={{
+                      fontSize: 11,
+                      padding: "4px 8px",
+                      background: "transparent",
+                      border: "1px solid var(--border)",
+                      color: "var(--text)",
+                      opacity:
+                        !canProbeRpc || rpcCheck.state === "checking" ? 0.5 : 1,
+                      cursor:
+                        !canProbeRpc || rpcCheck.state === "checking"
+                          ? "not-allowed"
+                          : "pointer",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Check RPC
+                  </button>
+                </div>
+                {rpcUrlError && (
+                  <p
+                    id="custom-network-rpc-error"
+                    role="alert"
+                    style={{
+                      color: "#f85149",
+                      fontSize: 11,
+                      margin: "2px 0 0",
+                    }}
+                  >
+                    {rpcUrlError}
+                  </p>
+                )}
+                {!rpcUrlError && rpcCheck.state !== "idle" && (
+                  <p
+                    role="status"
+                    aria-live="polite"
+                    data-testid="rpc-reachability-status"
+                    style={{
+                      fontSize: 11,
+                      margin: "2px 0 0",
+                      color:
+                        rpcCheck.state === "connected"
+                          ? "#22c55e"
+                          : rpcCheck.state === "checking"
+                            ? "var(--muted)"
+                            : "#f59e0b",
+                    }}
+                  >
+                    {rpcCheck.state === "checking" && "Checking RPC endpoint…"}
+                    {rpcCheck.state === "connected" &&
+                      `RPC reachable${rpcCheck.latencyMs != null ? ` (${rpcCheck.latencyMs}ms)` : ""}`}
+                    {rpcCheck.state === "degraded" &&
+                      "RPC responded with a non-OK status — you can still save."}
+                    {rpcCheck.state === "down" &&
+                      "Could not reach RPC endpoint — you can still save."}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  aria-label="Horizon URL (optional)"
+                  aria-invalid={Boolean(horizonUrlError)}
+                  aria-describedby={
+                    horizonUrlError ? "custom-network-horizon-error" : undefined
+                  }
+                  placeholder="Horizon URL (optional)"
+                  value={form.horizonUrl}
+                  onChange={(e) => updateField("horizonUrl", e.target.value)}
+                  onBlur={() => markTouched("horizonUrl")}
+                  style={{
+                    fontSize: 12,
+                    width: "100%",
+                    borderColor: horizonUrlError ? "#f85149" : undefined,
+                  }}
+                />
+                {horizonUrlError && (
+                  <p
+                    id="custom-network-horizon-error"
+                    role="alert"
+                    style={{
+                      color: "#f85149",
+                      fontSize: 11,
+                      margin: "2px 0 0",
+                    }}
+                  >
+                    {horizonUrlError}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  aria-label="Network passphrase"
+                  aria-invalid={Boolean(passphraseError)}
+                  aria-describedby={
+                    passphraseError
+                      ? "custom-network-passphrase-error"
+                      : undefined
+                  }
+                  placeholder="Network passphrase"
+                  value={form.passphrase}
+                  onChange={(e) => updateField("passphrase", e.target.value)}
+                  onBlur={() => markTouched("passphrase")}
+                  style={{
+                    fontSize: 12,
+                    width: "100%",
+                    borderColor: passphraseError ? "#f85149" : undefined,
+                  }}
+                />
+                {passphraseError && (
+                  <p
+                    id="custom-network-passphrase-error"
+                    role="alert"
+                    style={{
+                      color: "#f85149",
+                      fontSize: 11,
+                      margin: "2px 0 0",
+                    }}
+                  >
+                    {passphraseError}
+                  </p>
+                )}
+              </div>
+
               <div style={{ display: "flex", gap: 6 }}>
                 <button
                   type="submit"
-                  disabled={validating}
-                  style={{ flex: 1, fontSize: 12 }}
+                  disabled={!isFormValid}
+                  style={{
+                    flex: 1,
+                    fontSize: 12,
+                    opacity: isFormValid ? 1 : 0.5,
+                    cursor: isFormValid ? "pointer" : "not-allowed",
+                  }}
                 >
-                  {validating ? "Validating…" : "Save & switch"}
+                  Save & switch
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowAddForm(false)}
+                  onClick={() => {
+                    resetAddForm();
+                    setShowAddForm(false);
+                  }}
                   style={{ fontSize: 12 }}
                 >
                   Cancel

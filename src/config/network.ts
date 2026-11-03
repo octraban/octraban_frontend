@@ -47,9 +47,35 @@ export function applyNetworkToEnvContent(
 ): string {
   let updated = content.split(DEFAULT_NETWORK.rpcUrl).join(network.rpcUrl);
   if (/^.*PASSPHRASE=.*$/m.test(updated)) {
-    updated = updated.replace(/^(.*PASSPHRASE=).*$/m, `$1${network.passphrase}`);
+    updated = updated.replace(
+      /^(.*PASSPHRASE=).*$/m,
+      `$1${network.passphrase}`,
+    );
   } else {
     updated = `${updated.trimEnd()}\nNETWORK_PASSPHRASE=${network.passphrase}\n`;
   }
   return updated;
+}
+
+export function isValidHttpUrl(value: string): boolean {
+  const trimmed = value.trim();
+  if (!trimmed || /\s/.test(trimmed)) return false;
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return false;
+    }
+    const host = parsed.hostname;
+    if (
+      !host ||
+      host.startsWith(".") ||
+      host.endsWith(".") ||
+      host.includes("..")
+    ) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
 }
