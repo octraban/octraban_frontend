@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { resolveActiveNetwork } from "../config/network";
+import { isValidHttpUrl, resolveActiveNetwork } from "../config/network";
 
 export type NetworkKind = "testnet" | "mainnet" | "futurenet" | "custom";
 
@@ -61,12 +61,72 @@ export const NETWORK_COLORS: Record<NetworkKind, string> = {
 const ACTIVE_KEY = "sb-network-active";
 const CUSTOM_KEY = "sb-network-custom";
 
+let lastCustomId = 0;
+
+function readStorage(key: string): string | null {
+  try {
+    return typeof localStorage !== "undefined" &&
+      typeof localStorage?.getItem === "function"
+      ? localStorage.getItem(key)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(key: string, value: string): void {
+  try {
+    if (
+      typeof localStorage !== "undefined" &&
+      typeof localStorage?.setItem === "function"
+    ) {
+      localStorage.setItem(key, value);
+    }
+  } catch {
+    // Ignore storage quota or privacy-mode errors.
+  }
+}
+
+function isStoredCustomNetwork(entry: unknown): entry is NetworkConfig {
+  if (!entry || typeof entry !== "object") return false;
+  const candidate = entry as Record<string, unknown>;
+  if (
+    typeof candidate.id !== "string" ||
+    !candidate.id.trim() ||
+    typeof candidate.name !== "string" ||
+    !candidate.name.trim() ||
+    typeof candidate.rpcUrl !== "string" ||
+    !isValidHttpUrl(candidate.rpcUrl) ||
+    typeof candidate.passphrase !== "string" ||
+    !candidate.passphrase.trim()
+  ) {
+    return false;
+  }
+  if (
+    typeof candidate.horizonUrl === "string" &&
+    candidate.horizonUrl.trim() !== "" &&
+    !isValidHttpUrl(candidate.horizonUrl)
+  ) {
+    return false;
+  }
+  return true;
+}
+
 function loadCustomNetworks(): NetworkConfig[] {
   try {
-    const raw = localStorage.getItem(CUSTOM_KEY);
+    const raw = readStorage(CUSTOM_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isStoredCustomNetwork).map((n) => ({
+      ...n,
+      name: n.name.trim(),
+      rpcUrl: n.rpcUrl.trim(),
+      horizonUrl: typeof n.horizonUrl === "string" ? n.horizonUrl.trim() : "",
+      passphrase: n.passphrase.trim(),
+      kind: "custom",
+      custom: true,
+    }));
   } catch {
     return [];
   }
@@ -88,7 +148,7 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
   const [customNetworks, setCustomNetworks] =
     useState<NetworkConfig[]>(loadCustomNetworks);
   const [activeId, setActiveIdState] = useState<string>(
-    () => localStorage.getItem(ACTIVE_KEY) || defaultNetwork.id,
+    () => readStorage(ACTIVE_KEY) || defaultNetwork.id,
   );
 
   const networks = useMemo(
@@ -102,19 +162,42 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    localStorage.setItem(CUSTOM_KEY, JSON.stringify(customNetworks));
+    writeStorage(CUSTOM_KEY, JSON.stringify(customNetworks));
   }, [customNetworks]);
 
   const setActiveId = useCallback((id: string) => {
     setActiveIdState(id);
-    localStorage.setItem(ACTIVE_KEY, id);
+    writeStorage(ACTIVE_KEY, id);
   }, []);
 
   const addCustomNetwork = useCallback(
     (network: Omit<NetworkConfig, "id" | "kind" | "custom">) => {
-      const id = `custom-${Date.now()}`;
+      const name = network.name.trim();
+      const rpcUrl = network.rpcUrl.trim();
+      const horizonUrl = network.horizonUrl.trim();
+      const passphrase = network.passphrase.trim();
+
+      if (!name) {
+        throw new Error("Network name is required.");
+      }
+      if (!isValidHttpUrl(rpcUrl)) {
+        throw new Error("Enter a valid http(s) RPC URL.");
+      }
+      if (horizonUrl && !isValidHttpUrl(horizonUrl)) {
+        throw new Error("Enter a valid http(s) Horizon URL.");
+      }
+      if (!passphrase) {
+        throw new Error("Network passphrase is required.");
+      }
+
+      const nextId = Math.max(Date.now(), lastCustomId + 1);
+      lastCustomId = nextId;
+      const id = `custom-${nextId}`;
       const full: NetworkConfig = {
-        ...network,
+        name,
+        rpcUrl,
+        horizonUrl,
+        passphrase,
         id,
         kind: "custom",
         custom: true,
