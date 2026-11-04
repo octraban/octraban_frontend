@@ -11,22 +11,37 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { buildApiUrl } from "../api";
 
 /** How often to re-check when the backend is unreachable (ms). */
 const POLL_INTERVAL = 15_000;
 
-/** Resolved from VITE_INDEXER_URL at build time; falls back to localhost. */
-const INDEXER_URL =
-  (import.meta as unknown as { env: Record<string, string> }).env
-    .VITE_INDEXER_URL ?? "http://localhost:3001";
+export function resolveIndexerDisplayUrl(
+  env: { VITE_API_URL?: string; VITE_INDEXER_URL?: string } = import.meta.env,
+): string {
+  return (
+    env.VITE_API_URL?.trim() ||
+    env.VITE_INDEXER_URL?.trim() ||
+    "http://localhost:3001"
+  );
+}
+
+/** Resolved from VITE_API_URL or VITE_INDEXER_URL at build time; falls back to localhost. */
+const INDEXER_URL = resolveIndexerDisplayUrl();
 
 type Status = "checking" | "ok" | "unreachable";
 
-async function checkHealth(): Promise<boolean> {
+export async function checkHealth(
+  env: { VITE_API_URL?: string } = import.meta.env,
+): Promise<boolean> {
   try {
-    const res = await fetch("/api/health", {
+    const res = await fetch(buildApiUrl("/health", env), {
       signal: AbortSignal.timeout(4000),
     });
+    const contentType = res.headers?.get("content-type") ?? "";
+    if (contentType.includes("text/html")) {
+      return false;
+    }
     return res.ok;
   } catch {
     return false;

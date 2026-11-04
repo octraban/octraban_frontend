@@ -6,7 +6,44 @@ import { BatchCall } from "./types/batch";
 export function resolveApiBase(
   env: { VITE_API_URL?: string } = import.meta.env,
 ): string {
-  return `${env.VITE_API_URL ?? ""}/api`;
+  const configured = env.VITE_API_URL?.trim().replace(/\/+$/, "") ?? "";
+  if (!configured) {
+    return "/api";
+  }
+  return configured.endsWith("/api") ? configured : `${configured}/api`;
+}
+
+export function buildApiUrl(
+  path: string,
+  env: { VITE_API_URL?: string } = import.meta.env,
+): string {
+  const base = resolveApiBase(env);
+  const cleanPath = path.startsWith("/api/")
+    ? path.slice(4)
+    : path === "/api"
+      ? ""
+      : path.startsWith("/")
+        ? path
+        : `/${path}`;
+  return `${base}${cleanPath}`;
+}
+
+export function resolveWsUrl(
+  env: { VITE_API_URL?: string } = import.meta.env,
+  loc: Pick<Location, "protocol" | "host"> = window.location,
+): string {
+  const configured = env.VITE_API_URL?.trim() ?? "";
+  if (configured) {
+    try {
+      const parsed = new URL(configured);
+      const wsProtocol = parsed.protocol === "https:" ? "wss:" : "ws:";
+      return `${wsProtocol}//${parsed.host}`;
+    } catch {
+      // Fall back to window location when VITE_API_URL is relative or malformed.
+    }
+  }
+  const protocol = loc.protocol === "https:" ? "wss" : "ws";
+  return `${protocol}://${loc.host}`;
 }
 
 const BASE = resolveApiBase();
@@ -429,13 +466,21 @@ export interface NodeMetrics {
 }
 
 export interface DoctorReport {
-  runtimes: Record<string, { status: string; version?: string; message: string }>;
+  runtimes: Record<
+    string,
+    { status: string; version?: string; message: string }
+  >;
   database: { connected: boolean; message: string };
   env: Record<string, { status: string; value: string; message: string }>;
   ports: Record<string, { status: string; inUse: boolean; message: string }>;
   system: {
     disk: { status: string; freeGB?: string; message: string };
-    memory: { status: string; totalGB?: string; freeGB?: string; message: string };
+    memory: {
+      status: string;
+      totalGB?: string;
+      freeGB?: string;
+      message: string;
+    };
   };
   gitHooks: { status: string; message: string };
   docker: { status: string; message: string };
@@ -747,7 +792,11 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ databaseUrl }),
     }).then((r) => r.json()),
-  setupSaveConfig: (config: { sorobanRpcUrl: string; databaseUrl: string; pollMs: string }) =>
+  setupSaveConfig: (config: {
+    sorobanRpcUrl: string;
+    databaseUrl: string;
+    pollMs: string;
+  }) =>
     fetch(`${BASE}/setup/save-config`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

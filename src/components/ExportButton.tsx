@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { buildApiUrl } from "../api";
 
 type ExportTarget = "events" | "contracts";
 type ExportFormat = "csv" | "json";
@@ -29,7 +30,7 @@ export default function ExportButton({
     for (const [k, v] of Object.entries(params)) {
       if (v) q.set(k, v);
     }
-    return `/api/export/${target}?${q}`;
+    return buildApiUrl(`/export/${target}?${q}`);
   }
 
   function download(format: ExportFormat) {
