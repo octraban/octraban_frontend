@@ -11,7 +11,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import BackendStatusBanner from "../src/components/BackendStatusBanner";
+import BackendStatusBanner, {
+  checkHealth,
+  resolveIndexerDisplayUrl,
+} from "../src/components/BackendStatusBanner";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -131,5 +134,42 @@ describe("BackendStatusBanner", () => {
     await waitFor(() => {
       expect(screen.getByRole("alert")).toBeInTheDocument();
     });
+  });
+
+  it("resolves health URL from VITE_API_URL and rejects SPA HTML fallbacks", async () => {
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      headers: new Headers({ "content-type": "application/json" }),
+    });
+    await expect(
+      checkHealth({ VITE_API_URL: "https://indexer.example.com/" }),
+    ).resolves.toBe(true);
+    expect(global.fetch).toHaveBeenCalledWith(
+      "https://indexer.example.com/api/health",
+      expect.any(Object),
+    );
+
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      headers: new Headers({ "content-type": "text/html; charset=utf-8" }),
+    });
+    await expect(checkHealth({})).resolves.toBe(false);
+  });
+
+  it("prefers VITE_API_URL over VITE_INDEXER_URL for banner display text", () => {
+    expect(
+      resolveIndexerDisplayUrl({
+        VITE_API_URL: "https://indexer.example.com",
+        VITE_INDEXER_URL: "http://localhost:3001",
+      }),
+    ).toBe("https://indexer.example.com");
+    expect(
+      resolveIndexerDisplayUrl({
+        VITE_INDEXER_URL: "http://localhost:4000",
+      }),
+    ).toBe("http://localhost:4000");
+    expect(resolveIndexerDisplayUrl({})).toBe("http://localhost:3001");
   });
 });

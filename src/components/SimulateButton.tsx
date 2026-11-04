@@ -1,5 +1,6 @@
 // Contract execution simulation estimator button
 import { useState } from "react";
+import { buildApiUrl } from "../api";
 
 interface SimResult {
   success: boolean;
@@ -27,7 +28,7 @@ export default function SimulateButton({
     setLoading(true);
     setResult(null);
     try {
-      const res = await fetch("/api/simulate", {
+      const res = await fetch(buildApiUrl("/simulate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

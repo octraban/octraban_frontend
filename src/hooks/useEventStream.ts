@@ -3,12 +3,11 @@
  * Connects to the backend WebSocket and calls onEvent for each incoming event.
  */
 import { useEffect } from "react";
-import type { DecodedEvent } from "../api";
+import { resolveWsUrl, type DecodedEvent } from "../api";
 
 export function useEventStream(onEvent: (ev: DecodedEvent) => void) {
   useEffect(() => {
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const ws = new WebSocket(`${protocol}://${window.location.host}`);
+    const ws = new WebSocket(resolveWsUrl());
 
     ws.onmessage = (msg) => {
       try {

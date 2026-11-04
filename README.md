@@ -150,15 +150,16 @@ npm run dev               # http://localhost:5173
 
 Copy `.env.example` → `.env` and adjust:
 
-| Variable                  | Default                               | Description                                |
-| ------------------------- | ------------------------------------- | ------------------------------------------ |
-| `VITE_INDEXER_URL`        | `http://localhost:3001`               | Octraban indexer API the UI reads from     |
-| `VITE_SOROBAN_RPC_URL`    | `https://soroban-testnet.stellar.org` | Soroban RPC endpoint                       |
-| `VITE_NETWORK_PASSPHRASE` | `Test SDF Network ; September 2015`   | Stellar network passphrase                 |
+| Variable                  | Default                               | Description                                                                                  |
+| ------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `VITE_API_URL`            | _(unset → `/api`)_                    | Public indexer origin for static production builds (e.g. Vercel); unset uses relative `/api` |
+| `VITE_INDEXER_URL`        | `http://localhost:3001`               | Dev-server proxy target used by `npm run dev` (`vite.config.ts`)                             |
+| `VITE_SOROBAN_RPC_URL`    | `https://soroban-testnet.stellar.org` | Soroban RPC endpoint                                                                         |
+| `VITE_NETWORK_PASSPHRASE` | `Test SDF Network ; September 2015`   | Stellar network passphrase                                                                   |
 
 The defaults point at **Stellar testnet**, so a fresh checkout talks to the live testnet deployment out of the box.
 
-Both variables are resolved by a single module, [`src/config/network.ts`](src/config/network.ts), rather than being read ad hoc — anywhere the app builds, simulates, or signs a transaction (Sandbox template scaffolding, SDK snippet generation) reads the RPC URL and passphrase from there (directly, or via `useNetwork()`'s `active` network, which is seeded from it). Switching networks at runtime — including adding a custom RPC endpoint — is handled by the network switcher in the header, which layers builtin (testnet/mainnet/futurenet) and custom networks on top of this env-configured default.
+API URLs are resolved in one place by `resolveApiBase()` / `buildApiUrl()` in [`src/api.ts`](src/api.ts), while RPC and passphrase defaults are resolved by [`src/config/network.ts`](src/config/network.ts) — anywhere the app builds, simulates, or signs a transaction (Sandbox template scaffolding, SDK snippet generation) reads the RPC URL and passphrase from there (directly, or via `useNetwork()`'s `active` network, which is seeded from it). Switching networks at runtime — including adding a custom RPC endpoint — is handled by the network switcher in the header, which layers builtin (testnet/mainnet/futurenet) and custom networks on top of this env-configured default.
 
 ---
 
@@ -195,6 +196,17 @@ octraban_contract (deployed testnet contracts)
 ```
 
 In development, Vite proxies every `/api/*` request to `http://localhost:3001` (configured in `vite.config.ts`). The production Docker image uses nginx for the same proxy. **The frontend will display a banner and all data views will fail if the backend is not running.**
+
+### Deployment targets
+
+Each hosting environment reaches the `octraban_backend` indexer as follows:
+
+1. **Local development (`npm run dev` — Vite proxy):**
+   Leave `VITE_API_URL` unset. All API, SSE, and health requests use relative `/api/*` paths, which Vite's `server.proxy` in [`vite.config.ts`](vite.config.ts) forwards to `VITE_INDEXER_URL` (`http://localhost:3001` by default).
+2. **Docker / nginx ([`nginx.conf`](nginx.conf)):**
+   Leave `VITE_API_URL` unset at build time. Nginx serves the static `dist/` bundle on port `80` and proxies `location /api/` (including HTTP/1.1 `Upgrade` headers) to `http://indexer:3001`.
+3. **Vercel ([`vercel.json`](vercel.json)):**
+   Vercel deploys only the static Vite bundle and has no colocated backend process. Set `VITE_API_URL=https://<your-indexer-host>` in Vercel Project Environment Variables before building so `resolveApiBase()`, `buildApiUrl()`, and `resolveWsUrl()` route all `/api/*` REST, SSE, export, sandbox, health, and WebSocket traffic directly to the public indexer origin (ensure CORS on the indexer allows your Vercel domain). `vercel.json` scopes the SPA fallback rewrite to `/((?!api(?:/|$)).*)` → `/index.html` so unconfigured relative `/api` requests fail fast with `404` instead of returning `index.html` with `200 OK` and breaking JSON parsing. If you prefer same-origin HTTP proxying on Vercel, prepend `{ "source": "/api/:path*", "destination": "https://<your-indexer-host>/api/:path*" }` above the SPA rule in `vercel.json` (note that WebSockets still require direct connection via `VITE_API_URL`).
 
 ---
 

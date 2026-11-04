@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { buildApiUrl } from "../api";
 
 export type TxStatus =
   | "pending"
@@ -28,7 +29,9 @@ export function useTxStatus(txHash: string | null | undefined) {
   useEffect(() => {
     if (!txHash) return;
 
-    const es = new EventSource(`/api/transactions/${txHash}/status/stream`);
+    const es = new EventSource(
+      buildApiUrl(`/transactions/${txHash}/status/stream`),
+    );
 
     es.onmessage = (e) => {
       try {
@@ -45,7 +48,7 @@ export function useTxStatus(txHash: string | null | undefined) {
     es.onerror = () => {
       es.close();
       // Fallback: single poll
-      fetch(`/api/transactions/${txHash}/status`)
+      fetch(buildApiUrl(`/transactions/${txHash}/status`))
         .then((r) => r.json())
         .then(setPayload)
         .catch(() => {});

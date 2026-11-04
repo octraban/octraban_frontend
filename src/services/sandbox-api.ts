@@ -1,6 +1,5 @@
+import { buildApiUrl } from "../api";
 import { SandboxFile } from "./webcontainer";
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 export interface SavedSandbox {
   sandboxId: string;
@@ -22,7 +21,7 @@ export async function saveSandbox(
     filesObj[key] = file;
   }
 
-  const response = await fetch(`${API_BASE}/api/sandbox`, {
+  const response = await fetch(buildApiUrl("/sandbox"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -39,7 +38,7 @@ export async function saveSandbox(
 }
 
 export async function loadSandbox(sandboxId: string): Promise<SavedSandbox> {
-  const response = await fetch(`${API_BASE}/api/sandbox/${sandboxId}`);
+  const response = await fetch(buildApiUrl(`/sandbox/${sandboxId}`));
 
   if (!response.ok) {
     throw new Error(`Failed to load sandbox: ${response.statusText}`);
@@ -56,7 +55,7 @@ export async function listSandboxes(
   total: number;
 }> {
   const response = await fetch(
-    `${API_BASE}/api/sandboxes?limit=${limit}&offset=${offset}`,
+    buildApiUrl(`/sandboxes?limit=${limit}&offset=${offset}`),
   );
 
   if (!response.ok) {
@@ -67,7 +66,7 @@ export async function listSandboxes(
 }
 
 export async function deleteSandbox(sandboxId: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/api/sandbox/${sandboxId}`, {
+  const response = await fetch(buildApiUrl(`/sandbox/${sandboxId}`), {
     method: "DELETE",
   });
 
